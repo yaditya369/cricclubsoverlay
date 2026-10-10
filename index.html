@@ -487,12 +487,26 @@ function teamScore(v,p){
     rr:get(v,p+"RR","--")
   };
 }
+function showScore(n, t) {
+  $("name" + n).textContent = t.name;
 
-function showScore(n,t){
-  $("name"+n).textContent=t.name;
-  $("score"+n).textContent=`${t.total}/${t.wickets}`;
-  $("overs"+n).textContent=`Overs ${t.overs}`;
-  $("rr"+n).textContent=`RR ${t.rr}`;
+  const isZeroZero =
+    Number(t.total) === 0 && Number(t.wickets) === 0;
+
+  $("score" + n).style.visibility =
+    isZeroZero ? "hidden" : "visible";
+
+  $("overs" + n).style.visibility =
+    isZeroZero ? "hidden" : "visible";
+
+  $("rr" + n).style.visibility =
+    isZeroZero ? "hidden" : "visible";
+
+  if (!isZeroZero) {
+    $("score" + n).textContent = `${t.total}/${t.wickets}`;
+    $("overs" + n).textContent = `Overs ${t.overs}`;
+    $("rr" + n).textContent = `RR ${t.rr}`;
+  }
 }
 
 function showBatters(v){
@@ -619,7 +633,7 @@ async function refresh(){
   }catch(e){
     console.error(e);
     $("error").textContent="Live score temporarily unavailable. Retrying…";
-    $("error").style.display="block";
+    $("error").style.display="none";
   }
   if(!stopped)timer=setTimeout(refresh,REFRESH_MS);
 }
