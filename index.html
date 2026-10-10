@@ -8,7 +8,7 @@
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica,sans-serif;color:#fff}
-.overlay{width:100%;overflow:hidden;background:#101c2d;border:1px solid #33465c}
+
 .top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -236,7 +236,7 @@ html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica
 
 /* Compact, translucent charcoal scoreboard */
 .overlay {
-  background: rgba(24, 27, 31, 0.70);
+  background: rgba(24, 27, 31, var(--overlay-opacity, 0.70));
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
@@ -385,6 +385,17 @@ html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica
   }
 }
 
+/* Put Overs and Run Rate on separate lines */
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  line-height: 1.1;
+  margin-top: 3px;
+}
+
 
 </style>
 </head>
@@ -399,14 +410,20 @@ html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica
       <div class="details" id="details1"></div>
       <div class="scorebox">
         <div class="score" id="score1">--/--</div>
-        <div class="meta" id="meta1">Overs -- · RR --</div>
+        <div class="meta" id="meta1">
+  <span id="overs1">Overs --</span>
+  <span id="rr1">RR --</span>
+</div>
       </div>
     </section>
 
     <section class="team right">
       <div class="scorebox">
         <div class="score" id="score2">--/--</div>
-        <div class="meta" id="meta2">Overs -- · RR --</div>
+        <div class="meta" id="meta2">
+  <span id="overs2">Overs --</span>
+  <span id="rr2">RR --</span>
+</div>
       </div>
       <div class="details" id="details2"></div>
       <div class="identity">
@@ -428,6 +445,18 @@ const clubId = params.get("clubId") || "22594";
 const matchId = params.get("matchId") || "1374";
 
 const requested = Number(params.get("refreshInterval") || params.get("refresh") || 5000);
+
+const opacityValue = Number(params.get("opacity"));
+
+const overlayOpacity = params.has("opacity") && Number.isFinite(opacityValue)
+  ? Math.max(0.1, Math.min(1, opacityValue))
+  : 0.70;
+
+document.documentElement.style.setProperty(
+  "--overlay-opacity",
+  overlayOpacity
+);
+
 const REFRESH_MS = Number.isFinite(requested)
   ? Math.max(1000, Math.min(requested, 60000))
   : 5000;
@@ -462,7 +491,8 @@ function teamScore(v,p){
 function showScore(n,t){
   $("name"+n).textContent=t.name;
   $("score"+n).textContent=`${t.total}/${t.wickets}`;
-  $("meta"+n).textContent=`Overs ${t.overs} · RR ${t.rr}`;
+  $("overs"+n).textContent=`Overs ${t.overs}`;
+  $("rr"+n).textContent=`RR ${t.rr}`;
 }
 
 function showBatters(v){
