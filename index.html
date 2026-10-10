@@ -233,6 +233,159 @@ html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica
   }
 }
 
+
+/* Compact, translucent charcoal scoreboard */
+.overlay {
+  background: rgba(24, 27, 31, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Reduce overall row height */
+.top {
+  min-height: 0;
+}
+
+.team.left,
+.team.right {
+  min-height: 0;
+}
+
+/* Smaller logos and tighter team identity */
+.identity {
+  gap: 2px;
+  padding: 3px 5px;
+}
+
+.logo {
+  width: 30px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.team-name {
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.05;
+}
+
+/* Reduce space around player and bowler details */
+.details {
+  padding: 3px 6px;
+}
+
+.player {
+  margin: 2px 0;
+  line-height: 1.05;
+}
+
+.player-name,
+.player-stats,
+.bowler-name {
+  color: #fff;
+  line-height: 1.1;
+}
+
+.bowler-meta,
+.meta {
+  color: rgba(255, 255, 255, 0.78);
+  margin-top: 2px;
+  line-height: 1.05;
+}
+
+/* Smaller score panel */
+.scorebox {
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.score {
+  color: #fff;
+  font-size: clamp(20px, 2.3vw, 30px);
+  line-height: 1;
+}
+
+.balls {
+  margin-top: 4px;
+  gap: 3px;
+}
+
+.ball,
+.ball-label {
+  height: 19px;
+}
+
+.ball {
+  min-width: 19px;
+  padding: 0 4px;
+}
+
+/* Compact bottom row for chase/result */
+.bottom {
+  min-height: 0;
+  padding: 4px 8px;
+  background: rgba(15, 17, 20, 0.78);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 13px;
+}
+
+.powered {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Smaller screens */
+@media (max-width: 520px) {
+  .identity {
+    padding: 3px;
+    gap: 1px;
+  }
+
+  .logo {
+    width: 23px;
+    height: 21px;
+  }
+
+  .team-name {
+    font-size: 9px;
+  }
+
+  .details {
+    padding: 3px;
+  }
+
+  .scorebox {
+    padding: 3px 5px;
+  }
+
+  .score {
+    font-size: 19px;
+  }
+
+  .player {
+    margin: 1px 0;
+  }
+
+  .ball,
+  .ball-label {
+    height: 16px;
+  }
+
+  .ball {
+    min-width: 16px;
+    padding: 0 3px;
+    font-size: 9px;
+  }
+
+  .bottom {
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+}
+
+
 </style>
 </head>
 <body>
@@ -265,7 +418,6 @@ html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica
 
   <div class="bottom" id="bottom">
     <span id="bottomText"></span>
-    <span class="powered" id="powered">POWERED BY CRICCLUBS</span>
   </div>
   <div class="error" id="error"></div>
 </div>
