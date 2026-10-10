@@ -4,319 +4,445 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Live Cricket Overlay</title>
-
+<title>Cricket Score Overlay</title>
 <style>
-  
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  background: transparent;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #fff;
-}
-
-body {
-  padding: 0;
-}
-
-.scoreboard {
-  width: 100%;
-  max-width: 1100px;
-  background: rgba(16, 24, 34, 0.96);
-  border-radius: 3px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px #0005;
-}
-
-.header {
-  display: none;
-}
-
-.teams {
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica,sans-serif;color:#fff}
+.overlay{width:100%;overflow:hidden;background:#101c2d;border:1px solid #33465c}
+.top {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 64px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-width: 0;
 }
 
 .team {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  align-content: center;
-  column-gap: 10px;
-  padding: 7px 12px;
   min-width: 0;
-  background: #f4f5f6;
-  color: #15202b;
+  align-items: stretch;
+  overflow: hidden;
 }
 
-.team + .team {
-  border-left: 2px solid #25374b;
+.team.left {
+  grid-template-columns:
+    clamp(65px, 8vw, 112px)
+    minmax(0, 1fr)
+    clamp(90px, 11vw, 150px);
+}
+
+.team.right {
+  grid-template-columns:
+    clamp(90px, 11vw, 150px)
+    minmax(0, 1fr)
+    clamp(65px, 8vw, 112px);
+}
+
+.identity {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 5px;
+  overflow: hidden;
+}
+
+.logo {
+  display: block;
+  width: min(58px, 100%);
+  height: 48px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .team-name {
-  grid-column: 1;
-  font-size: 12px;
-  font-weight: 800;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  width: 100%;
+  min-width: 0;
   margin: 0;
+  font-size: clamp(10px, 1.3vw, 20px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
+.scorebox {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px clamp(5px, 1vw, 10px);
+  border-left: 1px solid #62758a;
+  border-right: 1px solid #62758a;
+}
+.right .scorebox{grid-column:1;grid-row:1;border-left:0;border-right:1px solid #62758a}
 
 .score {
-  grid-column: 2;
-  grid-row: 1 / 3;
-  align-self: center;
-  font-size: clamp(22px, 3vw, 34px);
-  font-weight: 900;
-  white-space: nowrap;
+  min-width: 0;
+  font-size: clamp(20px, 3vw, 43px);
+  line-height: 1.05;
+  font-weight: 800;
   letter-spacing: -1px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-.overs, .team .overs {
-  grid-column: 1;
-  font-size: 11px;
-  color: #465467;
-  margin-top: 3px;
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 7px;
+  font-size: clamp(9px, 1.1vw, 16px);
+  line-height: 1.2;
+  color: #d1dbe8;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.balls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.ball-label {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  margin: 0 3px 0 0;
+  font-size: 10px;
+  line-height: 1;
+  color: #9eb1c7;
   white-space: nowrap;
 }
 
-.details {
-  display: flex;
+.ball {
+  flex: 0 0 auto;
+  display: inline-flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 5px 14px;
-  padding: 6px 12px;
-  background: #182330;
+  justify-content: center;
+  height: 26px;
+  min-width: 26px;
+  padding: 0 5px;
+  line-height: 1;
+  border-radius: 5px;
   font-size: 11px;
-  line-height: 1.3;
+}
+.details {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px clamp(5px, 1vw, 12px);
+}
+.left .details{grid-column:2;grid-row:1}
+.right .details{grid-column:2;grid-row:1}
+.player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 7px 0;
+  font-size: clamp(9px, 1vw, 14px);
 }
 
-#batters, #bowler, #result {
+.player-name {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-stats {
+  min-width: 0;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.section-label{font-size:10px;color:#9eb1c7;letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px}
+.bowler-name,
+.bowler-meta {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-#recentBalls {
-  display: flex;
-  gap: 4px;
-  margin: 0;
+
+.ball.wicket{background:#c63c4b;color:#fff}
+.ball.boundary{background:#e6bb5d;color:#17263a}
+.right .identity{grid-column:3;grid-row:1}
+.right .scorebox{grid-column:1;grid-row:1}
+.right .details{grid-column:2;grid-row:1}
+.bottom{display:none;min-height:53px;align-items:center;justify-content:center;text-align:center;padding:10px 12px;background:#0b1421;border-top:1px solid #33465c;color:#ffd16e;font-weight:800;font-size:20px}
+.bottom.visible{display:flex}
+.powered{font-size:9px;letter-spacing:1px;font-weight:500;color:#9aabbe;margin-left:14px;white-space:nowrap}
+.error{display:none;padding:5px 10px;background:#672a36;font-size:11px}
+@media(max-width:900px){
+ .top{min-height:115px}
+ .team.left{grid-template-columns:72px minmax(0,1fr) 105px}
+ .team.right{grid-template-columns:105px minmax(0,1fr) 75px}
+ .identity{padding:10px 3px 6px}
+ .logo{width:43px;height:37px}
+ .team-name{font-size:14px}
+ .score{font-size:31px}
+ .meta{font-size:12px;margin-top:5px}
+ .details{padding:8px}
+ .player{font-size:11px;margin:5px 0}
+ .bowler-name{font-size:12px}
+ .bowler-meta{font-size:11px;margin-top:5px}
+ .balls{gap:4px;margin-top:8px}
+ .ball{height:25px;min-width:25px;font-size:11px;padding:0 4px}
+ .bottom{font-size:15px}
 }
 
-.ball {
-  min-width: 20px;
-  padding: 3px 5px;
-  border-radius: 50%;
-  background: #465467;
-  text-align: center;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.ball.boundary { background: #198754; }
-.ball.wicket { background: #d52b36; }
-.ball.extra { background: #7953a9; }
-
-.status {
-  display: none;
-}
-
-@media (max-width: 500px) {
-  .team {
-    padding: 6px;
-    column-gap: 5px;
+@media (max-width: 520px) {
+  .meta {
+    gap: 4px;
+    font-size: 9px;
+    margin-top: 5px;
   }
 
-  .team-name { font-size: 10px; }
-  .score { font-size: 21px; }
-  .overs { font-size: 9px; }
+  .balls {
+    flex-wrap: nowrap;
+    gap: 3px;
+    margin-top: 6px;
+  }
 
-  .details {
-    padding: 5px 7px;
-    gap: 5px 8px;
-    font-size: 10px;
+  .ball-label {
+    height: 19px;
+    font-size: 8px;
+    margin-right: 1px;
+  }
+
+  .ball {
+    height: 19px;
+    min-width: 17px;
+    padding: 0 3px;
+    font-size: 8px;
   }
 }
 
 </style>
 </head>
-
 <body>
-<div class="scoreboard">
-  <div class="header">
-    <span id="matchTitle">LIVE CRICKET</span>
-    <span class="live">LIVE</span>
+<div class="overlay">
+  <div class="top">
+    <section class="team left">
+      <div class="identity">
+        <img class="logo" id="logo1" alt="">
+        <div class="team-name" id="name1">TEAM 1</div>
+      </div>
+      <div class="details" id="details1"></div>
+      <div class="scorebox">
+        <div class="score" id="score1">--/--</div>
+        <div class="meta" id="meta1">Overs -- · RR --</div>
+      </div>
+    </section>
+
+    <section class="team right">
+      <div class="scorebox">
+        <div class="score" id="score2">--/--</div>
+        <div class="meta" id="meta2">Overs -- · RR --</div>
+      </div>
+      <div class="details" id="details2"></div>
+      <div class="identity">
+        <img class="logo" id="logo2" alt="">
+        <div class="team-name" id="name2">TEAM 2</div>
+      </div>
+    </section>
   </div>
 
-  <div class="teams">
-    <div class="team">
-      <div class="team-name" id="team1">Team 1</div>
-      <div class="score" id="score1">--/--</div>
-      <div class="overs" id="overs1">Overs: --</div>
-      <div class="overs" id="rr1">RR: --</div>
-    </div>
-
-    <div class="team">
-      <div class="team-name" id="team2">Team 2</div>
-      <div class="score" id="score2">--/--</div>
-      <div class="overs" id="overs2">Overs: --</div>
-      <div class="overs" id="rr2">RR: --</div>
-    </div>
+  <div class="bottom" id="bottom">
+    <span id="bottomText"></span>
+    <span class="powered" id="powered">POWERED BY CRICCLUBS</span>
   </div>
-
-  <div class="details">
-    <div id="batters">Batters: waiting for data...</div>
-    <div id="bowler">Bowler: --</div>
-    <div id="recentBalls" class="balls"></div>
-    <div id="result"></div>
-  </div>
-
-  <div class="status" id="status">Connecting to CricClubs...</div>
+  <div class="error" id="error"></div>
 </div>
 
 <script>
-(() => {
-  const params = new URLSearchParams(location.search);
-  const clubId = params.get("clubId");
-  const matchId = params.get("matchId");
+const params = new URLSearchParams(location.search);
+const clubId = params.get("clubId") || "22594";
+const matchId = params.get("matchId") || "1374";
 
-  const $ = id => document.getElementById(id);
+const requested = Number(params.get("refreshInterval") || params.get("refresh") || 5000);
+const REFRESH_MS = Number.isFinite(requested)
+  ? Math.max(1000, Math.min(requested, 60000))
+  : 5000;
 
-  // Require the match IDs in the URL.
-  if (!clubId || !matchId) {
-    $("status").textContent =
-      "Add ?clubId=22594&matchId=1374 to the URL.";
-    $("status").classList.add("error");
+const API = `https://cricclubs.com/liveScoreOverlayData.do?clubId=${encodeURIComponent(clubId)}&matchId=${encodeURIComponent(matchId)}`;
+
+let stopped = false;
+let timer;
+
+const $ = id => document.getElementById(id);
+const get = (o,k,d="") => o?.[k] == null || o[k] === "" ? d : String(o[k]);
+const truthy = x => ["true","1","yes"].includes(String(x).toLowerCase());
+
+function logo(id,path){
+  const img = $(id);
+  if(!path){img.style.visibility="hidden";return;}
+  img.style.visibility="visible";
+  img.src = path.startsWith("http") ? path : new URL(path,"https://cricclubs.com").href;
+  img.onerror = () => {img.style.visibility="hidden";};
+}
+
+function teamScore(v,p){
+  return {
+    name:get(v,p+"Name","Team"),
+    total:get(v,p+"Total","0"),
+    wickets:get(v,p+"Wickets","0"),
+    overs:get(v,p+"Overs","0.0"),
+    rr:get(v,p+"RR","--")
+  };
+}
+
+function showScore(n,t){
+  $("name"+n).textContent=t.name;
+  $("score"+n).textContent=`${t.total}/${t.wickets}`;
+  $("meta"+n).textContent=`Overs ${t.overs} · RR ${t.rr}`;
+}
+
+function showBatters(v){
+  return `
+    <div class="player">
+      <span class="player-name">${escapeHTML(get(v,"batsman1Name","Striker"))}</span>
+      <span class="player-stats">${escapeHTML(get(v,"batsman1Runs","0"))} (${escapeHTML(get(v,"batsman1Balls","0"))})</span>
+    </div>
+    <div class="player">
+      <span class="player-name">${escapeHTML(get(v,"batsman2Name","Non-striker"))}</span>
+      <span class="player-stats">${escapeHTML(get(v,"batsman2Runs","0"))} (${escapeHTML(get(v,"batsman2Balls","0"))})</span>
+    </div>`;
+}
+
+function showBowler(v,balls){
+  const recent = Array.isArray(balls) ? balls.slice(-7) : [];
+  const chips = recent.map(b=>{
+    const x=String(b);
+    let cls="ball";
+    if(x.toUpperCase().includes("W")) cls+=" wicket";
+    else if(x==="4"||x==="6") cls+=" boundary";
+    return `<span class="${cls}">${escapeHTML(x)}</span>`;
+  }).join("");
+
+  return `
+    <div class="section-label">Current bowler</div>
+    <div class="bowler-name">${escapeHTML(get(v,"bowlerName","--"))}</div>
+    <div class="bowler-meta">${escapeHTML(get(v,"bowlerWickets","0"))}/${escapeHTML(get(v,"bowlerRuns","0"))} · ${escapeHTML(get(v,"bowlerOvers","0"))} overs</div>
+    <div class="balls"><span class="ball-label">OVER</span>${chips}</div>`;
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+function overBalls(overs){
+  const p=String(overs||"").split(".");
+  const o=Number(p[0]), b=p.length>1?Number(p[1]):0;
+  return Number.isFinite(o)&&Number.isFinite(b)?o*6+b:null;
+}
+
+function completed(data,v){
+  return [
+    data.isMatchEnded,data.matchEnded,data.isCompleted,
+    v.isMatchEnded,v.matchEnded,v.isCompleted
+  ].some(truthy);
+}
+
+function render(data){
+  const v=data.values||{};
+  const second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
+
+  // Fixed team positions; roles change with the innings.
+  const t1=teamScore(v,"t1");
+  const t2=teamScore(v,"t2");
+
+  showScore(1,t1);
+  showScore(2,t2);
+logo("logo1", v.secondLogo);
+logo("logo2", v.firstLogo);
+
+  if(!second){
+    $("details1").innerHTML=showBatters(v);
+    $("details2").innerHTML=showBowler(v,data.balls);
+  }else{
+    $("details1").innerHTML=showBowler(v,data.balls);
+    $("details2").innerHTML=showBatters(v);
+  }
+
+  const bottom=$("bottom");
+  const bottomText=$("bottomText");
+  const powered=$("powered");
+
+  if(completed(data,v)){
+    bottomText.textContent=get(v,"result",get(data,"result","Match completed"));
+    bottom.classList.add("visible");
+    powered.style.display="inline";
+    stopped=true;
+    if(timer)clearTimeout(timer);
     return;
   }
 
-  const api =
-    "https://cricclubs.com/liveScoreOverlayData.do" +
-    "?clubId=" + encodeURIComponent(clubId) +
-    "&matchId=" + encodeURIComponent(matchId);
+  if(second){
+    const first=Number(get(v,"t1Total",""));
+    const current=Number(t2.total);
+    const needed=first+1-current;
+    const limit=Number(get(v,"totalOvers",get(v,"oversLimit",get(v,"matchOvers",""))));
+    const ballsBowled=overBalls(t2.overs);
+    let message="";
 
-  const safe = value => String(value ?? "--")
-    .replace(/[&<>"']/g, ch => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[ch]));
-
-  const value = (values, key) => values[key] ?? "";
-
-  function setText(id, text) {
-    $(id).textContent = text;
-  }
-
-  function score(total, wickets) {
-    return (total !== "" ? total : "--") + "/" +
-           (wickets !== "" ? wickets : "--");
-  }
-
-  function renderBalls(balls) {
-    const container = $("recentBalls");
-    container.replaceChildren();
-
-    if (!Array.isArray(balls)) return;
-
-    balls.forEach(item => {
-      const ball = String(item ?? "");
-      const chip = document.createElement("span");
-      chip.className = "ball";
-
-      if (ball === "W") chip.classList.add("wicket");
-      else if (ball === "4" || ball === "6")
-        chip.classList.add("boundary");
-      else if (/wd|nb|lb|b/i.test(ball))
-        chip.classList.add("extra");
-
-      chip.textContent = ball || "-";
-      container.appendChild(chip);
-    });
-  }
-
-  function render(data) {
-    const v = data.values || {};
-
-    setText("team1", value(v, "t1Name") || "Team 1");
-    setText("team2", value(v, "t2Name") || "Team 2");
-
-    setText("score1", score(v.t1Total, v.t1Wickets));
-    setText("score2", score(v.t2Total, v.t2Wickets));
-
-    setText("overs1", "Overs: " + (v.t1Overs || "--"));
-    setText("overs2", "Overs: " + (v.t2Overs || "--"));
-
-    setText("rr1", "RR: " + (v.t1RR || "--"));
-    setText("rr2", "RR: " + (v.t2RR || "--"));
-
-    const batter1 = v.batsman1Name
-      ? `${v.batsman1Name} ${v.batsman1Runs || 0} (${v.batsman1Balls || 0})`
-      : "";
-
-    const batter2 = v.batsman2Name
-      ? `${v.batsman2Name} ${v.batsman2Runs || 0} (${v.batsman2Balls || 0})`
-      : "";
-
-    const batterText = [batter1, batter2].filter(Boolean).join("  |  ");
-    setText("batters", batterText ? "Batters: " + batterText : "Batters: --");
-
-    const bowlerText = v.bowlerName
-      ? `${v.bowlerName}  ${v.bowlerWickets || 0}-${v.bowlerRuns || 0}` +
-        ` (${v.bowlerOvers || "0"})`
-      : "--";
-
-    setText("bowler", "Bowler: " + bowlerText);
-    renderBalls(data.balls);
-
-    setText("result", v.result || v.comments || "");
-
-    const now = new Date().toLocaleTimeString();
-    setText("status", "Auto-refresh: 5 seconds | Updated: " + now);
-    $("status").classList.remove("error");
-  }
-
-  let busy = false;
-
-  async function refresh() {
-    if (busy) return;
-    busy = true;
-
-    try {
-      const response = await fetch(api, { cache: "no-store" });
-
-      if (!response.ok) {
-        throw new Error("HTTP " + response.status);
+    if(Number.isFinite(first)&&Number.isFinite(current)&&first>=0){
+      if(needed<=0){
+        message="Target achieved";
+      }else{
+        message=`Need ${needed} runs to win`;
+        if(Number.isFinite(limit)&&limit>0&&ballsBowled!==null){
+          const left=Math.max(0,limit*6-ballsBowled);
+          if(left>0){
+            message+=` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
+          }
+        }
       }
-
-      const data = await response.json();
-
-      if (!data.values) {
-        throw new Error("Unexpected CricClubs response");
-      }
-
-      render(data);
-    } catch (error) {
-      console.error("Score refresh failed:", error);
-      setText("status", "Unable to load score. Retrying in 5 seconds.");
-      $("status").classList.add("error");
-    } finally {
-      busy = false;
+    }else{
+      message=get(v,"showMsgForScoreNeeded","");
     }
-  }
 
-  refresh();
-  setInterval(refresh, 5000);
-})();
+    bottomText.textContent=message;
+    bottom.classList.add("visible");
+    powered.style.display="none";
+  }else{
+    bottom.classList.remove("visible");
+  }
+}
+
+async function refresh(){
+  if(stopped)return;
+  try{
+    const response=await fetch(API,{cache:"no-store"});
+    if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    render(await response.json());
+    $("error").style.display="none";
+  }catch(e){
+    console.error(e);
+    $("error").textContent="Live score temporarily unavailable. Retrying…";
+    $("error").style.display="block";
+  }
+  if(!stopped)timer=setTimeout(refresh,REFRESH_MS);
+}
+
+refresh();
 </script>
 </body>
 </html>
