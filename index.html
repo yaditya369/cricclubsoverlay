@@ -1,192 +1,307 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match Scorecard Overlay</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Cricket Overlay</title>
+
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+    background: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+  }
+
+  body { padding: 12px; }
+
+  .scoreboard {
+    width: min(100%, 1000px);
+    background: rgba(10, 16, 28, 0.94);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,.35);
+  }
+
+  .header {
+    background: #087bce;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-weight: bold;
+  }
+
+  .live {
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .live::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #57f28b;
+  }
+
+  .teams {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .team {
+    padding: 16px;
+    min-width: 0;
+  }
+
+  .team + .team {
+    border-left: 1px solid rgba(255,255,255,.18);
+  }
+
+  .team-name {
+    color: #c6d8ed;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+  }
+
+  .score {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+
+  .overs {
+    color: #c4ceda;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+
+  .details {
+    padding: 10px 16px;
+    border-top: 1px solid rgba(255,255,255,.15);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .balls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .ball {
+    min-width: 27px;
+    padding: 5px 7px;
+    text-align: center;
+    border-radius: 5px;
+    background: #27364b;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .ball.boundary { background: #087bce; }
+  .ball.wicket { background: #c62828; }
+  .ball.extra { background: #7051a8; }
+
+  .status {
+    color: #b7c4d5;
+    font-size: 11px;
+    padding: 6px 16px;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  .error { color: #ffb7b7; }
+
+  @media (max-width: 420px) {
+    .team { padding: 12px 9px; }
+    .header, .details { padding-left: 10px; padding-right: 10px; }
+  }
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden" id="bodyRoot">
 
-    <!-- Top Floating Toolbar for Streamer Settings (Hidden in OBS Mode) -->
-    <div id="streamerToolbar" class="bg-slate-900 border-b border-slate-800 p-3 shadow-lg flex flex-wrap items-center justify-between gap-3 text-xs z-50">
-        <div class="flex items-center space-x-3">
-            <span class="font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span id="liveIndicator" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Scoreboard Overlay
-            </span>
-            <div class="hidden xl:flex items-center space-x-2 text-slate-400 bg-slate-950 px-2.5 py-1 rounded border border-slate-800 truncate max-w-md">
-                <span>Match: <strong id="lblMatchId" class="text-white">1374</strong></span>
-                <span>•</span>
-                <span>Club: <strong id="lblClubId" class="text-white">22594</strong></span>
-                <span>•</span>
-                <span>Refresh: <strong id="lblRefresh" class="text-white">5s</strong></span>
-            </div>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button onclick="toggleConfigModal(true)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded font-medium transition flex items-center gap-1">
-                ⚙️ Configure URL & Params
-            </button>
-            <button onclick="toggleControlDrawer(true)" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-3 py-1.5 rounded font-bold transition flex items-center gap-1">
-                ✏️ Manual Live Editor
-            </button>
-            <button onclick="toggleObsMode()" id="btnObsMode" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-medium transition">
-                Toggle OBS Transparent BG
-            </button>
-        </div>
+<body>
+<div class="scoreboard">
+  <div class="header">
+    <span id="matchTitle">LIVE CRICKET</span>
+    <span class="live">LIVE</span>
+  </div>
+
+  <div class="teams">
+    <div class="team">
+      <div class="team-name" id="team1">Team 1</div>
+      <div class="score" id="score1">--/--</div>
+      <div class="overs" id="overs1">Overs: --</div>
+      <div class="overs" id="rr1">RR: --</div>
     </div>
 
-    <!-- MAIN OVERLAY CONTAINER -->
-    <div class="w-full flex-grow flex items-end justify-center p-2 sm:p-4">
-        <div class="w-full max-w-6xl shadow-2xl rounded-lg overflow-hidden border border-slate-700/50 select-none">
-            
-            <!-- UPPER SCORE BAR -->
-            <div class="flex items-stretch h-12 bg-white text-slate-900 font-semibold text-sm">
-                
-                <!-- 1. Left Team Header -->
-                <div class="bg-blue-600 text-white px-3 flex items-center space-x-2 shrink-0">
-                    <span id="team1Short" class="font-black tracking-wider text-xs uppercase">EAGLES</span>
-                    <div class="w-8 h-8 rounded-full bg-white p-0.5 shadow-md flex items-center justify-center overflow-hidden shrink-0">
-                        <img id="team1Logo" src="https://media.cricclubs.com/documentsRep/teamLogos/ad84e247-550f-4447-8171-7e873de0af35.jpg" alt="Team 1" class="w-full h-full object-cover rounded-full">
-                    </div>
-                </div>
-
-                <!-- 2. Batters Section -->
-                <div class="flex-grow flex items-center justify-around px-3 bg-white text-slate-950 text-xs sm:text-sm border-r border-slate-200 overflow-hidden">
-                    <div class="flex items-center space-x-1.5 truncate">
-                        <span id="batter1Name" class="font-bold text-slate-900 truncate">Raman H*</span>
-                        <span id="batter1Runs" class="font-black text-slate-900">7</span>
-                        <span id="batter1Balls" class="text-slate-500 text-xs font-normal">(11)</span>
-                    </div>
-                    <div class="h-4 w-[1px] bg-slate-300 mx-2"></div>
-                    <div class="flex items-center space-x-1.5 truncate">
-                        <span id="batter2Name" class="font-medium text-slate-700 truncate">Kiran Kumar B</span>
-                        <span id="batter2Runs" class="font-bold text-slate-800">2</span>
-                        <span id="batter2Balls" class="text-slate-500 text-xs font-normal">(2)</span>
-                    </div>
-                </div>
-
-                <!-- 3. Central Score Block -->
-                <div class="bg-blue-700 text-white px-4 flex items-center space-x-3 shrink-0 shadow-inner">
-                    <div class="flex flex-col items-start leading-none">
-                        <span id="scoreTeamCode" class="text-[10px] uppercase font-bold tracking-widest text-blue-200">EAG</span>
-                        <span id="scoreRunRate" class="text-[9px] text-blue-100 font-medium mt-0.5">RR 3.4</span>
-                    </div>
-                    <div id="mainScore" class="text-xl sm:text-2xl font-black tracking-tight">
-                        17/1
-                    </div>
-                </div>
-
-                <!-- 4. Bowler & Over Section -->
-                <div class="hidden md:flex items-center px-4 bg-white text-slate-900 text-xs shrink-0 space-x-3 border-l border-slate-200">
-                    <div class="flex flex-col">
-                        <span id="bowlerName" class="font-bold text-slate-900 truncate max-w-[120px]">Badri Narayanan N</span>
-                        <div class="text-[10px] text-slate-500 space-x-1">
-                            <span>Fig: <strong id="bowlerFigures" class="text-slate-800">1/10 (2.0)</strong></span>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-end border-l pl-3 border-slate-200">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">OVERS</span>
-                        <span id="matchOvers" class="text-sm font-extrabold text-slate-900">5.0</span>
-                    </div>
-                </div>
-
-                <!-- 5. Recent Balls Indicator Bubbles -->
-                <div class="hidden lg:flex items-center px-3 bg-white space-x-1.5 shrink-0 border-l border-slate-200" id="recentBallsContainer">
-                    <span class="w-6 h-6 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center shadow">W</span>
-                    <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center shadow">0</span>
-                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center shadow">1</span>
-                    <span class="w-6 h-6 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center shadow">W</span>
-                </div>
-
-                <!-- 6. Right Team Logo & Banner -->
-                <div class="bg-slate-900 text-white px-3 flex items-center space-x-2 shrink-0">
-                    <div class="w-8 h-8 rounded-full bg-slate-800 p-0.5 shadow-md flex items-center justify-center overflow-hidden shrink-0 border border-slate-700">
-                        <img id="team2Logo" src="https://static.cricclubs.com/utilsv2/img/icons/no-image-team1.jpg" alt="Team 2" class="w-full h-full object-cover rounded-full">
-                    </div>
-                    <span id="team2Short" class="hidden sm:inline font-black tracking-wider text-xs uppercase text-slate-200">OG</span>
-                </div>
-
-            </div>
-
-            <!-- LOWER SUB-STRIP -->
-            <div class="bg-slate-900 text-emerald-400 px-3 py-1 flex items-center justify-between text-xs font-semibold border-t border-slate-800">
-                <div id="matchStatusText" class="truncate">
-                    PROJECTED SCORE: 54 RUNS (CRR: 3.4)
-                </div>
-                <div class="text-[10px] text-slate-400 font-normal uppercase tracking-wider shrink-0 ml-2">
-                    POWERED BY <strong class="text-slate-200 font-bold">CRICCLUBS</strong>
-                </div>
-            </div>
-
-        </div>
+    <div class="team">
+      <div class="team-name" id="team2">Team 2</div>
+      <div class="score" id="score2">--/--</div>
+      <div class="overs" id="overs2">Overs: --</div>
+      <div class="overs" id="rr2">RR: --</div>
     </div>
+  </div>
 
-    <!-- CONFIGURATION MODAL -->
-    <div id="configModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-700 rounded-xl p-6 max-w-md w-full shadow-2xl text-slate-200 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-amber-400 text-base">Configure Query Parameters</h3>
-                <button onclick="toggleConfigModal(false)" class="text-slate-400 hover:text-white font-bold">&times;</button>
-            </div>
-            <div class="space-y-3 text-sm">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">CricClubs Base URL</label>
-                    <input type="text" id="inputBaseUrl" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white focus:outline-none focus:border-amber-500 text-xs" value="https://cricclubs.com/GaleRanchCricketClub/ballbyball.do">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Match ID</label>
-                        <input type="text" id="inputMatchId" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white focus:outline-none focus:border-amber-500" value="1374">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Club ID</label>
-                        <input type="text" id="inputClubId" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white focus:outline-none focus:border-amber-500" value="22594">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Refresh Interval (Seconds)</label>
-                    <input type="number" id="inputRefresh" min="2" max="60" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white focus:outline-none focus:border-amber-500" value="5">
-                </div>
-            </div>
-            <div class="flex justify-end space-x-2 pt-3 border-t border-slate-800">
-                <button onclick="toggleConfigModal(false)" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-xs font-medium">Cancel</button>
-                <button onclick="saveConfig()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2 rounded text-xs font-bold">Apply & Reload URL</button>
-            </div>
-        </div>
-    </div>
+  <div class="details">
+    <div id="batters">Batters: waiting for data...</div>
+    <div id="bowler">Bowler: --</div>
+    <div id="recentBalls" class="balls"></div>
+    <div id="result"></div>
+  </div>
 
-    <!-- MANUAL LIVE EDITOR CONTROL DRAWER -->
-    <div id="controlDrawer" class="fixed inset-y-0 right-0 w-80 bg-slate-900 border-l border-slate-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-            <h3 class="font-bold text-amber-400 text-sm">Manual Live Score Editor</h3>
-            <button onclick="toggleControlDrawer(false)" class="text-slate-400 hover:text-white">&times;</button>
-        </div>
-        <div class="p-4 flex-grow overflow-y-auto space-y-4 text-xs">
-            <div>
-                <label class="block font-semibold text-slate-400 mb-1">Team 1 Name / Code</label>
-                <input type="text" id="editTeam1" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white" value="EAGLES">
-            </div>
-            <div>
-                <label class="block font-semibold text-slate-400 mb-1">Team 2 Name / Code</label>
-                <input type="text" id="editTeam2" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white" value="OG">
-            </div>
-            <div>
-                <label class="block font-semibold text-slate-400 mb-1">Main Score (e.g. 17/1)</label>
-                <input type="text" id="editScore" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white" value="17/1">
-            </div>
-            <div>
-                <label class="block font-semibold text-slate-400 mb-1">Overs (e.g. 5.0)</label>
-                <input type="text" id="editOvers" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white" value="5.0">
-            </div>
-            <div class="border-t border-slate-800 pt-3 space-y-3">
-                <h4 class="font-bold text-slate-300">Batter 1 (Striker)</h4>
-                <input type="text" id="editB1Name" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white" value="Raman H*">
-                <div class="grid grid-cols-2 gap-2">
+  <div class="status" id="status">Connecting to CricClubs...</div>
+</div>
+
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  const clubId = params.get("clubId");
+  const matchId = params.get("matchId");
+
+  const $ = id => document.getElementById(id);
+
+  // Require the match IDs in the URL.
+  if (!clubId || !matchId) {
+    $("status").textContent =
+      "Add ?clubId=22594&matchId=1374 to the URL.";
+    $("status").classList.add("error");
+    return;
+  }
+
+  const api =
+    "https://cricclubs.com/liveScoreOverlayData.do" +
+    "?clubId=" + encodeURIComponent(clubId) +
+    "&matchId=" + encodeURIComponent(matchId);
+
+  const safe = value => String(value ?? "--")
+    .replace(/[&<>"']/g, ch => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[ch]));
+
+  const value = (values, key) => values[key] ?? "";
+
+  function setText(id, text) {
+    $(id).textContent = text;
+  }
+
+  function score(total, wickets) {
+    return (total !== "" ? total : "--") + "/" +
+           (wickets !== "" ? wickets : "--");
+  }
+
+  function renderBalls(balls) {
+    const container = $("recentBalls");
+    container.replaceChildren();
+
+    if (!Array.isArray(balls)) return;
+
+    balls.forEach(item => {
+      const ball = String(item ?? "");
+      const chip = document.createElement("span");
+      chip.className = "ball";
+
+      if (ball === "W") chip.classList.add("wicket");
+      else if (ball === "4" || ball === "6")
+        chip.classList.add("boundary");
+      else if (/wd|nb|lb|b/i.test(ball))
+        chip.classList.add("extra");
+
+      chip.textContent = ball || "-";
+      container.appendChild(chip);
+    });
+  }
+
+  function render(data) {
+    const v = data.values || {};
+
+    setText("team1", value(v, "t1Name") || "Team 1");
+    setText("team2", value(v, "t2Name") || "Team 2");
+
+    setText("score1", score(v.t1Total, v.t1Wickets));
+    setText("score2", score(v.t2Total, v.t2Wickets));
+
+    setText("overs1", "Overs: " + (v.t1Overs || "--"));
+    setText("overs2", "Overs: " + (v.t2Overs || "--"));
+
+    setText("rr1", "RR: " + (v.t1RR || "--"));
+    setText("rr2", "RR: " + (v.t2RR || "--"));
+
+    const batter1 = v.batsman1Name
+      ? `${v.batsman1Name} ${v.batsman1Runs || 0} (${v.batsman1Balls || 0})`
+      : "";
+
+    const batter2 = v.batsman2Name
+      ? `${v.batsman2Name} ${v.batsman2Runs || 0} (${v.batsman2Balls || 0})`
+      : "";
+
+    const batterText = [batter1, batter2].filter(Boolean).join("  |  ");
+    setText("batters", batterText ? "Batters: " + batterText : "Batters: --");
+
+    const bowlerText = v.bowlerName
+      ? `${v.bowlerName}  ${v.bowlerWickets || 0}-${v.bowlerRuns || 0}` +
+        ` (${v.bowlerOvers || "0"})`
+      : "--";
+
+    setText("bowler", "Bowler: " + bowlerText);
+    renderBalls(data.balls);
+
+    setText("result", v.result || v.comments || "");
+
+    const now = new Date().toLocaleTimeString();
+    setText("status", "Auto-refresh: 5 seconds | Updated: " + now);
+    $("status").classList.remove("error");
+  }
+
+  let busy = false;
+
+  async function refresh() {
+    if (busy) return;
+    busy = true;
+
+    try {
+      const response = await fetch(api, { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+
+      const data = await response.json();
+
+      if (!data.values) {
+        throw new Error("Unexpected CricClubs response");
+      }
+
+      render(data);
+    } catch (error) {
+      console.error("Score refresh failed:", error);
+      setText("status", "Unable to load score. Retrying in 5 seconds.");
+      $("status").classList.add("error");
+    } finally {
+      busy = false;
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 5000);
+})();
+</script>
+</body>
+</html>
