@@ -575,9 +575,13 @@ function render(data){
 
   showScore(1,t1);
   showScore(2,t2);
-logo("logo1", v.secondLogo);
-logo("logo2", v.firstLogo);
-
+if (isSecondInningsStarted) {
+  logo("logo1", v.firstLogo);
+  logo("logo2", v.secondLogo);
+} else {
+  logo("logo1", v.secondLogo);
+  logo("logo2", v.firstLogo);
+}
   if(!second){
     $("details1").innerHTML=showBatters(v);
     $("details2").innerHTML=showBowler(v,data.balls);
