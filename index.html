@@ -485,7 +485,8 @@ body{
 .layout2 #details1 .player:first-child { border-bottom: 1px solid rgba(190,218,250,.42); }
 .layout2 #details1 .player + .player { padding-top: 13px; }
 .layout2 .section-label { font-size: clamp(9px,.85vw,12px); }
-.layout2 .bowler-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(190,218,250,.42); }\n.layout2 .bowler-name { font-size: 16px; white-space: nowrap; }
+.layout2 .bowler-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(190,218,250,.42); }
+.layout2 .bowler-name { font-size: 16px; white-space: nowrap; }
 .layout2 .bowler-meta { font-size: 14px; font-weight: 700; margin-top: 0; white-space: nowrap; }
 .layout2 .balls {
   margin-top: 10px;
@@ -560,11 +561,259 @@ body{
   .layout2 .ball-label { font-size: 8px; margin-right: 1px; }
 }
 
+
+/* Layout 2 compact sizing: keep the same content-driven height as Layout 1. */
+.layout2 .top { min-height: 0; height: auto; }
+.layout2 .identity { gap: 2px; padding: 3px 4px; }
+.layout2 .logo { width: 30px; height: 26px; }
+.layout2 .team-name { font-size: 12px; line-height: 1.05; }
+.layout2 #details1, .layout2 #details2 { padding: 3px 8px; }
+.layout2 .player { font-size: 14px; margin: 0; padding: 5px 0; line-height: 1.1; }
+.layout2 .player-name, .layout2 .bowler-name { font-size: 14px; }
+.layout2 #details1 .player + .player { padding-top: 5px; }
+.layout2 .bowler-row { padding-bottom: 5px; }
+.layout2 .bowler-meta { font-size: 12px; }
+.layout2 .balls { margin-top: 5px; gap: 3px; flex-wrap: nowrap; overflow: hidden; }
+.layout2 .ball { min-width: 20px; height: 21px; padding: 0 3px; font-size: 11px; }
+.layout2 .ball-label { height: 21px; font-size: 10px; margin-right: 2px; }
+.layout2 .team.left .scorebox { height: 62px; padding: 4px 6px; }
+.layout2 .score { font-size: clamp(20px,2.3vw,30px); }
+.layout2 .meta { font-size: clamp(9px,1vw,12px); margin-top: 4px; }
+.layout2 .meta span + span::before { margin: 0 5px; }
+@media (max-width: 650px) {
+  .layout2 .top { min-height: 0; }
+  .layout2 .team.left .scorebox { height: 56px; }
+  .layout2 .player { padding: 4px 0; font-size: 10px; }
+  .layout2 #details1 .player + .player { padding-top: 4px; }
+  .layout2 .player-name, .layout2 .bowler-name { font-size: 10px; }
+  .layout2 .ball { min-width: 17px; height: 18px; font-size: 9px; }
+}
+
+/* Keep bowler figures identical to batsmen score typography. */
+.layout2 .bowler-meta {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+@media (max-width: 650px) {
+  .layout2 .bowler-meta { font-size: 10px; }
+}
+
+/* Give team names more horizontal room without adding another line. */
+.layout2 .top {
+  grid-template-columns: clamp(95px, 9vw, 135px) minmax(110px, 1fr) clamp(125px, 15vw, 195px) minmax(110px, 1fr) clamp(95px, 9vw, 135px);
+}
+.layout2 .team-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  font-size: clamp(10px, 1vw, 14px);
+}
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 68px minmax(65px, 1fr) 88px minmax(65px, 1fr) 68px;
+  }
+  .layout2 .team-name { font-size: 9px; }
+}
+
+
+/* Layout 2: breathing room above and below the central score panel.
+   Keep the surrounding scoreboard content-driven and compact. */
+.layout2 .team.left .scorebox {
+  height: 54px;
+  margin-block: 4px;
+  padding: 3px 8px;
+  align-self: center;
+  border-radius: 6px;
+}
+@media (max-width: 650px) {
+  .layout2 .team.left .scorebox {
+    height: 48px;
+    margin-block: 3px;
+    padding: 3px 4px;
+  }
+}
+
+
+/* Team names: modestly wider than the original, maximum two lines. */
+.layout2 .top {
+  grid-template-columns: clamp(105px, 9.5vw, 145px) minmax(110px, 1fr) clamp(125px, 15vw, 195px) minmax(110px, 1fr) clamp(105px, 9.5vw, 145px);
+}
+.layout2 .team-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  line-height: 1.12;
+  font-size: clamp(10px, 1vw, 14px);
+}
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 76px minmax(65px, 1fr) 88px minmax(65px, 1fr) 76px;
+  }
+  .layout2 .team-name { font-size: 9px; }
+}
+
+/* Intermediate team-name width; preserve two-line wrapping. */
+@media (min-width: 651px) {
+  .layout2 .top {
+    grid-template-columns: clamp(100px, 9.25vw, 140px) minmax(110px, 1fr) clamp(125px, 15vw, 195px) minmax(110px, 1fr) clamp(100px, 9.25vw, 140px);
+  }
+}
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 72px minmax(65px, 1fr) 88px minmax(65px, 1fr) 72px;
+  }
+}
+
+/* Match phases, compact secondary bar, and event animations */
+.overlay .bottom {position:relative; gap:8px; padding-right:145px; min-height:27px;}
+.overlay .bottom.visible {display:flex;}
+.overlay .bottom .powered-credit {position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;letter-spacing:.2px;font-weight:600;color:#c9d8ec;white-space:nowrap;}
+.overlay .bottom .powered-credit a {color:inherit;text-decoration:none;}
+.overlay .bottom #bottomText {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.layout2 .top.pre-match .details {visibility:hidden;}
+.layout2 .top.pre-match .scorebox {visibility:hidden!important;}
+.layout2 .top.pre-match .identity {visibility:visible;}
+.layout2 .top.pre-match {min-height:72px;}
+.layout2 .top.pre-match .team.left .scorebox {display:flex!important;}
+.event-animation {position:fixed;left:50%;top:65%;transform:translate(-50%,-50%) scale(.7);z-index:1000;pointer-events:none;opacity:0;display:flex;flex-direction:column;align-items:center;gap:5px;filter:drop-shadow(0 6px 20px rgba(0,0,0,.8));}
+.event-animation.active {animation:score-event 2.4s ease-in-out both;}
+.event-animation .event-emoji {font-size:clamp(45px,7vw,90px);}
+.event-animation .event-text {font-size:clamp(32px,6vw,78px);font-weight:900;letter-spacing:2px;text-shadow:0 3px 0 #142640,0 6px 18px #000;}
+.event-animation.wicket .event-text {color:#ff657b;}
+.event-animation.four .event-text {color:#ffd36a;}
+.event-animation.six .event-text {color:#71f6aa;}
+@keyframes score-event {0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}15%,72%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
+@media(max-width:650px){.overlay .bottom{padding-right:112px;font-size:11px}.overlay .bottom .powered-credit{right:5px;font-size:8px;}}
+
+
+
+
+
+
+@media(max-width:650px){}
+
+.prematch-side{display:flex;align-items:center;justify-content:center;gap:15px;min-width:0;}
+.prematch-logo{width:clamp(48px,6vw,84px);height:clamp(48px,6vw,84px);object-fit:contain;flex:0 0 auto;}
+.prematch-side span{min-width:0;}
+@media(max-width:650px){.prematch-side{gap:5px;flex-direction:column}.prematch-logo{width:40px;height:40px}}
+/* Separate pre-match presentation; never use the five-column live scoreboard. */
+.prematch-template[hidden]{display:none!important}
+.prematch-template{display:grid;grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr);align-items:center;min-height:92px;padding:12px 28px;background:linear-gradient(115deg,rgba(11,34,67,.96),rgba(30,74,119,.94),rgba(11,34,67,.96));text-align:center;gap:12px;}
+.prematch-side{font-size:clamp(17px,2.4vw,32px);font-weight:900;letter-spacing:.4px;line-height:1.1;overflow-wrap:break-word;}
+.prematch-versus{font-size:clamp(23px,3.5vw,45px);font-weight:1000;color:#ffd26d;text-shadow:0 2px 12px #ffbd4260;}
+.overlay.is-prematch .top{display:none!important;}
+.overlay .bottom.projection{justify-content:center;}
+.overlay .bottom.projection #bottomText{position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 260px);text-align:center;font-weight:800;}
+/* Celebrations: layered burst, confetti, motion and a distinctive theme for each event */
+.event-animation{top:58%;width:min(640px,92vw);height:260px;justify-content:center;isolation:isolate;}
+.event-animation .event-rays{position:absolute;width:210px;height:210px;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.24) 0deg 8deg,transparent 8deg 24deg);opacity:0;z-index:-1;}
+.event-animation .event-particles{position:absolute;inset:0;z-index:-1;}
+.event-animation .particle{position:absolute;left:50%;top:48%;width:9px;height:15px;border-radius:2px;background:var(--particle,#ffd45b);opacity:0;}
+.event-animation.active .particle{animation:particle-burst 1.4s cubic-bezier(.1,.6,.2,1) forwards;animation-delay:var(--delay);}
+.event-animation.active .event-rays{animation:ray-burst 2s ease-out forwards;}
+.event-animation .event-emoji{font-size:clamp(48px,7vw,85px);line-height:1;transform-origin:center;}
+.event-animation .event-text{font-size:clamp(42px,7vw,88px);line-height:1;font-style:italic;letter-spacing:3px;-webkit-text-stroke:1px rgba(255,255,255,.45);}
+.event-animation .event-subtitle{font-size:clamp(12px,1.7vw,19px);font-weight:900;letter-spacing:4px;text-shadow:0 3px 12px #000;}
+.event-animation.wicket .event-text{color:#ff647e;text-shadow:0 0 22px #ff355b,0 4px 0 #74142d;}
+.event-animation.four .event-text{color:#ffd456;text-shadow:0 0 25px #fba923,0 4px 0 #8e520a;}
+.event-animation.six .event-text{color:#70f8c7;text-shadow:0 0 25px #00c9a5,0 4px 0 #09634e;}
+.event-animation.wicket .event-emoji{animation:wicket-shake .7s ease-in-out 2;}
+.event-animation.four .event-emoji{animation:four-slide 1.2s ease-out both;}
+.event-animation.six .event-emoji{animation:six-launch 1.6s ease-out both;}
+@keyframes particle-burst{0%{opacity:1;transform:translate(0,0) rotate(0)}70%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}}
+@keyframes ray-burst{0%{opacity:0;transform:scale(.2) rotate(0)}20%{opacity:1}100%{opacity:0;transform:scale(2) rotate(60deg)}}
+@keyframes wicket-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-18deg)}40%{transform:rotate(16deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(8deg)}}
+@keyframes four-slide{0%{transform:translateX(-180px) rotate(-30deg);opacity:0}60%{transform:translateX(20px) rotate(10deg);opacity:1}100%{transform:translateX(0) rotate(0)}}
+@keyframes six-launch{0%{transform:translateY(120px) scale(.4);opacity:0}55%{transform:translateY(-35px) scale(1.25);opacity:1}100%{transform:translateY(0) scale(1)}}
+@media(max-width:650px){.prematch-template{grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);padding:12px 8px;gap:5px;min-height:70px}.prematch-side{font-size:14px}.overlay .bottom.projection #bottomText{max-width:calc(100% - 145px);font-size:10px;}}
+/* Fallback team crests: initials appear if CricClubs has no logo or image fails. */
+.prematch-emblem{position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:clamp(48px,6vw,84px);height:clamp(48px,6vw,84px);border-radius:50%;background:linear-gradient(145deg,#357da6,#153a66);border:2px solid rgba(208,233,255,.65);box-shadow:0 2px 12px rgba(0,0,0,.3);overflow:hidden}
+.prematch-side:last-child .prematch-emblem{background:linear-gradient(145deg,#268c81,#14545e)}
+.prematch-emblem .prematch-logo{width:100%;height:100%;object-fit:contain;position:relative;z-index:1}
+.prematch-emblem .prematch-logo[hidden]{display:none}
+.prematch-initials{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(17px,2.5vw,30px);font-weight:900;letter-spacing:-1px;color:white}
+@media(max-width:650px){.prematch-emblem{width:40px;height:40px}.prematch-initials{font-size:15px}}
+
+/* Uniform broadcast header: pre-game/toss and both innings share the same frame. */
+.layout2 .top { min-height: 86px; }
+.layout2 .prematch-template {
+  box-sizing: border-box;
+  min-height: 86px;
+  padding: 5px 14px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.layout2.theme-blue .prematch-template { background: transparent; }
+.layout2 .prematch-emblem { width: 44px; height: 44px; }
+.layout2 .prematch-logo { width: 100%; height: 100%; }
+.layout2 .prematch-side { font-size: clamp(12px,1.2vw,17px); }
+.layout2 .prematch-versus { font-size: clamp(22px,2.4vw,32px); }
+/* Secondary-bar messages all use the same geometric center, including chase and result. */
+.layout2 .bottom.visible { justify-content: center; }
+.layout2 .bottom.visible #bottomText {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 255px);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 800;
+}
+@media(max-width:650px){
+ .layout2 .top,.layout2 .prematch-template{min-height:76px;}
+ .layout2 .prematch-template{padding:5px 7px;}
+ .layout2 .prematch-emblem{width:36px;height:36px;}
+ .layout2 .bottom.visible #bottomText{max-width:calc(100% - 135px);font-size:10px;}
+}
+
+/* Compact pre-game/toss: match the live scorecard height without enlarging innings. */
+.layout2 .top { min-height: 0; }
+.layout2 .prematch-template {
+  height: 72px;
+  min-height: 0;
+  padding: 3px 12px;
+  align-items: center;
+}
+.layout2 .prematch-emblem { width: 34px; height: 34px; }
+.layout2 .prematch-side { font-size: clamp(11px,1.1vw,15px); line-height: 1.05; gap: 3px; }
+.layout2 .prematch-versus { font-size: clamp(20px,2.2vw,28px); }
+@media (max-width:650px) {
+  .layout2 .top { min-height: 0; }
+  .layout2 .prematch-template { height: 66px; min-height: 0; padding: 2px 6px; }
+  .layout2 .prematch-emblem { width: 30px; height: 30px; }
+  .layout2 .prematch-side { font-size: 11px; }
+}
+
+/* Exact height synchronization: pre-match uses measured live innings header height. */
+.layout2 .prematch-template {
+  height: var(--live-header-height, 72px) !important;
+  min-height: 0 !important;
+  max-height: var(--live-header-height, 72px) !important;
+  padding: 2px 10px !important;
+  overflow: hidden;
+}
+.layout2 .prematch-side { min-height: 0; }
 </style>
 </head>
 <body>
 <div class="overlay">
-  <div class="top">
+  <div class="prematch-template" id="prematchTemplate" hidden>
+  <div class="prematch-side"><span class="prematch-emblem"><img class="prematch-logo" id="preLogo1" alt=""><span class="prematch-initials" id="preInitials1">TA</span></span><span id="preTeam1">TEAM A</span></div>
+  <div class="prematch-versus">VS</div>
+  <div class="prematch-side"><span class="prematch-emblem"><img class="prematch-logo" id="preLogo2" alt=""><span class="prematch-initials" id="preInitials2">TB</span></span><span id="preTeam2">TEAM B</span></div>
+</div>
+<div class="top">
     <section class="team left">
       <div class="identity">
         <img class="logo" id="logo1" alt="">
@@ -597,9 +846,13 @@ body{
   </div>
 
   <div class="bottom" id="bottom">
-    <span id="bottomText"></span>
+    <span id="bottomText"></span><span class="powered-credit">Powered by <a href="https://cricclubs.com" target="_blank" rel="noopener noreferrer">CricClubs</a></span>
   </div>
   <div class="error" id="error"></div>
+  <div class="event-animation" id="scoreEvent" aria-live="polite">
+    <div class="event-rays"></div><div class="event-particles"></div>
+    <span class="event-emoji"></span><span class="event-text"></span><span class="event-subtitle"></span>
+  </div>
 </div>
 
 <script>
@@ -622,9 +875,9 @@ document.documentElement.style.setProperty(
 
 // Layout and theme are independent query parameters.
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
-const requestedLayout = (params.get("layout") || "1").trim().toLowerCase();
+const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
 const overlayLayout = requestedLayout === "2" ? "2" : "1";
-const requestedTheme = (params.get("theme") || "graphite").trim().toLowerCase();
+const requestedTheme = (params.get("theme") || "blue").trim().toLowerCase();
 const overlayTheme = requestedTheme === "blue" ? "blue" : "graphite";
 document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
@@ -650,9 +903,21 @@ function logo(id,path){
   img.onerror = () => {img.style.visibility="hidden";};
 }
 
+function teamInitials(name){
+  const words=String(name||'TEAM').trim().split(/\s+/).filter(Boolean);
+  return (words.length>1 ? words.slice(0,2).map(w=>w[0]).join('') : (words[0]||'T').slice(0,2)).toUpperCase();
+}
+function prematchLogo(id, initialsId, name, path){
+  const img=$(id);
+  $(initialsId).textContent=teamInitials(name);
+  img.onerror=()=>{img.hidden=true;img.removeAttribute('src');};
+  if(!path){img.hidden=true;img.removeAttribute('src');return;}
+  img.hidden=false;
+  img.src=/^(https?:|data:|\/\/)/i.test(String(path)) ? path : new URL(path,'https://cricclubs.com').href;
+}
 function teamScore(v,p){
   return {
-    name:get(v,p+"Name","Team"),
+    name:get(v,p+"Name",p==="t1"?"Team A":"Team B"),
     total:get(v,p+"Total","0"),
     wickets:get(v,p+"Wickets","0"),
     overs:get(v,p+"Overs","0.0"),
@@ -754,6 +1019,93 @@ function completed(data,v){
   ].some(truthy);
 }
 
+
+const optional = (...xs) => xs.find(x => x !== undefined && x !== null && String(x).trim() !== "") ?? "";
+const textField = (data,v,keys) => optional(...keys.map(k => v[k]),...keys.map(k => data[k]));
+const urlParam = k => params.get(k) || "";
+let lastEventSignature = null;
+let eventReady = false;
+let animationTimer;
+function showEvent(kind) {
+  const el=$("scoreEvent");
+  const visual={wicket:["🏏","WICKET!"],four:["🏏","FOUR!"],six:["🚀","SIX!"]}[kind];
+  if(!visual) return;
+  clearTimeout(animationTimer);
+  el.className="event-animation "+kind;
+  const visuals={wicket:["💥","WICKET!",""],four:["🏏","FOUR!","RACING TO THE BOUNDARY"],six:["🚀","SIX!","OUT OF THE PARK"]};
+  const v=visuals[kind];
+  el.querySelector(".event-emoji").textContent=v[0];
+  el.querySelector(".event-text").textContent=v[1];
+  el.querySelector(".event-subtitle").textContent=v[2];
+  const particles=el.querySelector(".event-particles");
+  particles.replaceChildren();
+  for(let i=0;i<26;i++){
+    const part=document.createElement("span");
+    part.className="particle";
+    const angle=(i/26)*Math.PI*2;
+    const radius=95+(i%5)*23;
+    part.style.setProperty("--dx",Math.cos(angle)*radius+"px");
+    part.style.setProperty("--dy",Math.sin(angle)*radius+"px");
+    part.style.setProperty("--rot",(i*53)+"deg");
+    part.style.setProperty("--delay",(i%5)*.035+"s");
+    part.style.setProperty("--particle",kind==="wicket"?"#ff647e":kind==="six"?"#6df6c2":"#ffd456");
+    particles.appendChild(part);
+  }
+  void el.offsetWidth;
+  el.classList.add("active");
+  animationTimer=setTimeout(()=>el.classList.remove("active"),2500);
+}
+function eventKind(x) {
+  const b=String(x).trim().toUpperCase();
+  if(/(^|[^A-Z])W($|[^A-Z])|WICKET|RUN\s*OUT|STUMPED/.test(b))return "wicket";
+  if(/^4$|^4\b|FOUR/.test(b))return "four";
+  if(/^6$|^6\b|SIX/.test(b))return "six";
+  return "";
+}
+function watchLastBall(data,v,second) {
+  const balls=Array.isArray(data.balls)?data.balls:[];
+  const t=second?teamScore(v,"t2"):teamScore(v,"t1");
+  const last=balls.length?String(balls[balls.length-1]):"";
+  const signature=[second?"2":"1",t.total,t.wickets,t.overs,balls.length,last].join("|");
+  if(eventReady && signature!==lastEventSignature && last) {
+    const previous=lastEventSignature?.split("|");
+    const changedScore=previous && (previous[1]!==t.total || previous[2]!==t.wickets || previous[3]!==t.overs);
+    if(changedScore) showEvent(eventKind(last));
+  }
+  lastEventSignature=signature;
+  eventReady=true;
+}
+function projectedScore(v,t) {
+  const balls=overBalls(t.overs);
+  const limit=Number(optional(v.totalOvers,v.oversLimit,v.matchOvers,urlParam("overs")));
+  const runs=Number(t.total);
+  if(!(balls>0 && limit>0 && Number.isFinite(runs)))return "";
+  return `Projected ${Math.round(runs/balls*limit*6)} (${limit} overs)`;
+}
+function tossMessage(data,v) {
+  const winner=textField(data,v,["tossWonBy","tossWinner","tossWonByTeam","tossWinnerName"]) || urlParam("tossWinner");
+  const choice=textField(data,v,["tossDecision","electedTo","tossChoice","electedToDo"]) || urlParam("tossDecision");
+  if(!winner)return "";
+  return `${winner} won the toss${choice ? " and elected to "+choice : ""}`;
+}
+function postMatchMessage(data,v) {
+  const result=textField(data,v,["result","matchResult"]) || "Match completed";
+  const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"]) || urlParam("pom");
+  return [result,pom?`POM: ${pom}`:""].filter(Boolean).join(" · ");
+}
+function showSecondary(message) {
+  $("bottomText").textContent=message;
+  $("bottom").classList.add("visible");
+  $("bottom").classList.add("projection");
+}
+function matchNotStarted(data,v,t1,t2,second) {
+  const status=textField(data,v,["matchStatus","status","statusText"]).toLowerCase();
+  if(/live|in progress|innings break|completed|finished/.test(status))return false;
+  if(/not started|upcoming|scheduled|toss/.test(status))return true;
+  return !(Array.isArray(data.balls) && data.balls.length) && !second && Number(t1.total)===0 && Number(t2.total)===0 &&
+    overBalls(t1.overs)===0 && overBalls(t2.overs)===0;
+}
+
 function render(data){
   const v=data.values||{};
   const second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
@@ -763,6 +1115,30 @@ function render(data){
   const bottom=$("bottom");
   const bottomText=$("bottomText");
   const powered=$("powered");
+  const preMatch=!completed(data,v) && matchNotStarted(data,v,t1,t2,second);
+  const overlayEl=document.querySelector(".overlay");
+  overlayEl.classList.toggle("is-prematch",preMatch);
+  $("prematchTemplate").hidden=!preMatch;
+  $("bottom").classList.remove("projection");
+  document.querySelector(".top").classList.toggle("pre-match",preMatch && isLayout2);
+  if (!preMatch && !completed(data,v)) watchLastBall(data,v,second);
+  if (preMatch) {
+    $("name1").textContent=t1.name;
+    $("name2").textContent=t2.name;
+    $("preTeam1").textContent=t1.name;
+    $("preTeam2").textContent=t2.name;
+    prematchLogo("preLogo1","preInitials1",t1.name,v.secondLogo);
+    prematchLogo("preLogo2","preInitials2",t2.name,v.firstLogo);
+    logo("logo1",v.secondLogo);
+    logo("logo2",v.firstLogo);
+    $("details1").innerHTML=showBatters(v);
+    $("details2").innerHTML=showBowler(v,data.balls);
+    if (isLayout2) $("score1").closest(".scorebox").style.display="flex";
+    showSecondary(tossMessage(data,v) || "Match yet to start");
+    syncHeaderHeight();
+    return;
+  }
+
 
   if (isLayout2) {
     // Layout 2 always puts the current batting side on the left and bowling side on the right.
@@ -784,8 +1160,7 @@ function render(data){
     logo("logo2", second ? v.secondLogo : v.firstLogo);
 
     if (completed(data,v)) {
-      bottomText.textContent = get(v,"result",get(data,"result","Match completed"));
-      bottom.classList.add("visible");
+      showSecondary(postMatchMessage(data,v));
       if (powered) powered.style.display = "none";
       stopped = true;
       if (timer) clearTimeout(timer);
@@ -811,12 +1186,10 @@ function render(data){
           }
         }
       }
-      bottomText.textContent = message;
-      bottom.classList.add("visible");
+      showSecondary(message);
     } else {
       // No chase bar during the first innings.
-      bottom.classList.remove("visible");
-      bottomText.textContent = "";
+      showSecondary(projectedScore(v,t1) || "First innings");
     }
     return;
   }
@@ -840,8 +1213,7 @@ function render(data){
   }
 
   if(completed(data,v)){
-    bottomText.textContent=get(v,"result",get(data,"result","Match completed"));
-    bottom.classList.add("visible");
+    showSecondary(postMatchMessage(data,v));
     if(powered) powered.style.display="inline";
     stopped=true;
     if(timer)clearTimeout(timer);
@@ -869,11 +1241,10 @@ function render(data){
     }else{
       message=get(v,"showMsgForScoreNeeded","");
     }
-    bottomText.textContent=message;
-    bottom.classList.add("visible");
+    showSecondary(message);
     if(powered) powered.style.display="none";
   }else{
-    bottom.classList.remove("visible");
+    showSecondary(projectedScore(v,t1) || "First innings");
   }
 }
 async function refresh(){
@@ -886,11 +1257,22 @@ async function refresh(){
   }catch(e){
     console.error(e);
     $("error").textContent="Live score temporarily unavailable. Retrying…";
-    $("error").style.display="none";
+    $("error").style.display="block";
   }
   if(!stopped)timer=setTimeout(refresh,REFRESH_MS);
 }
 
+// Production: load CricClubs live data and refresh until the match is completed.
+function syncHeaderHeight() {
+  const overlay=document.querySelector('.overlay');
+  const top=overlay.querySelector('.top');
+  const pre=overlay.classList.contains('is-prematch');
+  if(pre)overlay.classList.remove('is-prematch');
+  const height=Math.ceil(top.getBoundingClientRect().height);
+  if(pre)overlay.classList.add('is-prematch');
+  if(height>0)overlay.style.setProperty('--live-header-height',height+'px');
+}
+window.addEventListener('resize',syncHeaderHeight);
 refresh();
 </script>
 </body>
