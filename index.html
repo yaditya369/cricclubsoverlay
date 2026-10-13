@@ -7,7 +7,21 @@
 <title>Cricket Score Overlay</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica,sans-serif;color:#fff}
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:transparent;
+  font-family:Arial,Helvetica,sans-serif;
+  color:#fff;
+}
+html{height:100%}
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+}
 
 .top {
   display: grid;
@@ -236,6 +250,8 @@ html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica
 
 /* Compact, translucent charcoal scoreboard */
 .overlay {
+  width:100%;
+  margin-top:auto;
   background: rgba(24, 27, 31, var(--overlay-opacity, 0.70));
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 4px;
@@ -397,6 +413,153 @@ html,body{margin:0;width:100%;background:transparent;font-family:Arial,Helvetica
 }
 
 
+
+/* Layout 2: reference broadcast scoreboard. Layout 1 above remains unchanged. */
+.overlay.layout2 {
+  width: 100%;
+  margin-top: auto;
+  overflow: hidden;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(24,27,31,var(--overlay-opacity,.70));
+  color: #fff;
+}
+.layout2 .top {
+  display: grid;
+  grid-template-columns: clamp(78px,8vw,120px) minmax(130px,1fr) clamp(150px,20vw,270px) minmax(130px,1fr) clamp(78px,8vw,120px);
+  height: auto;
+  min-height: 115px;
+  align-items: stretch;
+}
+.layout2 .team { display: contents; }
+.layout2 .team .identity,
+.layout2 .team .details,
+.layout2 .team .scorebox { min-width: 0; }
+.layout2 #logo1 { grid-column: 1; grid-row: 1; }
+.layout2 #name1 { grid-column: 1; grid-row: 1; }
+.layout2 .team.left .identity { grid-column: 1; grid-row: 1; border: 0; }
+.layout2 #details1 { grid-column: 2; grid-row: 1; border: 0; padding: 7px 16px; }
+.layout2 .team.left .scorebox { grid-column: 3; grid-row: 1; z-index: 1; }
+.layout2 #details2 { grid-column: 4; grid-row: 1; border: 0; padding: 7px 16px; }
+.layout2 .team.right .identity { grid-column: 5; grid-row: 1; border: 0; }
+.layout2 .team.right .scorebox { display: none !important; }
+.layout2 .team.left .scorebox {
+  box-sizing: border-box;
+  align-self: center;
+  justify-self: center;
+  width: calc(100% - 12px);
+  height: 82px;
+  background: rgba(8,20,37,.42);
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 6px;
+  padding: 8px 10px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.layout2 .score { font-size: clamp(26px,3vw,42px); }
+.layout2 .meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  white-space: nowrap;
+  font-size: clamp(11px,1.15vw,17px);
+  margin-top: 8px;
+}
+.layout2 .meta span + span::before {
+  content: "·";
+  display: inline-block;
+  margin: 0 10px;
+  color: rgba(255,255,255,.78);
+}
+.layout2 .meta { column-gap: 0; }
+.layout2 .identity { gap: 7px; padding: 6px 5px; }
+.layout2 .logo { width: min(58px,100%); height: 48px; }
+.layout2 .team-name { font-size: clamp(10px,1.1vw,17px); }
+.layout2 .player { font-size: clamp(14px,1.45vw,21px); margin: 0; padding: 13px 0; gap: 8px; }
+.layout2 .player-name,
+.layout2 .bowler-name { font-size: 16px; }
+/* Reference screenshot has a thin divider between the two batter rows. */
+.layout2 #details1 .player:first-child { border-bottom: 1px solid rgba(190,218,250,.42); }
+.layout2 #details1 .player + .player { padding-top: 13px; }
+.layout2 .section-label { font-size: clamp(9px,.85vw,12px); }
+.layout2 .bowler-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(190,218,250,.42); }\n.layout2 .bowler-name { font-size: 16px; white-space: nowrap; }
+.layout2 .bowler-meta { font-size: 14px; font-weight: 700; margin-top: 0; white-space: nowrap; }
+.layout2 .balls {
+  margin-top: 10px;
+  gap: 5px;
+  flex-wrap: wrap;
+  overflow: visible;
+  max-width: 100%;
+}
+.layout2 .ball-label {
+  font-size: clamp(10px,1vw,14px);
+  font-weight: 700;
+  margin-right: 3px;
+  white-space: nowrap;
+}
+.layout2 .ball {
+  min-width: 27px;
+  height: 32px;
+  padding: 0 5px;
+  flex: 0 1 auto;
+  box-sizing: border-box;
+  border: 1px solid rgba(190,218,250,.65);
+  background: rgba(255,255,255,.05);
+  border-radius: 3px;
+  font-size: 14px;
+}
+.layout2 .ball.wicket { background: #d92f45; border-color: #ff8794; color: #fff; font-weight: 800; }
+.layout2 .ball.boundary { background: #e6bb5d; border-color: #ffdc85; color: #17263a; font-weight: 800; }
+.layout2 .ball.six { background: #36a269; border-color: #79e0a8; color: #fff; font-weight: 800; }
+.layout2 .bottom {
+  display: none;
+  min-height: 0;
+  padding: 7px 16px;
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,.35);
+  border-radius: 0 0 8px 8px;
+  font-size: clamp(13px,1.25vw,19px);
+  font-weight: 700;
+  text-align: center;
+  justify-content: center;
+  background: rgba(10,18,30,.80);
+  color: #fff;
+}
+.layout2 .bottom.visible { display: flex; }
+.layout2 #score2, .layout2 #meta2, .layout2 #overs2, .layout2 #rr2 { display: none !important; }
+.layout2.theme-blue { background: rgba(20,57,105,var(--overlay-opacity,.70)); }
+.layout2.theme-blue .team.left .scorebox { background: rgba(35,79,128,.88); }
+.layout2.theme-blue .bottom { background: rgba(12,39,77,.94); }
+.layout2.theme-blue .team.left .identity,
+.layout2.theme-blue #details1,
+.layout2.theme-blue #details2,
+.layout2.theme-blue .team.right .identity { border-color: rgba(190,218,250,.48); }
+.layout2.theme-blue .team.left .scorebox { border-color: rgba(190,218,250,.35); }
+.layout2.theme-blue .meta,
+.layout2.theme-blue .bowler-meta { color: #d5e6ff; }
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 48px minmax(80px,1fr) 100px minmax(80px,1fr) 48px;
+    height: auto;
+    min-height: 90px;
+  }
+  .layout2 .team.left .identity,
+  .layout2 .team.right .identity { padding: 5px 2px; }
+  .layout2 .logo { width: 27px; height: 25px; }
+  .layout2 .team-name { font-size: 8px; }
+  .layout2 #details1, .layout2 #details2 { padding: 5px 6px; }
+  .layout2 .team.left .scorebox { width: calc(100% - 6px); height: 60px; padding: 4px; }
+  .layout2 .score { font-size: 22px; }
+  .layout2 .meta { font-size: 9px; }
+  .layout2 .player { font-size: 10px; margin: 0; padding: 7px 0; gap: 3px; }
+  .layout2 .balls { gap: 3px; margin-top: 6px; }
+  .layout2 .ball { min-width: 17px; height: 18px; padding: 0 3px; font-size: 9px; }
+  .layout2 .ball-label { font-size: 8px; margin-right: 1px; }
+}
+
 </style>
 </head>
 <body>
@@ -457,6 +620,15 @@ document.documentElement.style.setProperty(
   overlayOpacity
 );
 
+// Layout and theme are independent query parameters.
+// layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
+const requestedLayout = (params.get("layout") || "1").trim().toLowerCase();
+const overlayLayout = requestedLayout === "2" ? "2" : "1";
+const requestedTheme = (params.get("theme") || "graphite").trim().toLowerCase();
+const overlayTheme = requestedTheme === "blue" ? "blue" : "graphite";
+document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
+document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
+
 const REFRESH_MS = Number.isFinite(requested)
   ? Math.max(1000, Math.min(requested, 60000))
   : 5000;
@@ -505,7 +677,10 @@ function showScore(n, t) {
 
   if (!isZeroZero) {
     $("score" + n).textContent = `${t.total}/${t.wickets}`;
-    $("overs" + n).textContent = `Overs ${t.overs}`;
+    const shownOvers = document.querySelector(".overlay").classList.contains("layout2")
+      ? formatOvers(t.overs)
+      : t.overs;
+    $("overs" + n).textContent = `Overs ${shownOvers}`;
     $("rr" + n).textContent = `RR ${t.rr}`;
   }
 }
@@ -535,21 +710,35 @@ function showBowler(v,balls){
     const x=String(b);
     let cls="ball";
     if(x.toUpperCase().includes("W")) cls+=" wicket";
-    else if(x==="4"||x==="6") cls+=" boundary";
+    else if(x==="6") cls+=" boundary six";
+    else if(x==="4") cls+=" boundary";
     return `<span class="${cls}">${escapeHTML(x)}</span>`;
   }).join("");
 
   return `
-    <div class="section-label">Current bowler</div>
-    <div class="bowler-name">${escapeHTML(get(v,"bowlerName","--"))}</div>
-    <div class="bowler-meta">${escapeHTML(get(v,"bowlerWickets","0"))}/${escapeHTML(get(v,"bowlerRuns","0"))} · ${escapeHTML(get(v,"bowlerOvers","0"))} overs</div>
-    <div class="balls"><span class="ball-label">OVER</span>${chips}</div>`;
+    <div class="bowler-row">
+      <div class="bowler-name">${escapeHTML(get(v,"bowlerName","--"))}</div>
+      <div class="bowler-meta">${escapeHTML(get(v,"bowlerWickets","0"))}/${escapeHTML(get(v,"bowlerRuns","0"))} (${escapeHTML(formatOvers(get(v,"bowlerOvers","0.0")))})</div>
+    </div>
+    <div class="balls"><span class="ball-label">THIS OVER</span>${chips}</div>`;
 }
 
 function escapeHTML(s){
   return String(s).replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
+}
+
+function formatOvers(overs) {
+  const value = String(overs ?? "").trim();
+  if (!value) return "0.0";
+
+  // CricClubs may return completed overs as "15", "15.", or "15.0".
+  // Normalize all completed-over representations to include the .0 suffix.
+  const completedOvers = value.match(/^(\\d+)\\.?$/);
+  if (completedOvers) return `${completedOvers[1]}.0`;
+
+  return value;
 }
 
 function overBalls(overs){
@@ -568,16 +757,79 @@ function completed(data,v){
 function render(data){
   const v=data.values||{};
   const second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
-
-  // Fixed team positions; roles change with the innings.
   const t1=teamScore(v,"t1");
   const t2=teamScore(v,"t2");
+  const isLayout2 = document.querySelector(".overlay").classList.contains("layout2");
+  const bottom=$("bottom");
+  const bottomText=$("bottomText");
+  const powered=$("powered");
 
+  if (isLayout2) {
+    // Layout 2 always puts the current batting side on the left and bowling side on the right.
+    const battingTeam = second ? t2 : t1;
+    const bowlingTeam = second ? t1 : t2;
+
+    $("name1").textContent = battingTeam.name;
+    $("name2").textContent = bowlingTeam.name;
+    showScore(1, battingTeam);
+    $("score1").closest(".scorebox").style.display = "flex";
+    $("score1").closest(".scorebox").style.visibility = "visible";
+    $("score2").closest(".scorebox").style.display = "none";
+
+    $("details1").innerHTML = showBatters(v);
+    $("details2").innerHTML = showBowler(v, data.balls);
+
+    // CricClubs' logo fields appear opposite to the visual team slots in the original overlay.
+    logo("logo1", second ? v.firstLogo : v.secondLogo);
+    logo("logo2", second ? v.secondLogo : v.firstLogo);
+
+    if (completed(data,v)) {
+      bottomText.textContent = get(v,"result",get(data,"result","Match completed"));
+      bottom.classList.add("visible");
+      if (powered) powered.style.display = "none";
+      stopped = true;
+      if (timer) clearTimeout(timer);
+      return;
+    }
+
+    if (second) {
+      const first = Number(get(v,"t1Total",""));
+      const current = Number(t2.total);
+      const needed = first + 1 - current;
+      const limit = Number(get(v,"totalOvers",get(v,"oversLimit",get(v,"matchOvers",""))));
+      const ballsBowled = overBalls(t2.overs);
+      let message = get(v,"showMsgForScoreNeeded","");
+
+      if (Number.isFinite(first) && Number.isFinite(current) && first >= 0) {
+        if (needed <= 0) {
+          message = "Target achieved";
+        } else {
+          message = `Need ${needed} runs to win`;
+          if (Number.isFinite(limit) && limit > 0 && ballsBowled !== null) {
+            const left = Math.max(0, limit * 6 - ballsBowled);
+            if (left > 0) message += ` · ${left} balls left · RRR ${(needed * 6 / left).toFixed(2)}`;
+          }
+        }
+      }
+      bottomText.textContent = message;
+      bottom.classList.add("visible");
+    } else {
+      // No chase bar during the first innings.
+      bottom.classList.remove("visible");
+      bottomText.textContent = "";
+    }
+    return;
+  }
+
+  // Layout 1: original design preserved.
   showScore(1,t1);
   showScore(2,t2);
-  
-logo("logo1", v.secondLogo);
-logo("logo2", v.firstLogo);
+  $("score1").closest(".scorebox").style.display = "";
+  $("score2").closest(".scorebox").style.display = "";
+  $("score1").closest(".scorebox").style.visibility = "visible";
+  $("score2").closest(".scorebox").style.visibility = "visible";
+  logo("logo1", v.secondLogo);
+  logo("logo2", v.firstLogo);
 
   if(!second){
     $("details1").innerHTML=showBatters(v);
@@ -587,14 +839,10 @@ logo("logo2", v.firstLogo);
     $("details2").innerHTML=showBatters(v);
   }
 
-  const bottom=$("bottom");
-  const bottomText=$("bottomText");
-  const powered=$("powered");
-
   if(completed(data,v)){
     bottomText.textContent=get(v,"result",get(data,"result","Match completed"));
     bottom.classList.add("visible");
-    powered.style.display="inline";
+    if(powered) powered.style.display="inline";
     stopped=true;
     if(timer)clearTimeout(timer);
     return;
@@ -615,23 +863,19 @@ logo("logo2", v.firstLogo);
         message=`Need ${needed} runs to win`;
         if(Number.isFinite(limit)&&limit>0&&ballsBowled!==null){
           const left=Math.max(0,limit*6-ballsBowled);
-          if(left>0){
-            message+=` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
-          }
+          if(left>0) message+=` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
         }
       }
     }else{
       message=get(v,"showMsgForScoreNeeded","");
     }
-
     bottomText.textContent=message;
     bottom.classList.add("visible");
-    powered.style.display="none";
+    if(powered) powered.style.display="none";
   }else{
     bottom.classList.remove("visible");
   }
 }
-
 async function refresh(){
   if(stopped)return;
   try{
