@@ -1072,6 +1072,50 @@ body::before, body::after { content: none !important; }
 .overlay.theme-graphite .scorebox, .overlay.theme-graphite .team.left .scorebox { background: rgba(57,64,74,var(--overlay-opacity,.70)) !important; }
 .overlay.theme-graphite .bottom, .overlay.theme-graphite .bottom.visible { background: rgba(18,22,28,var(--overlay-opacity,.70)) !important; }
 
+
+/* Opacity regression repair. Use a single translucent paint layer per visible
+   surface; never stack a tinted outer wrapper behind tinted child panels. */
+.overlay.theme-red, .overlay.theme-blue, .overlay.theme-graphite {
+  background: transparent !important;
+}
+.overlay .team { background: transparent !important; box-shadow: none !important; }
+.overlay.theme-blue .top, .overlay.theme-blue .prematch-template {
+  background: rgba(20,57,105,var(--overlay-opacity,.70)) !important;
+}
+.overlay.theme-graphite .top, .overlay.theme-graphite .prematch-template {
+  background: rgba(35,40,47,var(--overlay-opacity,.70)) !important;
+}
+.overlay.theme-red .top, .overlay.theme-red .prematch-template {
+  background: rgba(138,12,24,var(--overlay-opacity,.70)) !important;
+}
+/* No second translucent background behind the primary top surface. */
+.overlay.theme-blue .scorebox, .overlay.theme-blue .team.left .scorebox,
+.overlay.theme-graphite .scorebox, .overlay.theme-graphite .team.left .scorebox,
+.overlay.theme-red .scorebox, .overlay.theme-red .team.left .scorebox {
+  background: transparent !important;
+}
+/* Match summary and innings break surfaces use the same query-controlled alpha. */
+body:not(.theme-red-active) #overSummary {background:rgba(9,35,63,var(--overlay-opacity,.70)) !important;}
+body:not(.theme-red-active) #overSummary .os-panel {background:rgba(25,60,96,var(--overlay-opacity,.70)) !important;}
+body:not(.theme-red-active) #fullInningsBreak .ib-header,
+body:not(.theme-red-active) #fullInningsBreak .ib-panel,
+body:not(.theme-red-active) #fullInningsBreak .ib-foot {
+  background:rgba(7,51,96,var(--overlay-opacity,.70)) !important;
+}
+body:not(.theme-red-active) #fullInningsBreak .ib-panel h3,
+body:not(.theme-red-active) #fullInningsBreak .ib-table th {background:rgba(7,51,96,var(--overlay-opacity,.70)) !important;}
+/* At opacity=0, keep foreground text and animation visible. */
+
+
+/* Keep celebration anchored to the WebView viewport, not the clipped scoreboard.
+   The scoreboard itself retains its compact dimensions and bottom anchoring. */
+body > #scoreEvent.event-animation {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  z-index: 2147483000 !important;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -1117,12 +1161,13 @@ body::before, body::after { content: none !important; }
     <span id="bottomText"></span><span class="powered-credit">Powered by <a href="https://cricclubs.com" target="_blank" rel="noopener noreferrer">CricClubs</a></span>
   </div>
   <div class="error" id="error"></div>
+</div>
+
+<!-- Full-viewport event layer: sibling of clipped bottom scoreboard. -->
   <div class="event-animation" id="scoreEvent" aria-live="polite">
     <div class="event-rays"></div><div class="event-particles"></div>
     <span class="event-emoji"></span><span class="event-text"></span><span class="event-subtitle"></span>
   </div>
-</div>
-
 
 <div id="fullInningsBreak" aria-live="polite" aria-label="First innings full scorecard">
  <div class="ib-header"><div class="ib-team" id="ibBatTeam">BATTING TEAM</div><div class="ib-center"><strong>INNINGS BREAK</strong><div class="ib-score" id="ibScore">—</div><span id="ibOvers">— overs</span></div><div class="ib-team" id="ibBowlTeam">BOWLING TEAM<br><span class="ib-target" id="ibTarget"></span></div></div>
