@@ -832,6 +832,34 @@ body { position:relative; min-height:100vh; }
 }
 .innings-break-detail{font-size:clamp(10px,1.2vw,14px);font-weight:800;letter-spacing:.6px;text-align:center;opacity:.85;padding:8px 2px;}
 
+/* Compact footer correction: retain original 76px/70px scoreboard height.
+   The footer stays in normal flow, below the header, without oversized minimums. */
+.layout2 .top, .layout2 .prematch-template {
+  overflow: hidden !important;
+}
+.layout2 .bottom.visible {
+  box-sizing: border-box !important;
+  height: 27px !important;
+  min-height: 27px !important;
+  max-height: 27px !important;
+  padding: 3px 145px 3px 12px !important;
+  flex-shrink: 0;
+  overflow: hidden;
+  align-items: center;
+}
+.layout2 .bottom.visible #bottomText { line-height: 1.1; }
+@media(max-width:650px) {
+  .layout2 .bottom.visible {
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+    padding: 2px 112px 2px 8px !important;
+  }
+}
+@media (orientation: portrait) {
+  .overlay { bottom: max(var(--scoreboard-bottom-offset, 16px), env(safe-area-inset-bottom, 0px)) !important; }
+}
+
 /* Full landscape innings-break broadcast graphic; hidden during normal play. */
 #fullInningsBreak{display:none;position:fixed;left:1.2%;right:1.2%;bottom:var(--scoreboard-bottom-offset,0px);z-index:100;color:#f5faff;font:600 clamp(10px,1.05vw,17px)/1.24 system-ui,Arial,sans-serif;box-sizing:border-box;max-height:96dvh;overflow:auto;pointer-events:none}
 body.show-full-break #fullInningsBreak{display:block}
@@ -895,6 +923,9 @@ body.show-over-summary .overlay,body.show-over-summary #fullInningsBreak{display
   white-space: nowrap;
 }
 
+/* Keep the second innings row hidden despite the higher-specificity centered grid. */
+#overSummary .os-second-score[hidden] { display: none !important; }
+
 /* Money Heist-inspired crimson broadcast theme; theme=red. */
 .layout2.theme-red, .overlay.theme-red {
   background: rgba(138, 12, 24, var(--overlay-opacity, .70)) !important;
@@ -903,11 +934,11 @@ body.show-over-summary .overlay,body.show-over-summary #fullInningsBreak{display
 }
 .overlay.theme-red .top,
 .overlay.theme-red .prematch-template {
-  background: linear-gradient(110deg, rgba(105, 8, 18, .97), rgba(189, 19, 36, .95) 50%, rgba(99, 8, 18, .97)) !important;
+  background: linear-gradient(110deg, rgba(105, 8, 18, var(--overlay-opacity, .70)), rgba(189, 19, 36, var(--overlay-opacity, .70)) 50%, rgba(99, 8, 18, var(--overlay-opacity, .70))) !important;
 }
 .overlay.theme-red .scorebox,
 .overlay.theme-red .team.left .scorebox {
-  background: rgba(55, 7, 14, .64) !important;
+  background: rgba(55, 7, 14, var(--overlay-opacity, .70)) !important;
   border-color: rgba(255, 226, 214, .38) !important;
 }
 .overlay.theme-red .identity,
@@ -929,7 +960,7 @@ body.show-over-summary .overlay,body.show-over-summary #fullInningsBreak{display
 .overlay.theme-red .prematch-side { color: #ffe1d9 !important; }
 .overlay.theme-red .bottom,
 .overlay.theme-red .bottom.visible {
-  background: rgba(67, 6, 15, .96) !important;
+  background: rgba(67, 6, 15, var(--overlay-opacity, .70)) !important;
   border-top-color: rgba(255, 213, 199, .4) !important;
   color: #fff6f0 !important;
 }
@@ -939,18 +970,76 @@ body.show-over-summary .overlay,body.show-over-summary #fullInningsBreak{display
 .overlay.theme-red .ball.six { background: #f5e9df !important; border-color: #fff !important; color: #6f0c1b !important; }
 /* Match summary and innings-break panels share the selected red palette. */
 body.theme-red-active #overSummary {
-  background: rgba(68, 7, 16, .97) !important;
+  background: rgba(68, 7, 16, var(--overlay-opacity, .70)) !important;
   border-color: #e43a4a !important;
   color: #fff6f2 !important;
   font-family: "Arial Narrow", "Roboto Condensed", Arial, sans-serif !important;
 }
 body.theme-red-active #overSummary .os-head,
-body.theme-red-active #overSummary .os-foot { background: #b81429 !important; }
-body.theme-red-active #overSummary .os-panel { background: #751320 !important; }
+body.theme-red-active #overSummary .os-foot { background: rgba(184, 20, 41, var(--overlay-opacity, .70)) !important; }
+body.theme-red-active #overSummary .os-panel { background: rgba(117, 19, 32, var(--overlay-opacity, .70)) !important; }
 body.theme-red-active #overSummary .os-panel h3 { color: #ffd9c8 !important; }
 body.theme-red-active #fullInningsBreak { border-color: #e43a4a !important; }
 body.theme-red-active #fullInningsBreak .ib-header,
-body.theme-red-active #fullInningsBreak .ib-foot { background: #a51025 !important; }
+body.theme-red-active #fullInningsBreak .ib-foot { background: rgba(165, 16, 37, var(--overlay-opacity, .70)) !important; }
+
+/* Keep innings-break and prematch red panels consistent with opacity. */
+body.theme-red-active #fullInningsBreak .ib-panel {
+  background: rgba(80, 9, 21, var(--overlay-opacity, .70)) !important;
+}
+.overlay.theme-red .prematch-emblem {
+  background: rgba(105, 8, 18, var(--overlay-opacity, .70)) !important;
+}
+
+
+/* 2026-10-13 compact reference: one bottom-anchored scoreboard and footer.
+   Keep this after older layout rules to avoid conflicting min-heights. */
+.overlay.layout2 {
+  display: flex !important;
+  flex-direction: column;
+  bottom: var(--scoreboard-bottom-offset, 0px) !important;
+}
+.layout2 .top, .layout2 .prematch-template {
+  flex: 0 0 70px !important;
+  height: 70px !important;
+  min-height: 70px !important;
+  max-height: 70px !important;
+  overflow: hidden !important;
+}
+.layout2 #details1, .layout2 #details2 { padding: 3px 10px !important; }
+.layout2 .player { padding: 5px 0 !important; gap: 4px; }
+.layout2 #details1 .player + .player { padding-top: 5px !important; }
+.layout2 .bowler-row { padding-bottom: 4px !important; }
+.layout2 .balls { margin-top: 5px !important; gap: 4px; }
+.layout2 .ball { height: 22px; min-width: 22px; font-size: 11px; padding: 0 3px; }
+.layout2 .team.left .scorebox { height: 48px !important; margin-block: 0 !important; padding: 3px 6px !important; }
+.layout2 .meta { margin-top: 2px !important; gap: 0; }
+.layout2 .identity { gap: 2px; padding: 3px 4px; }
+.layout2 .logo { height: 33px; width: min(42px,100%); }
+.layout2 .bottom.visible {
+  position: relative !important;
+  display: flex !important;
+  flex: 0 0 25px !important;
+  height: 25px !important;
+  min-height: 25px !important;
+  max-height: 25px !important;
+  padding: 2px 125px 2px 8px !important;
+  box-sizing: border-box !important;
+  overflow: hidden;
+  align-items: center;
+}
+.layout2 .bottom.visible #bottomText { line-height: 1.2; }
+@media (max-width:650px) {
+  .layout2 .top, .layout2 .prematch-template { flex-basis: 64px !important; height:64px !important; min-height:64px !important; max-height:64px !important; }
+  .layout2 #details1, .layout2 #details2 { padding: 2px 4px !important; }
+  .layout2 .player-name, .layout2 .bowler-name { font-size: 11px; }
+  .layout2 .bowler-meta { font-size: 10px; }
+  .layout2 .team.left .scorebox { height: 42px !important; }
+  .layout2 .bottom.visible { flex-basis: 23px !important; height:23px !important; min-height:23px !important; max-height:23px !important; padding: 2px 90px 2px 5px !important; }
+}
+@media (orientation:portrait) {
+  .overlay.layout2 { bottom: max(var(--scoreboard-bottom-offset, 0px), env(safe-area-inset-bottom, 0px)) !important; }
+}
 
 </style>
 </head>
@@ -1024,7 +1113,7 @@ const legacyRefreshMs = Number(params.get("refreshInterval") ?? "5000");
 const opacityValue = Number(params.get("opacity"));
 
 const overlayOpacity = params.has("opacity") && Number.isFinite(opacityValue)
-  ? Math.max(0.1, Math.min(1, opacityValue))
+  ? Math.max(0, Math.min(1, opacityValue))
   : 0.70;
 
 document.documentElement.style.setProperty(
