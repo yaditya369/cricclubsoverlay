@@ -1041,6 +1041,25 @@ body.theme-red-active #fullInningsBreak .ib-panel {
   .overlay.layout2 { bottom: max(var(--scoreboard-bottom-offset, 0px), env(safe-area-inset-bottom, 0px)) !important; }
 }
 
+
+/* Transparent camera canvas: no full-screen backdrop or stray shadow.
+   Keep the existing compact scoreboard and footer dimensions unchanged. */
+html, body {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+body::before, body::after { content: none !important; }
+.overlay {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  box-shadow: none !important;
+  background-clip: padding-box;
+}
+.overlay::before, .overlay::after { content: none !important; }
+/* Preserve the selected theme background only on the visible scoreboard. */
+.overlay.layout2 { height: auto !important; min-height: 0 !important; }
+
 </style>
 </head>
 <body>
