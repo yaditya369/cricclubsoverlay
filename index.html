@@ -804,6 +804,154 @@ body{
   overflow: hidden;
 }
 .layout2 .prematch-side { min-height: 0; }
+
+/* Camera WebView: keep the viewport transparent and anchor the visible bar. */
+html, body { width:100%; height:100%; margin:0; background:transparent !important; }
+body { position:relative; min-height:100vh; }
+.overlay { position:fixed !important; left:0; right:0; bottom:var(--scoreboard-bottom-offset, 0px) !important; top:auto !important; width:100%; height:auto !important; margin:0 !important; z-index:10; }
+
+/* Camera compact mode: same header height for every match phase.
+   Only the WebView fills the screen; the scoreboard does not. */
+.layout2 .top,
+.layout2 .prematch-template {
+  box-sizing: border-box !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  overflow: hidden;
+}
+.layout2 .prematch-template { padding: 2px 10px !important; }
+.layout2 .bottom { min-height: 0 !important; padding-top: 5px !important; padding-bottom: 5px !important; }
+@media(max-width:650px) {
+  .layout2 .top,.layout2 .prematch-template {
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+  }
+  .layout2 .prematch-emblem { width: 30px; height: 30px; }
+}
+.innings-break-detail{font-size:clamp(10px,1.2vw,14px);font-weight:800;letter-spacing:.6px;text-align:center;opacity:.85;padding:8px 2px;}
+
+/* Full landscape innings-break broadcast graphic; hidden during normal play. */
+#fullInningsBreak{display:none;position:fixed;left:1.2%;right:1.2%;bottom:var(--scoreboard-bottom-offset,0px);z-index:100;color:#f5faff;font:600 clamp(10px,1.05vw,17px)/1.24 system-ui,Arial,sans-serif;box-sizing:border-box;max-height:96dvh;overflow:auto;pointer-events:none}
+body.show-full-break #fullInningsBreak{display:block}
+body.show-full-break .overlay{display:none!important}
+.ib-header,.ib-panel,.ib-foot{background:linear-gradient(125deg,rgba(3,21,45,.96),rgba(7,51,96,.94));border:2px solid #368ad0;border-radius:12px;box-shadow:0 4px 20px #00152e80}
+.ib-header{display:grid;grid-template-columns:1fr 1.05fr 1fr;align-items:center;text-align:center;padding:8px 18px;margin-bottom:8px;gap:8px}
+.ib-header .ib-team{font-size:clamp(14px,1.8vw,29px);font-weight:900;overflow-wrap:anywhere}
+.ib-header .ib-center strong{display:block;color:#ffda63;letter-spacing:2px;font-size:clamp(12px,1.35vw,22px)}
+.ib-header .ib-score{font-size:clamp(24px,3vw,50px);font-weight:950}
+.ib-target{color:#ffda63;font-weight:900}
+.ib-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:8px;align-items:start}
+.ib-panel{overflow:hidden;padding-bottom:6px}
+.ib-panel h3{margin:0;padding:7px 12px;background:#0a4179;font-size:clamp(12px,1.25vw,20px);letter-spacing:.6px}
+.ib-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:clamp(9px,.94vw,16px)}
+.ib-table th{color:#b9d9fa;font-weight:700;text-align:right;padding:6px 6px;background:#071e3b}
+.ib-table td{text-align:right;padding:5px 6px;border-top:1px solid #285176;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ib-table .ib-name,.ib-table .ib-how{text-align:left;overflow:hidden;text-overflow:ellipsis}
+.ib-table .ib-name{font-weight:800}
+.ib-table .ib-runs{font-weight:900;color:#fff}
+.ib-table .ib-how{color:#bcd7f2;font-weight:500}
+.ib-summary{padding:6px 10px;border-top:1px solid #37638d;color:#d4eaff;font-size:clamp(9px,.91vw,15px)}
+.ib-summary b{color:#ffdb69}
+.ib-right{display:grid;gap:8px}
+.ib-extras{padding:6px 12px;display:grid;grid-template-columns:1fr auto;gap:5px;font-size:clamp(10px,.95vw,16px)}
+.ib-extras .ib-total{color:#ffdb69;font-weight:900;border-top:1px solid #4a7298;padding-top:5px}
+.ib-foot{text-align:center;padding:10px;font-size:clamp(11px,1.2vw,19px);font-weight:900;color:#ffda63}
+.ib-status{padding:14px;color:#f9d27a;text-align:center}
+@media (max-aspect-ratio: 1/1){#fullInningsBreak{left:1%;right:1%;font-size:10px;max-height:92dvh}.ib-grid{grid-template-columns:1fr}.ib-table{font-size:10px}.ib-table td,.ib-table th{padding:4px 3px}.ib-header{padding:6px}.ib-right{grid-template-columns:1fr}.ib-panel h3{font-size:12px}}
+
+/* Compact landscape summary: centered for 5 seconds after each completed over. */
+#overSummary{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(660px,88vw);z-index:200;box-sizing:border-box;color:#f6fbff;font:600 clamp(11px,1.05vw,16px)/1.35 system-ui,Arial,sans-serif;background:rgba(9,35,63,.96);border:2px solid #277cc2;border-radius:12px;padding:10px;box-shadow:0 10px 35px #0009;pointer-events:none}
+body.show-over-summary #overSummary{display:block}
+body.show-over-summary .overlay,body.show-over-summary #fullInningsBreak{display:none!important}
+.os-head,.os-foot{background:#146cb5;border-radius:5px;padding:7px 10px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.os-head{font-weight:900;letter-spacing:.6px}.os-score{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 5px}.os-score strong{font-size:clamp(20px,2.1vw,29px)}
+.os-second-score{border-top:1px solid #466784;padding-top:7px}.os-second-score[hidden]{display:none!important}.os-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.os-panel{background:#193c60;border-radius:6px;padding:9px 12px;min-width:0}.os-panel h3{color:#afcbe6;margin:0 0 8px;font-size:12px;letter-spacing:.6px}.os-row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}.os-row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.os-row span:last-child{white-space:nowrap}.os-foot{margin-top:9px;font-size:12px}
+@media(max-width:520px){#overSummary{width:95vw;padding:6px}.os-panel{padding:6px}.os-grid{gap:5px}.os-row{font-size:10px}.os-foot{font-size:10px}}
+/* Match summary: center each team score independently of name/overs widths. */
+#overSummary .os-score {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+  align-items: center;
+  column-gap: 12px;
+}
+#overSummary .os-score > span:first-child {
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#overSummary .os-score > strong {
+  justify-self: center;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+#overSummary .os-score > span:last-child {
+  justify-self: end;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Money Heist-inspired crimson broadcast theme; theme=red. */
+.layout2.theme-red, .overlay.theme-red {
+  background: rgba(138, 12, 24, var(--overlay-opacity, .70)) !important;
+  color: #fff8f5;
+  font-family: "Arial Narrow", "Roboto Condensed", "Arial", sans-serif;
+}
+.overlay.theme-red .top,
+.overlay.theme-red .prematch-template {
+  background: linear-gradient(110deg, rgba(105, 8, 18, .97), rgba(189, 19, 36, .95) 50%, rgba(99, 8, 18, .97)) !important;
+}
+.overlay.theme-red .scorebox,
+.overlay.theme-red .team.left .scorebox {
+  background: rgba(55, 7, 14, .64) !important;
+  border-color: rgba(255, 226, 214, .38) !important;
+}
+.overlay.theme-red .identity,
+.overlay.theme-red #details1,
+.overlay.theme-red #details2,
+.overlay.theme-red .team.right .identity {
+  border-color: rgba(255, 218, 205, .36) !important;
+}
+.overlay.theme-red .score,
+.overlay.theme-red .team-name,
+.overlay.theme-red .prematch-team-name {
+  color: #fffaf6 !important;
+  font-weight: 900;
+  letter-spacing: .035em;
+  text-shadow: 0 1px 2px rgba(28, 0, 0, .5);
+}
+.overlay.theme-red .meta,
+.overlay.theme-red .bowler-meta,
+.overlay.theme-red .prematch-side { color: #ffe1d9 !important; }
+.overlay.theme-red .bottom,
+.overlay.theme-red .bottom.visible {
+  background: rgba(67, 6, 15, .96) !important;
+  border-top-color: rgba(255, 213, 199, .4) !important;
+  color: #fff6f0 !important;
+}
+.overlay.theme-red .ball { border-color: rgba(255, 221, 208, .55); }
+.overlay.theme-red .ball.wicket { background: #3b050d !important; border-color: #ff8c92 !important; color: #fff !important; }
+.overlay.theme-red .ball.boundary { background: #f1c76c !important; border-color: #ffe2a4 !important; color: #401017 !important; }
+.overlay.theme-red .ball.six { background: #f5e9df !important; border-color: #fff !important; color: #6f0c1b !important; }
+/* Match summary and innings-break panels share the selected red palette. */
+body.theme-red-active #overSummary {
+  background: rgba(68, 7, 16, .97) !important;
+  border-color: #e43a4a !important;
+  color: #fff6f2 !important;
+  font-family: "Arial Narrow", "Roboto Condensed", Arial, sans-serif !important;
+}
+body.theme-red-active #overSummary .os-head,
+body.theme-red-active #overSummary .os-foot { background: #b81429 !important; }
+body.theme-red-active #overSummary .os-panel { background: #751320 !important; }
+body.theme-red-active #overSummary .os-panel h3 { color: #ffd9c8 !important; }
+body.theme-red-active #fullInningsBreak { border-color: #e43a4a !important; }
+body.theme-red-active #fullInningsBreak .ib-header,
+body.theme-red-active #fullInningsBreak .ib-foot { background: #a51025 !important; }
+
 </style>
 </head>
 <body>
@@ -855,12 +1003,23 @@ body{
   </div>
 </div>
 
+
+<div id="fullInningsBreak" aria-live="polite" aria-label="First innings full scorecard">
+ <div class="ib-header"><div class="ib-team" id="ibBatTeam">BATTING TEAM</div><div class="ib-center"><strong>INNINGS BREAK</strong><div class="ib-score" id="ibScore">—</div><span id="ibOvers">— overs</span></div><div class="ib-team" id="ibBowlTeam">BOWLING TEAM<br><span class="ib-target" id="ibTarget"></span></div></div>
+ <div class="ib-grid"><section class="ib-panel"><h3 id="ibBatTitle">BATTING</h3><table class="ib-table"><colgroup><col style="width:24%"><col style="width:32%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:12%"></colgroup><thead><tr><th class="ib-name">BATSMAN</th><th class="ib-how">HOW OUT</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody id="ibBatRows"></tbody></table><div class="ib-summary" id="ibFoW"></div></section>
+ <div class="ib-right"><section class="ib-panel"><h3 id="ibBowlTitle">BOWLING</h3><table class="ib-table"><colgroup><col style="width:37%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:15%"></colgroup><thead><tr><th class="ib-name">BOWLER</th><th>O</th><th>M</th><th>R</th><th>W</th><th>ECON</th></tr></thead><tbody id="ibBowlRows"></tbody></table></section><section class="ib-panel"><h3>EXTRAS BREAKDOWN</h3><div class="ib-extras" id="ibExtras"></div></section><div class="ib-foot" id="ibFoot">SECOND INNINGS STARTING SOON</div></div></div>
+</div>
+
+<div id="overSummary" aria-live="polite"><div class="os-head"><span id="osTitle">OVER SUMMARY</span><span id="osOvers"></span></div><div class="os-score" id="osFirstRow"><span id="osTeam">TEAM</span><strong id="osScore">—</strong><span id="osRR"></span></div><div class="os-score os-second-score" id="osSecondRow" hidden><span id="osSecondTeam">TEAM B</span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div><div class="os-grid"><section class="os-panel"><h3>TOP BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>TOP BOWLERS</h3><div id="osBowlers"></div></section></div><div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div></div>
 <script>
 const params = new URLSearchParams(location.search);
 const clubId = params.get("clubId") || "22594";
 const matchId = params.get("matchId") || "1374";
 
-const requested = Number(params.get("refreshInterval") || params.get("refresh") || 5000);
+// refresh is expressed in seconds (e.g. refresh=5).
+// Legacy refreshInterval remains supported in milliseconds for older links.
+const refreshSeconds = Number(params.get("refresh") ?? "5");
+const legacyRefreshMs = Number(params.get("refreshInterval") ?? "5000");
 
 const opacityValue = Number(params.get("opacity"));
 
@@ -878,12 +1037,15 @@ document.documentElement.style.setProperty(
 const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
 const overlayLayout = requestedLayout === "2" ? "2" : "1";
 const requestedTheme = (params.get("theme") || "blue").trim().toLowerCase();
-const overlayTheme = requestedTheme === "blue" ? "blue" : "graphite";
+const overlayTheme = ["blue", "graphite", "red"].includes(requestedTheme) ? requestedTheme : "graphite";
 document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
+document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
+document.body.classList.toggle("theme-red-active", overlayTheme === "red");
 
-const REFRESH_MS = Number.isFinite(requested)
-  ? Math.max(1000, Math.min(requested, 60000))
+const requestedRefreshMs = params.has("refresh") ? refreshSeconds * 1000 : legacyRefreshMs;
+const REFRESH_MS = Number.isFinite(requestedRefreshMs) && requestedRefreshMs > 0
+  ? Math.max(1000, Math.min(requestedRefreshMs, 60000))
   : 5000;
 
 const API = `https://cricclubs.com/liveScoreOverlayData.do?clubId=${encodeURIComponent(clubId)}&matchId=${encodeURIComponent(matchId)}`;
@@ -1106,6 +1268,162 @@ function matchNotStarted(data,v,t1,t2,second) {
     overBalls(t1.overs)===0 && overBalls(t2.overs)===0;
 }
 
+// Between innings: prefer an explicit CricClubs status, with score-based fallback.
+function inningsBreak(data,v,t1,t2,second){
+  if(second || completed(data,v))return false;
+  const status=textField(data,v,["matchStatus","status","statusText","matchState","inningsStatus"]).toLowerCase();
+  if(/innings?\s*break|interval|between innings|first innings (ended|complete|completed)/.test(status))return true;
+  // A full allotment of overs or ten wickets ends a standard innings.
+  // Require evidence that the innings was actually played, not a zeroed pre-match score.
+  const balls=overBalls(t1.overs);
+  const limit=Number(optional(v.totalOvers,v.oversLimit,v.matchOvers,urlParam("overs")));
+  return balls>0 && (Number(t1.wickets)>=10 || (Number.isFinite(limit) && limit>0 && balls>=limit*6));
+}
+function breakMessage(t1){
+  const runs=Number(t1.total);
+  return `INNINGS BREAK${Number.isFinite(runs)?` · Target ${runs+1}`:""}`;
+}
+
+// Full scorecard data contract: { batting:[{name,howOut,r,b,fours,sixes,sr}],
+// bowling:[{name,overs,maidens,runs,wickets,econ}], extras:{byes,legByes,wides,noBalls,penalty}, fallOfWickets:[...], battingTeam,bowlingTeam,total,wickets,overs }.
+// Provide via ?scorecardUrl=https://your-cors-enabled-service/... (same-origin or CORS required).
+const demoFullCard = {
+ battingTeam:'RAGING BULLS',bowlingTeam:'CSK YORKERS',total:156,wickets:8,overs:'20.0',
+ batting:[
+  {name:'Rahul Sharma',howOut:'c Patel b Kumar',r:36,b:36,fours:6,sixes:1},
+  {name:'Aditya Reddy',howOut:'b Singh',r:27,b:21,fours:3,sixes:1},
+  {name:'Vikram Rao',howOut:'lbw b Kumar',r:18,b:16,fours:2,sixes:0},
+  {name:'Sandeep Patel',howOut:'c Shah b Reddy',r:32,b:24,fours:4,sixes:2},
+  {name:'Kiran R',howOut:'run out (Singh)',r:12,b:10,fours:1,sixes:0},
+  {name:'Naresh Regunta',howOut:'c & b Patel',r:8,b:9,fours:1,sixes:0},
+  {name:'Vamsi K',howOut:'st Shah b Patel',r:6,b:7,fours:0,sixes:0},
+  {name:'Rohit Verma',howOut:'not out',r:4,b:3,fours:0,sixes:0},
+  {name:'Deepak M',howOut:'c Shah b Kumar',r:1,b:2,fours:0,sixes:0},
+  {name:'Karthik S',howOut:'did not bat',r:null,b:null},
+  {name:'Manoj T',howOut:'did not bat',r:null,b:null}
+ ],
+ bowling:[{name:'Kumar',overs:'4.0',maidens:0,runs:28,wickets:2},{name:'Singh',overs:'4.0',maidens:0,runs:26,wickets:1},{name:'Patel',overs:'4.0',maidens:0,runs:32,wickets:2},{name:'Reddy',overs:'4.0',maidens:0,runs:30,wickets:1},{name:'Shah',overs:'4.0',maidens:0,runs:35,wickets:1}],
+ extras:{byes:2,legByes:3,wides:6,noBalls:1,penalty:0},
+ fallOfWickets:[]
+};
+// Demo is intentionally a UI illustration, not a validated CricClubs match scorecard.
+let loadedFullCard=null;
+let fullCardLoading=false;
+let lastFullCardAttempt=0;
+const scorecardUrl=params.get('scorecardUrl');
+function escapeScore(s){return String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function numberOrDash(n){return n===null||n===undefined?'—':escapeScore(n);}
+function showFullScorecard(card,live){
+ document.body.classList.add('show-full-break');
+ const d=card||{};const a=Array.isArray(d.batting)?d.batting:[];const b=Array.isArray(d.bowling)?d.bowling:[];
+ const battingTeam=d.battingTeam||live?.t1?.name||'BATTING TEAM';const bowlingTeam=d.bowlingTeam||live?.t2?.name||'BOWLING TEAM';
+ const total=d.total??live?.t1?.total??'—';const wickets=d.wickets??live?.t1?.wickets??'—';const overs=d.overs??live?.t1?.overs??'—';
+ $('ibBatTeam').textContent=battingTeam;$('ibBowlTeam').textContent=bowlingTeam;
+ $('ibScore').textContent=total+'/'+wickets;$('ibOvers').textContent=overs+' overs';
+ $('ibTarget').textContent=Number.isFinite(Number(total))?'Target: '+(Number(total)+1):'';
+ $('ibBatTitle').textContent=battingTeam+' BATTING';$('ibBowlTitle').textContent=bowlingTeam+' BOWLING';
+ $('ibBatRows').innerHTML=a.length?a.map(p=>{const sr=p.sr??(Number(p.b)>0?(Number(p.r)*100/Number(p.b)).toFixed(1):'—');return `<tr><td class="ib-name">${escapeScore(p.name)}</td><td class="ib-how" title="${escapeScore(p.howOut||'')}">${escapeScore(p.howOut||'not out')}</td><td class="ib-runs">${numberOrDash(p.r)}</td><td>${numberOrDash(p.b)}</td><td>${numberOrDash(p.fours)}</td><td>${numberOrDash(p.sixes)}</td><td>${numberOrDash(sr)}</td></tr>`}).join(''):'<tr><td colspan="7" class="ib-status">Waiting for full batting scorecard feed</td></tr>';
+ $('ibBowlRows').innerHTML=b.length?b.map(p=>{const o=String(p.overs??'0');const parts=o.split('.');const balls=Number(parts[0])*6+Number(parts[1]||0);const econ=p.econ??(balls>0?(Number(p.runs)*6/balls).toFixed(2):'—');return `<tr><td class="ib-name">${escapeScore(p.name)}</td><td>${numberOrDash(p.overs)}</td><td>${numberOrDash(p.maidens)}</td><td>${numberOrDash(p.runs)}</td><td>${numberOrDash(p.wickets)}</td><td>${numberOrDash(econ)}</td></tr>`}).join(''):'<tr><td colspan="6" class="ib-status">Waiting for full bowling scorecard feed</td></tr>';
+ const ex=d.extras||{};const fields=[['Byes',ex.byes],['Leg byes',ex.legByes],['Wides',ex.wides],['No balls',ex.noBalls],['Penalty',ex.penalty]];const known=fields.every(x=>Number.isFinite(Number(x[1]))&&x[1]!==undefined&&x[1]!==null);const sum=known?fields.reduce((n,x)=>n+Number(x[1]),0):null;
+ $('ibExtras').innerHTML=fields.map(([name,val])=>`<span>${name}</span><span>${numberOrDash(val)}</span>`).join('')+`<span class="ib-total">Total Extras</span><span class="ib-total">${numberOrDash(sum)}</span>`;
+ $('ibFoW').innerHTML='<b>Fall of wickets: </b>'+escapeScore(Array.isArray(d.fallOfWickets)&&d.fallOfWickets.length?d.fallOfWickets.join(', '):'Not available');
+ $('ibFoot').textContent=Number.isFinite(Number(total))?`${bowlingTeam} need ${Number(total)+1} runs to win · SECOND INNINGS STARTING SOON`:'SECOND INNINGS STARTING SOON';
+}
+async function fetchFullScorecard(force=false){
+ if(!scorecardUrl||fullCardLoading||(!force&&Date.now()-lastFullCardAttempt<15000))return;
+ lastFullCardAttempt=Date.now();fullCardLoading=true;
+ try{const res=await fetch(scorecardUrl,{cache:'no-store'});if(!res.ok)throw Error('Scorecard HTTP '+res.status);const obj=await res.json();if(!Array.isArray(obj.batting)||!Array.isArray(obj.bowling))throw Error('Expected batting and bowling arrays');loadedFullCard=obj;}
+ catch(e){console.warn('Full scorecard feed unavailable:',e);}
+ finally{fullCardLoading=false;}
+}
+
+
+// Summary data uses the optional full scorecard JSON feed; missing stats are never fabricated.
+// Independent switches; both disabled by default.
+// summary=1 remains an alias for the end-of-over summary for older links.
+const summaryParams = new URLSearchParams(location.search);
+const enabledFlag = value => /^(1|true|on|yes)$/i.test(String(value ?? '0'));
+const overSummaryEnabled = enabledFlag(summaryParams.get('overSummary') ?? summaryParams.get('summary'));
+const inningsBreakSummaryEnabled = enabledFlag(summaryParams.get('inningsBreakSummary'));
+// summaryDuration is seconds (default 5) or "nextBall" to wait for the first legal ball.
+const summaryDurationRaw = String(new URLSearchParams(location.search).get('summaryDuration') ?? '5').trim();
+const summaryUntilNextBall = /^(nextball|next-ball|ball)$/i.test(summaryDurationRaw);
+const summarySeconds = Number(summaryDurationRaw);
+const OVER_SUMMARY_MS = !summaryUntilNextBall && Number.isFinite(summarySeconds) && summarySeconds > 0
+  ? Math.min(summarySeconds, 3600) * 1000 : 5000;
+let awaitingNextBall = null;
+let overSummaryTimer=null;
+let previousOverState=null;
+let lastShownOverKey=null;
+function dismissOverSummary(){
+  if(overSummaryTimer){clearTimeout(overSummaryTimer);overSummaryTimer=null;}
+  awaitingNextBall = null;
+  document.body.classList.remove('show-over-summary');
+}
+function renderCompactSummary(card,t,second,overNo,breakMode,balls){
+  const d=card||{};
+  $('osTitle').textContent='MATCH SUMMARY';
+  $('osOvers').textContent=`${t.overs} OVERS`;
+  $('osTeam').textContent=t.name;
+  $('osScore').textContent=`${t.total}/${t.wickets}`;
+  $('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;
+  $('osSecondRow').hidden=true;
+  $('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo} COMPLETE`;
+  const bat=Array.isArray(d.batting)?d.batting.slice().filter(x=>Number.isFinite(Number(x.r))).sort((a,b)=>Number(b.r)-Number(a.r)).slice(0,3):[];
+  const bowl=Array.isArray(d.bowling)?d.bowling.slice().filter(x=>x.wickets!=null&&x.runs!=null).sort((a,b)=>Number(b.wickets)-Number(a.wickets)||Number(a.runs)-Number(b.runs)).slice(0,3):[];
+  $('osBatters').innerHTML=bat.length?bat.map(p=>{
+    const notOut=p.notOut===true||/^(not out|retired hurt)$/i.test(String(p.howOut||'').trim());
+    return `<div class="os-row"><span>${escapeScore(p.name)}${notOut?'*':''}</span><span>${escapeScore(p.r)} (${numberOrDash(p.b)})</span></div>`;
+  }).join(''):'<div class="os-row">Player stats unavailable</div>';
+  $('osBowlers').innerHTML=bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${escapeScore(p.wickets)}/${escapeScore(p.runs)} (${numberOrDash(p.overs)})</span></div>`).join(''):'<div class="os-row">Bowling stats unavailable</div>';
+  const ex=d.extras||{};
+  const extras=ex.total??(Object.values(ex).length&&Object.values(ex).every(x=>Number.isFinite(Number(x)))?Object.values(ex).reduce((a,b)=>a+Number(b),0):null);
+  $('osExtras').textContent=extras==null?'':`EXTRAS ${extras}`;
+  $('osFooter').textContent=breakMode?`TARGET ${Number(t.total)+1} · 2ND INNINGS SOON`:(Array.isArray(balls)&&balls.length?`RECENT: ${balls.slice(-6).map(x=>String(x)).join(' · ')}`:'');
+}
+function renderBothTeamsSummary(card,first,second,overNo,balls){
+  renderCompactSummary(card,second,true,overNo,false,balls);
+  $('osSecondRow').hidden=false;
+  $('osTeam').textContent=first.name;
+  $('osScore').textContent=`${first.total}/${first.wickets}`;
+  $('osRR').textContent=`${first.overs} OV`;
+  $('osSecondTeam').textContent=second.name;
+  $('osSecondScore').textContent=`${second.total}/${second.wickets}`;
+  $('osSecondRR').textContent=`${second.overs} OV · RR ${second.rr}`;
+  const need=Math.max(0,Number(first.total)+1-Number(second.total));
+  $('osFooter').textContent=`TARGET ${Number(first.total)+1} · NEED ${need} RUNS`;
+}
+function observeCompletedOver(data,v,t1,t2,second,onBreak){
+  if(!overSummaryEnabled)return;
+  const t=second?t2:t1;
+  const n=overBalls(t.overs);
+  const key=(second?'2':'1')+':'+Math.floor((n||0)/6);
+  const valid=n!==null&&n>0&&n%6===0;
+  // Establish baseline on first load: don't replay a summary from hours ago.
+  if(previousOverState===null){previousOverState={second,n};return;}
+  const prev=previousOverState;
+  previousOverState={second,n};
+  // For nextBall mode, dismiss when the next over's first delivery has been recorded.
+  // Any increase in delivered-ball count after the completed over qualifies.
+  if(awaitingNextBall && (awaitingNextBall.second !== second || (n !== null && n > awaitingNextBall.n))) {
+    dismissOverSummary();
+  }
+  if(onBreak||completed(data,v)||!valid||prev.second!==second||prev.n===null||n<=prev.n||lastShownOverKey===key)return;
+  lastShownOverKey=key;
+  if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
+  else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
+  document.body.classList.add('show-over-summary');
+  if(overSummaryTimer)clearTimeout(overSummaryTimer);
+  if(summaryUntilNextBall) awaitingNextBall={second,n};
+  else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
+  // Fetch updated full scorecard when configured. Only refresh the popup if still showing this over.
+  if(scorecardUrl){fetchFullScorecard(true).then(()=>{
+    if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key)
+      if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
+  else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
+  });}
+}
+
 function render(data){
   const v=data.values||{};
   const second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
@@ -1115,13 +1433,26 @@ function render(data){
   const bottom=$("bottom");
   const bottomText=$("bottomText");
   const powered=$("powered");
-  const preMatch=!completed(data,v) && matchNotStarted(data,v,t1,t2,second);
+  const onBreak=inningsBreak(data,v,t1,t2,second);
+  if(completed(data,v)||onBreak) dismissOverSummary();
+  observeCompletedOver(data,v,t1,t2,second,onBreak);
+  const showDemoFull=params.get('demo')==='inningsBreak';
+  if(onBreak && !inningsBreakSummaryEnabled) document.body.classList.remove('show-over-summary');
+  if(onBreak && inningsBreakSummaryEnabled){
+    document.body.classList.remove('show-full-break');
+    renderCompactSummary(showDemoFull?demoFullCard:loadedFullCard,t1,false,0,true,data.balls);
+    document.body.classList.add('show-over-summary');
+    if(scorecardUrl)fetchFullScorecard(true).then(()=>{
+      if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls);
+    });
+  } else if((!overSummaryTimer && !awaitingNextBall) || !(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
+  const preMatch=!onBreak && !completed(data,v) && matchNotStarted(data,v,t1,t2,second);
   const overlayEl=document.querySelector(".overlay");
   overlayEl.classList.toggle("is-prematch",preMatch);
   $("prematchTemplate").hidden=!preMatch;
   $("bottom").classList.remove("projection");
   document.querySelector(".top").classList.toggle("pre-match",preMatch && isLayout2);
-  if (!preMatch && !completed(data,v)) watchLastBall(data,v,second);
+  if (!preMatch && !onBreak && !completed(data,v)) watchLastBall(data,v,second);
   if (preMatch) {
     $("name1").textContent=t1.name;
     $("name2").textContent=t2.name;
@@ -1164,6 +1495,13 @@ function render(data){
       if (powered) powered.style.display = "none";
       stopped = true;
       if (timer) clearTimeout(timer);
+      return;
+    }
+
+    if (onBreak) {
+      $("details1").innerHTML = '<div class="innings-break-detail">FIRST INNINGS COMPLETE</div>';
+      $("details2").innerHTML = '<div class="innings-break-detail">SECOND INNINGS TO FOLLOW</div>';
+      showSecondary(breakMessage(t1));
       return;
     }
 
@@ -1220,6 +1558,14 @@ function render(data){
     return;
   }
 
+  if(onBreak){
+    $("details1").innerHTML='<div class="innings-break-detail">FIRST INNINGS COMPLETE</div>';
+    $("details2").innerHTML='<div class="innings-break-detail">SECOND INNINGS TO FOLLOW</div>';
+    showSecondary(breakMessage(t1));
+    if(powered)powered.style.display="inline";
+    return;
+  }
+
   if(second){
     const first=Number(get(v,"t1Total",""));
     const current=Number(t2.total);
@@ -1262,6 +1608,15 @@ async function refresh(){
   if(!stopped)timer=setTimeout(refresh,REFRESH_MS);
 }
 
+// Optional browser-only vertical adjustment. Default is 0px for Android WebView.
+// Example: &bottomOffset=24 moves the scoreboard 24 CSS pixels upward.
+(function applyBottomOffset() {
+  const raw = new URLSearchParams(window.location.search).get('bottomOffset');
+  const parsed = raw === null || raw.trim() === '' ? 0 : Number(raw);
+  const offset = Number.isFinite(parsed) ? Math.min(250, Math.max(0, parsed)) : 0;
+  document.documentElement.style.setProperty('--scoreboard-bottom-offset', offset + 'px');
+})();
+
 // Production: load CricClubs live data and refresh until the match is completed.
 function syncHeaderHeight() {
   const overlay=document.querySelector('.overlay');
@@ -1273,7 +1628,28 @@ function syncHeaderHeight() {
   if(height>0)overlay.style.setProperty('--live-header-height',height+'px');
 }
 window.addEventListener('resize',syncHeaderHeight);
-refresh();
+if (overSummaryEnabled && urlParam("demo") === "secondInningsSummary") {
+  const a={name:'TEAM A',total:156,wickets:8,overs:'20.0',rr:'7.80'};
+  const b={name:'TEAM B',total:74,wickets:2,overs:'10.0',rr:'7.40'};
+  renderBothTeamsSummary(demoFullCard,a,b,10,['1','4','0','2','1','0']);
+  document.body.classList.add('show-over-summary');
+} else if (overSummaryEnabled && urlParam("demo") === "overSummary") {
+  const t={name:'RAGING BULLS',total:63,wickets:2,overs:'8.0',rr:'7.88'};
+  renderCompactSummary(demoFullCard,t,false,8,false,['1','4','0','2','1','0']);
+  document.body.classList.add('show-over-summary');
+} else if (inningsBreakSummaryEnabled && urlParam("demo") === "inningsBreak") {
+  render({
+    matchStatus: "Innings Break",
+    isSecondInningsStarted: false,
+    values: {
+      t1Name: "Team A", t1Total: "156", t1Wickets: "8", t1Overs: "20.0", t1RR: "7.80",
+      t2Name: "Team B", t2Total: "0", t2Wickets: "0", t2Overs: "0.0",
+      totalOvers: "20"
+    }, balls: []
+  });
+} else {
+  refresh();
+}
 </script>
 </body>
 </html>
