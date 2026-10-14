@@ -1060,6 +1060,18 @@ body::before, body::after { content: none !important; }
 /* Preserve the selected theme background only on the visible scoreboard. */
 .overlay.layout2 { height: auto !important; min-height: 0 !important; }
 
+
+/* Theme palette repair: the transparent camera canvas must not erase
+   the visible Blue and Graphite scoreboard surfaces. */
+.overlay.theme-blue { background: rgba(20,57,105,var(--overlay-opacity,.70)) !important; color:#fff; }
+.overlay.theme-blue .top, .overlay.theme-blue .prematch-template { background: rgba(20,57,105,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-blue .scorebox, .overlay.theme-blue .team.left .scorebox { background: rgba(35,79,128,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-blue .bottom, .overlay.theme-blue .bottom.visible { background: rgba(12,39,77,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-graphite { background: rgba(24,27,31,var(--overlay-opacity,.70)) !important; color:#fff; }
+.overlay.theme-graphite .top, .overlay.theme-graphite .prematch-template { background: rgba(35,40,47,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-graphite .scorebox, .overlay.theme-graphite .team.left .scorebox { background: rgba(57,64,74,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-graphite .bottom, .overlay.theme-graphite .bottom.visible { background: rgba(18,22,28,var(--overlay-opacity,.70)) !important; }
+
 </style>
 </head>
 <body>
@@ -1148,6 +1160,7 @@ const requestedTheme = (params.get("theme") || "blue").trim().toLowerCase();
 const overlayTheme = ["blue", "graphite", "red"].includes(requestedTheme) ? requestedTheme : "graphite";
 document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
+document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
 document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
 document.body.classList.toggle("theme-red-active", overlayTheme === "red");
 
@@ -1723,6 +1736,21 @@ async function refresh(){
   const parsed = raw === null || raw.trim() === '' ? 0 : Number(raw);
   const offset = Number.isFinite(parsed) ? Math.min(250, Math.max(0, parsed)) : 0;
   document.documentElement.style.setProperty('--scoreboard-bottom-offset', offset + 'px');
+})();
+
+// Optional animation preview. Does not change match data or scoring.
+// highlight=four|six|wicket&highlightCount=3
+(function previewHighlightFromQuery() {
+  const raw = (params.get('highlight') || '').trim().toLowerCase();
+  const kinds = {four:'four', '4':'four', six:'six', '6':'six', wicket:'wicket', w:'wicket'};
+  const kind = kinds[raw];
+  if (!kind) return;
+  const requested = Number(params.get('highlightCount') ?? '1');
+  const count = Number.isFinite(requested) ? Math.max(1, Math.min(20, Math.floor(requested))) : 1;
+  // Each celebration lasts 2.5 seconds; wait until it has finished before replaying.
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => showEvent(kind), 350 + i * 2900);
+  }
 })();
 
 // Production: load CricClubs live data and refresh until the match is completed.
