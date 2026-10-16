@@ -1202,6 +1202,16 @@ body.show-final-result .overlay{display:none!important}
 .mr-pom{font-size:13px;color:#c4c4c4;overflow-wrap:anywhere}
 .mr-powered{font-size:10px;letter-spacing:1px;color:#85878d;margin-top:16px}
 @media(max-height:500px){#finalMatchResult{padding:12px 22px}.mr-teams{gap:5px}.mr-team img{height:32px;width:32px}#finalMatchResult h2{margin-bottom:6px;padding-bottom:5px}.mr-powered{margin-top:6px}}
+/* Match result must follow the selected theme, not default to graphite. */
+body.theme-blue-active #finalMatchResult {background:rgba(15,48,88,var(--overlay-opacity,.88));border:1px solid #4c83bc}
+body.theme-blue-active #finalMatchResult h2 {border-bottom-color:#75a6d0}
+body.theme-blue-active #finalMatchResult .mr-result {color:#b5e5ff}
+body.theme-graphite-active #finalMatchResult {background:rgba(23,27,33,var(--overlay-opacity,.88));border:1px solid #69717c}
+body.theme-graphite-active #finalMatchResult .mr-result {color:#8fdfa5}
+body.theme-red-active #finalMatchResult {background:rgba(119,12,29,var(--overlay-opacity,.88));border:1px solid #e45662}
+body.theme-red-active #finalMatchResult h2 {border-bottom-color:#ec8c92}
+body.theme-red-active #finalMatchResult .mr-result {color:#ffe09a}
+
 </style>
 <script>
 const params = new URLSearchParams(location.search);
@@ -1235,6 +1245,8 @@ document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme =
 document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
 document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
 document.body.classList.toggle("theme-red-active", overlayTheme === "red");
+document.body.classList.toggle("theme-blue-active", overlayTheme === "blue");
+document.body.classList.toggle("theme-graphite-active", overlayTheme === "graphite");
 
 const requestedRefreshMs = params.has("refresh") ? refreshSeconds * 1000 : legacyRefreshMs;
 const REFRESH_MS = Number.isFinite(requestedRefreshMs) && requestedRefreshMs > 0
@@ -1648,10 +1660,10 @@ function render(data){
   const bottomText=$("bottomText");
   const powered=$("powered");
   const onBreak=inningsBreak(data,v,t1,t2,second);
-  const isFinished=completed(data,v);
+  const isFinished=completed(data,v) && Boolean(textField(data,v,["result","matchResult"]));
   if(isFinished) showFinalMatchResult(data,v,t1,t2);
   else {$("finalMatchResult").hidden=true;document.body.classList.remove("show-final-result");}
-  if(completed(data,v)||onBreak) dismissOverSummary();
+  if(isFinished||onBreak) dismissOverSummary();
   observeCompletedOver(data,v,t1,t2,second,onBreak);
   const showDemoFull=params.get('demo')==='inningsBreak';
   if(onBreak && !inningsBreakSummaryEnabled) document.body.classList.remove('show-over-summary');
@@ -1663,13 +1675,13 @@ function render(data){
       if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls);
     });
   } else if((!overSummaryTimer && !awaitingNextBall) || !(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
-  const preMatch=!onBreak && !completed(data,v) && matchNotStarted(data,v,t1,t2,second);
+  const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
   const overlayEl=document.querySelector(".overlay");
   overlayEl.classList.toggle("is-prematch",preMatch);
   $("prematchTemplate").hidden=!preMatch;
   $("bottom").classList.remove("projection");
   document.querySelector(".top").classList.toggle("pre-match",preMatch && isLayout2);
-  if (!preMatch && !onBreak && !completed(data,v)) watchLastBall(data,v,second);
+  if (!preMatch && !onBreak && !isFinished) watchLastBall(data,v,second);
   if (preMatch) {
     $("name1").textContent=t1.name;
     $("name2").textContent=t2.name;
@@ -1707,7 +1719,7 @@ function render(data){
     logo("logo1", second ? v.firstLogo : v.secondLogo);
     logo("logo2", second ? v.secondLogo : v.firstLogo);
 
-    if (completed(data,v)) {
+    if (isFinished) {
       showSecondary(postMatchMessage(data,v));
       if (powered) powered.style.display = "none";
       stopped = true;
@@ -1767,7 +1779,7 @@ function render(data){
     $("details2").innerHTML=showBatters(v);
   }
 
-  if(completed(data,v)){
+  if(isFinished){
     showSecondary(postMatchMessage(data,v));
     if(powered) powered.style.display="inline";
     stopped=true;
