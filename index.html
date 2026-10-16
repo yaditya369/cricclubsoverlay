@@ -1176,6 +1176,33 @@ body > #scoreEvent.event-animation {
 </div>
 
 <div id="overSummary" aria-live="polite"><div class="os-head"><span id="osTitle">OVER SUMMARY</span><span id="osOvers"></span></div><div class="os-score" id="osFirstRow"><span id="osTeam">TEAM</span><strong id="osScore">—</strong><span id="osRR"></span></div><div class="os-score os-second-score" id="osSecondRow" hidden><span id="osSecondTeam">TEAM B</span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div><div class="os-grid"><section class="os-panel"><h3>TOP BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>TOP BOWLERS</h3><div id="osBowlers"></div></section></div><div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div></div>
+<!-- Match-complete card is viewport centered and independent of the bottom scoreboard. -->
+<div id="finalMatchResult" role="status" aria-live="polite" hidden>
+  <h2>MATCH RESULT</h2>
+  <div class="mr-teams">
+    <div class="mr-team"><img id="mrLogo1" alt="" hidden><div><div class="mr-name" id="mrName1"></div><strong id="mrScore1"></strong><small id="mrOvers1"></small></div></div>
+    <div class="mr-team"><img id="mrLogo2" alt="" hidden><div><div class="mr-name" id="mrName2"></div><strong id="mrScore2"></strong><small id="mrOvers2"></small></div></div>
+  </div>
+  <div class="mr-result" id="mrWinner"></div>
+  <div class="mr-pom" id="mrPom"></div>
+  <div class="mr-powered">POWERED BY CRICCLUBS</div>
+</div>
+<style>
+#finalMatchResult[hidden]{display:none!important}
+body.show-final-result .overlay{display:none!important}
+#finalMatchResult{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:400;width:min(470px,90vw);max-height:90vh;overflow:auto;box-sizing:border-box;padding:22px 28px 18px;background:rgba(17,19,23,.96);border-radius:10px;color:#fff;text-align:center;font-family:system-ui,Arial,sans-serif;box-shadow:0 12px 38px #0008;pointer-events:none}
+#finalMatchResult h2{font-size:clamp(19px,2vw,26px);letter-spacing:1px;margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid #ffffff2b}
+.mr-teams{display:grid;gap:12px;padding-bottom:14px;border-bottom:1px solid #ffffff24}
+.mr-team{display:flex;align-items:center;justify-content:center;gap:14px;min-width:0}
+.mr-team img{width:48px;height:48px;object-fit:contain;flex-shrink:0}
+.mr-name{font-size:clamp(17px,1.8vw,23px);font-weight:700;overflow-wrap:anywhere}
+.mr-team strong{display:block;font-size:clamp(26px,3vw,36px);line-height:1.12}
+.mr-team small{display:block;color:#aab1bd;font-size:13px}
+.mr-result{color:#74d38b;font-weight:800;font-size:clamp(16px,1.6vw,22px);margin:12px 0 4px;overflow-wrap:anywhere}
+.mr-pom{font-size:13px;color:#c4c4c4;overflow-wrap:anywhere}
+.mr-powered{font-size:10px;letter-spacing:1px;color:#85878d;margin-top:16px}
+@media(max-height:500px){#finalMatchResult{padding:12px 22px}.mr-teams{gap:5px}.mr-team img{height:32px;width:32px}#finalMatchResult h2{margin-bottom:6px;padding-bottom:5px}.mr-powered{margin-top:6px}}
+</style>
 <script>
 const params = new URLSearchParams(location.search);
 const clubId = params.get("clubId") || "22594";
@@ -1421,6 +1448,27 @@ function postMatchMessage(data,v) {
   const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"]) || urlParam("pom");
   return [result,pom?`POM: ${pom}`:""].filter(Boolean).join(" · ");
 }
+function showFinalMatchResult(data,v,t1,t2){
+  const panel=$("finalMatchResult");
+  const setText=(id,value)=>$(id).textContent=String(value??"");
+  [t1,t2].forEach((t,i)=>{
+    const n=i+1;
+    setText("mrName"+n,t.name);
+    setText("mrScore"+n,`${t.total}/${t.wickets}`);
+    setText("mrOvers"+n,`(${formatOvers(t.overs)} ov)`);
+    const img=$("mrLogo"+n);
+    // Match the existing CricClubs logo mapping used by layout 1.
+    const path=i===0?v.secondLogo:v.firstLogo;
+    if(path){img.src=/^(https?:|data:|\/\/)/i.test(String(path))?path:new URL(path,"https://cricclubs.com").href;img.hidden=false;img.onerror=()=>{img.hidden=true};}
+    else {img.hidden=true;img.removeAttribute("src")}
+  });
+  setText("mrWinner",textField(data,v,["result","matchResult"])||"Match completed");
+  const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"])||urlParam("pom");
+  setText("mrPom",pom?`Player of the Match: ${pom}`:"");
+  panel.hidden=false;
+  document.body.classList.add("show-final-result");
+  document.body.classList.remove("show-over-summary","show-full-break");
+}
 function showSecondary(message) {
   $("bottomText").textContent=message;
   $("bottom").classList.add("visible");
@@ -1600,6 +1648,9 @@ function render(data){
   const bottomText=$("bottomText");
   const powered=$("powered");
   const onBreak=inningsBreak(data,v,t1,t2,second);
+  const isFinished=completed(data,v);
+  if(isFinished) showFinalMatchResult(data,v,t1,t2);
+  else {$("finalMatchResult").hidden=true;document.body.classList.remove("show-final-result");}
   if(completed(data,v)||onBreak) dismissOverSummary();
   observeCompletedOver(data,v,t1,t2,second,onBreak);
   const showDemoFull=params.get('demo')==='inningsBreak';
@@ -1798,6 +1849,12 @@ async function refresh(){
   }
 })();
 
+// Standalone preview of the final result layout, without live match data.
+if(params.get("demo")==="matchResult"){
+  showFinalMatchResult({values:{},result:"Vikings won by 6 Wickets",playerOfMatch:"KRISHNA TEJA REDDY VAVVETI"},{},
+    {name:"Lords",total:111,wickets:10,overs:"19.1"},
+    {name:"Vikings",total:112,wickets:4,overs:"15.2"});
+}
 // Production: load CricClubs live data and refresh until the match is completed.
 function syncHeaderHeight() {
   const overlay=document.querySelector('.overlay');
@@ -1809,7 +1866,9 @@ function syncHeaderHeight() {
   if(height>0)overlay.style.setProperty('--live-header-height',height+'px');
 }
 window.addEventListener('resize',syncHeaderHeight);
-if (overSummaryEnabled && urlParam("demo") === "secondInningsSummary") {
+if (urlParam("demo") === "matchResult") {
+  // Preview card is already rendered above; do not fetch or overwrite it.
+} else if (overSummaryEnabled && urlParam("demo") === "secondInningsSummary") {
   const a={name:'TEAM A',total:156,wickets:8,overs:'20.0',rr:'7.80'};
   const b={name:'TEAM B',total:74,wickets:2,overs:'10.0',rr:'7.40'};
   renderBothTeamsSummary(demoFullCard,a,b,10,['1','4','0','2','1','0']);
