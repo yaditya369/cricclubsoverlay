@@ -1189,44 +1189,20 @@ body > #scoreEvent.event-animation {
 </div>
 <style>
 #finalMatchResult[hidden]{display:none!important}
-/* Keep the bottom result/footer strip visible when the centered result appears. */
-body.show-final-result .overlay{display:flex!important}
-/* Keep the live/final scorecard visible behind the centered result card.
-   Only the prematch placeholder and error banner should be suppressed. */
+/* Result card is an independent layer. Keep the scorecard's original grid
+   and footer in the SAME flex column; never fix the footer to the viewport. */
+body.show-final-result .overlay{display:flex!important;flex-direction:column!important}
+body.show-final-result .overlay .top{display:grid!important;visibility:visible!important}
 body.show-final-result .overlay #prematchTemplate,
 body.show-final-result .overlay #error{display:none!important}
-body.show-final-result .overlay .top{display:flex!important;visibility:visible!important}
-body.show-final-result .overlay #bottom{display:flex!important;visibility:visible!important}
-/* Final-result mode: footer is anchored to the viewport independently of
-   scoreboard height and of any hidden score rows. Do not hide the footer. */
-body.show-final-result .overlay #bottom {
-  position: fixed !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: var(--scoreboard-bottom-offset, 0px) !important;
-  width: 100% !important;
-  margin: 0 !important;
-  z-index: 450 !important;
-  box-sizing: border-box !important;
-  opacity: 1 !important;
+body.show-final-result .overlay #bottom.visible{
+  display:flex!important;
+  position:relative!important;
+  inset:auto!important;
+  width:auto!important;
+  margin:0!important;
+  z-index:auto!important;
 }
-body.show-final-result .overlay.layout2 #bottom {
-  height: 25px !important;
-  min-height: 25px !important;
-  max-height: 25px !important;
-}
-@media(max-width:650px) {
-  body.show-final-result .overlay.layout2 #bottom {
-    height: 23px !important;
-    min-height: 23px !important;
-    max-height: 23px !important;
-  }
-}
-/* Preserve the actual theme surface and the opacity parameter. */
-body.show-final-result .overlay.theme-blue #bottom { background: rgba(12,39,77,var(--overlay-opacity,.70)) !important; }
-body.show-final-result .overlay.theme-graphite #bottom { background: rgba(18,22,28,var(--overlay-opacity,.70)) !important; }
-body.show-final-result .overlay.theme-red #bottom { background: rgba(105,8,18,var(--overlay-opacity,.70)) !important; }
-
 #finalMatchResult{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:400;width:min(470px,90vw);max-height:90vh;overflow:auto;box-sizing:border-box;padding:22px 28px 18px;background:rgba(17,19,23,.96);border-radius:10px;color:#fff;text-align:center;font-family:system-ui,Arial,sans-serif;box-shadow:0 12px 38px #0008;pointer-events:none}
 #finalMatchResult h2{font-size:clamp(19px,2vw,26px);letter-spacing:1px;margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid #ffffff2b}
 .mr-teams{display:grid;gap:12px;padding-bottom:14px;border-bottom:1px solid #ffffff24}
@@ -1515,6 +1491,8 @@ function showFinalMatchResult(data,v,t1,t2){
   const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"])||urlParam("pom");
   setText("mrPom",pom?`Player of the Match: ${pom}`:"");
   panel.hidden=false;
+  const eventEl=document.getElementById("scoreEvent");
+  if(eventEl){eventEl.classList.remove("show","active");eventEl.style.display="none";}
   document.body.classList.add("show-final-result");
   document.body.classList.remove("show-over-summary","show-full-break");
   showSecondary(postMatchMessage(data,v));
@@ -1895,15 +1873,16 @@ async function refresh(){
   const count = Number.isFinite(requested) ? Math.max(1, Math.min(20, Math.floor(requested))) : 1;
   // Each celebration lasts 2.5 seconds; wait until it has finished before replaying.
   for (let i = 0; i < count; i++) {
-    setTimeout(() => showEvent(kind), 350 + i * 2900);
+    setTimeout(() => {if(!document.body.classList.contains("show-final-result")) showEvent(kind);}, 350 + i * 2900);
   }
 })();
 
 // Standalone preview of the final result layout, without live match data.
 if(params.get("demo")==="matchResult"){
-  showFinalMatchResult({values:{},result:"Vikings won by 6 Wickets",playerOfMatch:"KRISHNA TEJA REDDY VAVVETI"},{},
-    {name:"Lords",total:111,wickets:10,overs:"19.1"},
-    {name:"Vikings",total:112,wickets:4,overs:"15.2"});
+  render({matchStatus:"Completed",isMatchEnded:true,isSecondInningsStarted:true,
+    result:"Vikings won by 6 Wickets",playerOfMatch:"KRISHNA TEJA REDDY VAVVETI",
+    values:{t1Name:"Lords",t1Total:"111",t1Wickets:"10",t1Overs:"19.1",t1RR:"5.79",
+      t2Name:"Vikings",t2Total:"112",t2Wickets:"4",t2Overs:"15.2",t2RR:"7.30"},balls:[]});
 }
 // Production: load CricClubs live data and refresh until the match is completed.
 function syncHeaderHeight() {
