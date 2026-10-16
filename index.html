@@ -1191,9 +1191,11 @@ body > #scoreEvent.event-animation {
 #finalMatchResult[hidden]{display:none!important}
 /* Keep the bottom result/footer strip visible when the centered result appears. */
 body.show-final-result .overlay{display:flex!important}
-body.show-final-result .overlay .top,
+/* Keep the live/final scorecard visible behind the centered result card.
+   Only the prematch placeholder and error banner should be suppressed. */
 body.show-final-result .overlay #prematchTemplate,
 body.show-final-result .overlay #error{display:none!important}
+body.show-final-result .overlay .top{display:flex!important;visibility:visible!important}
 body.show-final-result .overlay #bottom{display:flex!important;visibility:visible!important}
 /* Final-result mode: footer is anchored to the viewport independently of
    scoreboard height and of any hidden score rows. Do not hide the footer. */
