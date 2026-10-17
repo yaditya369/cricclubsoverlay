@@ -1210,6 +1210,14 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 .overlay.layout2 .top .player-stats{white-space:nowrap!important}
 .overlay.layout2 .bottom.visible{position:relative!important;inset:auto!important;display:flex!important}
 </style>
+
+<style id="prematch-single-header-fix">
+/* In pre-match/toss, show ONLY the VS header; never the live five-column grid. */
+.overlay.layout2.is-prematch > .top,
+.overlay.is-prematch > .top { display:none !important; }
+.overlay.is-prematch > #prematchTemplate:not([hidden]) { display:grid !important; }
+.overlay.is-prematch .bottom { position:relative !important; }
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1556,10 +1564,24 @@ function projectedScore(v,t) {
   return `Projected ${Math.round(runs/balls*limit*6)} (${limit} overs)`;
 }
 function tossMessage(data,v) {
-  const winner=textField(data,v,["tossWonBy","tossWinner","tossWonByTeam","tossWinnerName"]) || urlParam("tossWinner");
-  const choice=textField(data,v,["tossDecision","electedTo","tossChoice","electedToDo"]) || urlParam("tossDecision");
+  // CricClubs response shapes differ between leagues; look in common nested objects.
+  const sources=[data,v,data?.match,data?.matchDetails,data?.matchInfo,data?.toss,
+    v?.match,v?.matchDetails,v?.matchInfo,v?.toss].filter(x=>x&&typeof x==="object");
+  const read=(keys)=>{
+    for(const obj of sources)for(const key of keys){
+      const value=obj[key];
+      if(value!==undefined && value!==null && String(value).trim())return value;
+    }
+    return "";
+  };
+  const rawWinner=read(["tossWonBy","tossWinner","tossWonByTeam","tossWinnerName",
+    "tossWinningTeam","tossWonTeam","toss_winner","wonBy","winner"])||urlParam("tossWinner");
+  const rawChoice=read(["tossDecision","electedTo","tossChoice","electedToDo",
+    "toss_decision","decision","optedTo"])||urlParam("tossDecision");
+  const winner=typeof rawWinner==="object"?(rawWinner.name||rawWinner.teamName||""):String(rawWinner||"").trim();
   if(!winner)return "";
-  return `${winner} won the toss${choice ? " and elected to "+choice : ""}`;
+  const choice=String(rawChoice||"").trim().replace(/^elected\s+to\s+/i,"");
+  return `${winner} won the toss${choice?" and elected to "+choice:""}`;
 }
 function postMatchMessage(data,v) {
   const result=textField(data,v,["result","matchResult"]) || "Match completed";
