@@ -1507,10 +1507,28 @@ const urlParam = k => params.get(k) || "";
 let lastEventSignature = null;
 let eventReady = false;
 let animationTimer;
+// Place boundary-horn.mp3 beside index.html on the same website.
+// Enabled by default; add &sound=0 to mute, or &soundVolume=0.5 to adjust volume.
+const soundEnabled = !/^(0|false|off|no)$/i.test(String(params.get("sound") ?? "1"));
+const soundVolumeRaw = Number(params.get("soundVolume") ?? "0.8");
+const soundVolume = Number.isFinite(soundVolumeRaw) ? Math.max(0,Math.min(1,soundVolumeRaw)) : 0.8;
+const eventAudio = new Audio("boundary-horn.mp3");
+eventAudio.preload = "auto";
+eventAudio.volume = soundVolume;
+function playEventSound(){
+  if(!soundEnabled) return;
+  try {
+    eventAudio.pause();
+    eventAudio.currentTime = 0;
+    const attempt=eventAudio.play();
+    if(attempt && typeof attempt.catch === "function") attempt.catch(e=>console.info("Event audio blocked or unavailable:",e.message));
+  } catch(e) { console.info("Event audio unavailable:",e.message); }
+}
 function showEvent(kind) {
   const el=$("scoreEvent");
   const visual={wicket:["🏏","WICKET!"],four:["🏏","FOUR!"],six:["🚀","SIX!"]}[kind];
   if(!visual) return;
+  if(kind === "four" || kind === "six") playEventSound();
   clearTimeout(animationTimer);
   el.className="event-animation "+kind;
   const visuals={wicket:["💥","WICKET!",""],four:["🏏","FOUR!","RACING TO THE BOUNDARY"],six:["🚀","SIX!","OUT OF THE PARK"]};
