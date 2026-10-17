@@ -1528,6 +1528,7 @@ function showEvent(kind) {
   const el=$("scoreEvent");
   const visual={wicket:["🏏","WICKET!"],four:["🏏","FOUR!"],six:["🚀","SIX!"]}[kind];
   if(!visual) return;
+  el.style.removeProperty("display");
   if(kind === "four" || kind === "six") playEventSound();
   clearTimeout(animationTimer);
   el.className="event-animation "+kind;
@@ -1628,7 +1629,7 @@ function showFinalMatchResult(data,v,t1,t2){
   const reserve=bottomOverlay ? Math.ceil(bottomOverlay.getBoundingClientRect().height)+8 : 105;
   document.documentElement.style.setProperty('--result-bottom-reserve',reserve+'px');
   const eventEl=document.getElementById("scoreEvent");
-  if(eventEl){eventEl.classList.remove("show","active");eventEl.style.display="none";}
+  if(eventEl && !params.has("highlight")){eventEl.classList.remove("show","active");eventEl.style.display="none";}
   document.body.classList.add("show-final-result");
   document.body.classList.remove("show-over-summary","show-full-break");
   showSecondary(postMatchMessage(data,v));
@@ -2010,7 +2011,7 @@ async function refresh(){
   const count = Number.isFinite(requested) ? Math.max(1, Math.min(20, Math.floor(requested))) : 1;
   // Each celebration lasts 2.5 seconds; wait until it has finished before replaying.
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {if(!document.body.classList.contains("show-final-result")) showEvent(kind);}, 350 + i * 2900);
+    setTimeout(() => { const eventLayer=document.getElementById("scoreEvent"); if(eventLayer) eventLayer.style.removeProperty("display"); showEvent(kind); }, 600 + i * 2900);
   }
 })();
 
