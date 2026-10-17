@@ -863,7 +863,7 @@ body { position:relative; min-height:100vh; }
 /* Full landscape innings-break broadcast graphic; hidden during normal play. */
 #fullInningsBreak{display:none;position:fixed;left:1.2%;right:1.2%;bottom:var(--scoreboard-bottom-offset,0px);z-index:100;color:#f5faff;font:600 clamp(10px,1.05vw,17px)/1.24 system-ui,Arial,sans-serif;box-sizing:border-box;max-height:96dvh;overflow:auto;pointer-events:none}
 body.show-full-break #fullInningsBreak{display:block}
-body.show-full-break .overlay{display:flex!important}
+body.show-full-break .overlay{display:none!important}
 .ib-header,.ib-panel,.ib-foot{background:linear-gradient(125deg,rgba(3,21,45,.96),rgba(7,51,96,.94));border:2px solid #368ad0;border-radius:12px;box-shadow:0 4px 20px #00152e80}
 .ib-header{display:grid;grid-template-columns:1fr 1.05fr 1fr;align-items:center;text-align:center;padding:8px 18px;margin-bottom:8px;gap:8px}
 .ib-header .ib-team{font-size:clamp(14px,1.8vw,29px);font-weight:900;overflow-wrap:anywhere}
@@ -892,7 +892,7 @@ body.show-full-break .overlay{display:flex!important}
 /* Compact landscape summary: centered for 5 seconds after each completed over. */
 #overSummary{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(660px,88vw);z-index:200;box-sizing:border-box;color:#f6fbff;font:600 clamp(11px,1.05vw,16px)/1.35 system-ui,Arial,sans-serif;background:rgba(9,35,63,.96);border:2px solid #277cc2;border-radius:12px;padding:10px;box-shadow:0 10px 35px #0009;pointer-events:none}
 body.show-over-summary #overSummary{display:block}
-body.show-over-summary #fullInningsBreak{display:none!important}
+body.show-over-summary .overlay,body.show-over-summary #fullInningsBreak{display:none!important}
 .os-head,.os-foot{background:#146cb5;border-radius:5px;padding:7px 10px;display:flex;justify-content:space-between;gap:10px;align-items:center}
 .os-head{font-weight:900;letter-spacing:.6px}.os-score{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 5px}.os-score strong{font-size:clamp(20px,2.1vw,29px)}
 .os-second-score{border-top:1px solid #466784;padding-top:7px}.os-second-score[hidden]{display:none!important}.os-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.os-panel{background:#193c60;border-radius:6px;padding:9px 12px;min-width:0}.os-panel h3{color:#afcbe6;margin:0 0 8px;font-size:12px;letter-spacing:.6px}.os-row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}.os-row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.os-row span:last-child{white-space:nowrap}.os-foot{margin-top:9px;font-size:12px}
@@ -1316,39 +1316,6 @@ body.show-final-result .overlay #bottom.visible{
 .mr-pom{font-size:13px;color:#c4c4c4;overflow-wrap:anywhere}
 .mr-powered{font-size:10px;letter-spacing:1px;color:#85878d;margin-top:8px}
 @media(max-height:500px){#finalMatchResult{padding:8px 16px}.mr-teams{gap:3px;padding-bottom:5px}.mr-team img{height:26px;width:26px}#finalMatchResult h2{margin-bottom:4px;padding-bottom:4px;font-size:17px}.mr-name{font-size:14px}.mr-team strong{font-size:22px}.mr-result{font-size:14px;margin:5px 0 2px}.mr-powered{margin-top:4px}}
-/* Persistent broadcast ticker: event cards never replace the live bottom scorecard. */
-body.show-over-summary .overlay,
-body.show-full-break .overlay,
-body.show-final-result .overlay {
-  display:flex !important;
-  visibility:visible !important;
-  z-index:500 !important;
-}
-body.show-over-summary #fullInningsBreak {display:none !important;}
-#overSummary {
-  top:calc((100% - var(--persistent-scoreboard-height, 110px))/2) !important;
-  max-height:calc(100dvh - var(--persistent-scoreboard-height, 110px) - 12px);
-  overflow:auto;
-}
-#fullInningsBreak {
-  bottom:calc(var(--persistent-scoreboard-height, 110px) + 6px) !important;
-  max-height:calc(100dvh - var(--persistent-scoreboard-height, 110px) - 12px) !important;
-}
-#finalMatchResult {
-  top:calc((100% - var(--persistent-scoreboard-height, 110px))/2) !important;
-  max-height:calc(100dvh - var(--persistent-scoreboard-height, 110px) - 12px) !important;
-}
-/* Player name left; individual figures on the far right of the same row. */
-#overSummary .os-row {
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) max-content !important;
-  align-items:baseline;
-  column-gap:12px;
-  width:100%;
-}
-#overSummary .os-row span:first-child {min-width:0;text-align:left;}
-#overSummary .os-row span:last-child {text-align:right;white-space:nowrap;font-weight:800;}
-
 /* Match result must follow the selected theme, not default to graphite. */
 body.theme-blue-active #finalMatchResult {background:rgba(15,48,88,var(--overlay-opacity,.88));border:1px solid #4c83bc}
 body.theme-blue-active #finalMatchResult h2 {border-bottom-color:#75a6d0}
@@ -1621,20 +1588,6 @@ function postMatchMessage(data,v) {
   const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"]) || urlParam("pom");
   return [result,pom?`POM: ${pom}`:""].filter(Boolean).join(" · ");
 }
-function updatePersistentScoreboardHeight(){
-  const el=document.querySelector('.overlay');
-  if(!el)return;
-  const rect=el.getBoundingClientRect();
-  const height=Math.max(0,Math.ceil(window.innerHeight-rect.top));
-  if(height>0)document.documentElement.style.setProperty('--persistent-scoreboard-height',height+'px');
-}
-window.addEventListener('resize',updatePersistentScoreboardHeight);
-window.addEventListener('load',updatePersistentScoreboardHeight);
-if(typeof ResizeObserver!=='undefined'){
-  const ticker=document.querySelector('.overlay');
-  if(ticker)new ResizeObserver(updatePersistentScoreboardHeight).observe(ticker);
-}
-
 function showFinalMatchResult(data,v,t1,t2){
   const panel=$("finalMatchResult");
   const setText=(id,value)=>$(id).textContent=String(value??"");
@@ -1653,7 +1606,6 @@ function showFinalMatchResult(data,v,t1,t2){
   const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"])||urlParam("pom");
   setText("mrPom",pom?`Player of the Match: ${pom}`:"");
   panel.hidden=false;
-  updatePersistentScoreboardHeight();
   const bottomOverlay=document.querySelector('.overlay');
   const reserve=bottomOverlay ? Math.ceil(bottomOverlay.getBoundingClientRect().height)+8 : 105;
   document.documentElement.style.setProperty('--result-bottom-reserve',reserve+'px');
@@ -1694,7 +1646,7 @@ function breakMessage(t1){
 
 // Full scorecard data contract: { batting:[{name,howOut,r,b,fours,sixes,sr}],
 // bowling:[{name,overs,maidens,runs,wickets,econ}], extras:{byes,legByes,wides,noBalls,penalty}, fallOfWickets:[...], battingTeam,bowlingTeam,total,wickets,overs }.
-// Read the official fullScorecard.do HTML directly (subject to browser CORS policy).
+// Provide via ?scorecardUrl=https://your-cors-enabled-service/... (same-origin or CORS required).
 const demoFullCard = {
  battingTeam:'RAGING BULLS',bowlingTeam:'CSK YORKERS',total:156,wickets:8,overs:'20.0',
  batting:[
@@ -1718,10 +1670,7 @@ const demoFullCard = {
 let loadedFullCard=null;
 let fullCardLoading=false;
 let lastFullCardAttempt=0;
-// Scorecard is derived automatically from the same clubId and matchId as the live feed.
-const SCORECARD_PAGE = `https://cricclubs.com/GaleRanchCricketClub/fullScorecard.do?clubId=${encodeURIComponent(clubId)}&matchId=${encodeURIComponent(matchId)}`;
-let scorecardFetchError = '';
-
+const scorecardUrl=params.get('scorecardUrl');
 function escapeScore(s){return String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function numberOrDash(n){return n===null||n===undefined?'—':escapeScore(n);}
 function showFullScorecard(card,live){
@@ -1740,61 +1689,23 @@ function showFullScorecard(card,live){
  $('ibFoW').innerHTML='<b>Fall of wickets: </b>'+escapeScore(Array.isArray(d.fallOfWickets)&&d.fallOfWickets.length?d.fallOfWickets.join(', '):'Not available');
  $('ibFoot').textContent=Number.isFinite(Number(total))?`${bowlingTeam} need ${Number(total)+1} runs to win · SECOND INNINGS STARTING SOON`:'SECOND INNINGS STARTING SOON';
 }
-function parseCricClubsScorecard(html, inningsIndex=0) {
- const doc=new DOMParser().parseFromString(html,'text/html');
- const tables=[...doc.querySelectorAll('table')];
- const text=el=>(el?.textContent||'').replace(/\s+/g,' ').trim();
- const battingTables=tables.filter(t=>{const h=text(t.querySelector('tr'));return /\bR\s+B\s+4s\s+6s\s+SR\b/i.test(h)});
- const battingTable=battingTables[inningsIndex];
- if(!battingTable)throw Error('Batting innings table not found');
- const batting=[];
- for(const tr of [...battingTable.querySelectorAll('tr')].slice(1)){
-   const cells=[...tr.children].filter(e=>e.matches('th,td'));
-   const values=cells.map(text);
-   if(cells.length<7 || !/^\d+$/.test(values[2]))continue;
-   const anchor=cells[0].querySelector('a[href*="viewPlayer"]');
-   const name=text(anchor)||text(cells[0]).replace(/\s+(not out|c .*|b .*|lbw .*|run out.*)$/i,'');
-   if(!name)continue;
-   const howOut=values[1]||'';
-   batting.push({name:name.replace(/\*$/,''),howOut,r:Number(values[2]),b:Number(values[3]),fours:Number(values[4]),sixes:Number(values[5]),sr:values[6],notOut:/not out/i.test(howOut)||/\*$/.test(name)});
- }
- const battingPos=tables.indexOf(battingTable);
- const nextBatting=battingTables[inningsIndex+1];
- const end=nextBatting?tables.indexOf(nextBatting):tables.length;
- const bowlingTable=tables.slice(battingPos+1,end).find(t=>/Bowling\s+O\s+M\s+Dot\s+R\s+W\s+Econ/i.test(text(t.querySelector('tr'))));
- const bowling=[];
- if(bowlingTable)for(const tr of [...bowlingTable.querySelectorAll('tr')].slice(1)){
-   const v=[...tr.children].filter(e=>e.matches('th,td')).map(text);
-   if(v.length<8 || !/^\d+(?:\.\d+)?$/.test(v[2]))continue;
-   bowling.push({name:v[1],overs:v[2],maidens:Number(v[3]),runs:Number(v[5]),wickets:Number(v[6]),econ:v[7]});
- }
- if(!batting.length)throw Error('No batting rows parsed');
- return {batting,bowling,battingTeam:text(battingTable.querySelector('tr th')),
-   bowlingTeam:'',extras:{},source:'cricclubs-fullScorecard'};
-}
-async function fetchFullScorecard(force=false, inningsIndex=0){
- if(fullCardLoading||Date.now()-lastFullCardAttempt<15000)return;
+async function fetchFullScorecard(force=false){
+ if(!scorecardUrl||fullCardLoading||(!force&&Date.now()-lastFullCardAttempt<15000))return;
  lastFullCardAttempt=Date.now();fullCardLoading=true;
- try{
-   const response=await fetch(SCORECARD_PAGE,{cache:'no-store',credentials:'omit'});
-   if(!response.ok)throw Error('Scorecard HTTP '+response.status);
-   const html=await response.text();
-   loadedFullCard=parseCricClubsScorecard(html,inningsIndex);
-   scorecardFetchError='';
- }catch(e){
-   scorecardFetchError=String(e.message||e);
-   console.warn('CricClubs full scorecard unavailable (possible cross-origin restriction):',e);
- }finally{fullCardLoading=false;}
+ try{const res=await fetch(scorecardUrl,{cache:'no-store'});if(!res.ok)throw Error('Scorecard HTTP '+res.status);const obj=await res.json();if(!Array.isArray(obj.batting)||!Array.isArray(obj.bowling))throw Error('Expected batting and bowling arrays');loadedFullCard=obj;}
+ catch(e){console.warn('Full scorecard feed unavailable:',e);}
+ finally{fullCardLoading=false;}
 }
 
 
-// Summary data uses the official CricClubs HTML scorecard; missing stats are never fabricated.
+// Summary data uses the optional full scorecard JSON feed; missing stats are never fabricated.
 // Independent switches; both disabled by default.
 // summary=1 remains an alias for the end-of-over summary for older links.
 const summaryParams = new URLSearchParams(location.search);
 const enabledFlag = value => /^(1|true|on|yes)$/i.test(String(value ?? '0'));
 const overSummaryEnabled = enabledFlag(summaryParams.get('overSummary') ?? summaryParams.get('summary'));
-const inningsBreakSummaryEnabled = enabledFlag(summaryParams.get('inningsBreakSummary'));
+// Innings-break summary is disabled by default; opt in with ?inningsBreakSummary=1.
+const inningsBreakSummaryEnabled = enabledFlag(summaryParams.get('inningsBreakSummary') ?? '0');
 // summaryDuration is seconds (default 5) or "nextBall" to wait for the first legal ball.
 const summaryDurationRaw = String(new URLSearchParams(location.search).get('summaryDuration') ?? '5').trim();
 const summaryUntilNextBall = /^(nextball|next-ball|ball)$/i.test(summaryDurationRaw);
@@ -1862,13 +1773,12 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
   lastShownOverKey=key;
   if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
   else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
-  updatePersistentScoreboardHeight();
   document.body.classList.add('show-over-summary');
   if(overSummaryTimer)clearTimeout(overSummaryTimer);
   if(summaryUntilNextBall) awaitingNextBall={second,n};
   else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
   // Fetch updated full scorecard when configured. Only refresh the popup if still showing this over.
-  {fetchFullScorecard(true,second?1:0).then(()=>{
+  if(scorecardUrl){fetchFullScorecard(true).then(()=>{
     if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key)
       if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
   else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
@@ -1895,9 +1805,8 @@ function render(data){
   if(onBreak && inningsBreakSummaryEnabled){
     document.body.classList.remove('show-full-break');
     renderCompactSummary(showDemoFull?demoFullCard:loadedFullCard,t1,false,0,true,data.balls);
-    updatePersistentScoreboardHeight();
-  document.body.classList.add('show-over-summary');
-    fetchFullScorecard(true,0).then(()=>{
+    document.body.classList.add('show-over-summary');
+    if(scorecardUrl)fetchFullScorecard(true).then(()=>{
       if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls);
     });
   } else if((!overSummaryTimer && !awaitingNextBall) || !(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
@@ -1941,9 +1850,9 @@ function render(data){
     $("details1").innerHTML = showBatters(v);
     $("details2").innerHTML = showBowler(v, data.balls);
 
-    // CricClubs' logo fields appear opposite to the visual team slots in the original overlay.
-    logo("logo1", second ? v.firstLogo : v.secondLogo);
-    logo("logo2", second ? v.secondLogo : v.firstLogo);
+    // Layout 2: first-innings logos corrected; preserve the working second-innings mapping.
+    logo("logo1", v.firstLogo);
+    logo("logo2", v.secondLogo);
 
     if (isFinished) {
       showSecondary(postMatchMessage(data,v));
@@ -2053,9 +1962,7 @@ async function refresh(){
   try{
     const response=await fetch(API,{cache:"no-store"});
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    const liveData=await response.json();
-     render(liveData);
-     fetchFullScorecard(false,truthy(liveData.isSecondInningsStarted)||truthy(liveData.values?.isSecondInningsStarted)?1:0);
+    render(await response.json());
     $("error").style.display="none";
   }catch(e){
     console.error(e);
@@ -2113,12 +2020,10 @@ if (urlParam("demo") === "matchResult") {
   const a={name:'TEAM A',total:156,wickets:8,overs:'20.0',rr:'7.80'};
   const b={name:'TEAM B',total:74,wickets:2,overs:'10.0',rr:'7.40'};
   renderBothTeamsSummary(demoFullCard,a,b,10,['1','4','0','2','1','0']);
-  updatePersistentScoreboardHeight();
   document.body.classList.add('show-over-summary');
 } else if (overSummaryEnabled && urlParam("demo") === "overSummary") {
   const t={name:'RAGING BULLS',total:63,wickets:2,overs:'8.0',rr:'7.88'};
   renderCompactSummary(demoFullCard,t,false,8,false,['1','4','0','2','1','0']);
-  updatePersistentScoreboardHeight();
   document.body.classList.add('show-over-summary');
 } else if (inningsBreakSummaryEnabled && urlParam("demo") === "inningsBreak") {
   render({
