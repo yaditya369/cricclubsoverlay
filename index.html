@@ -1583,6 +1583,32 @@ function projectedScore(v,t) {
   return `Projected ${Math.round(runs/balls*limit*6)} (${limit} overs)`;
 }
 function tossMessage(data,v) {
+  // Prefer CricClubs' complete toss announcement, wherever it appears in the payload.
+  // Do not infer the decision from batting order or overwrite a genuine message.
+  const seen=new Set();
+  function findAnnouncement(obj,depth=0){
+    if(obj==null || depth>5)return "";
+    if(typeof obj==="string"){
+      const text=obj.replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+      const match=text.match(/(?:[A-Za-z0-9][^.!?]{0,130}?)\s+won the toss\s+(?:and\s+)?(?:chose|choose|elected|opted)\s+to\s+(?:bat|bowl|field)(?:\s+first)?/i);
+      return match?match[0].trim():"";
+    }
+    if(typeof obj!=="object" || seen.has(obj))return "";
+    seen.add(obj);
+    for(const [key,value] of Object.entries(obj)){
+      if(typeof value==="string" && /toss|message|status|description|comment/i.test(key)){
+        const found=findAnnouncement(value,depth+1);
+        if(found)return found;
+      }
+    }
+    for(const value of Object.values(obj)){
+      const found=findAnnouncement(value,depth+1);
+      if(found)return found;
+    }
+    return "";
+  }
+  const announcement=findAnnouncement(data);
+  if(announcement)return announcement;
   // CricClubs response shapes differ between leagues; look in common nested objects.
   const sources=[data,v,data?.match,data?.matchDetails,data?.matchInfo,data?.toss,
     v?.match,v?.matchDetails,v?.matchInfo,v?.toss].filter(x=>x&&typeof x==="object");
