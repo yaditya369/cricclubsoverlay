@@ -1173,6 +1173,38 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
   line-height: 1 !important;
   padding-bottom: 0 !important;
 }
+
+/* Landscape repair: the two-line THIS OVER label must not be clipped by
+   the older fixed 19px delivery-row height. Keep the scoreboard size. */
+.overlay.layout2 .top .balls {
+  height: auto !important;
+  min-height: 25px !important;
+  overflow: visible !important;
+  align-items: center !important;
+}
+.overlay.layout2 .top .this-over-label {
+  height: 25px !important;
+  min-height: 25px !important;
+  display: inline-flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0 !important;
+  line-height: 1 !important;
+  margin-right: 4px !important;
+}
+.overlay.layout2 .top .this-over-label .ball-label {
+  height: auto !important;
+  min-height: 0 !important;
+  font-size: 9px !important;
+  line-height: 12px !important;
+}
+.overlay.layout2 .top .this-over-label .this-over-runs {
+  height: auto !important;
+  font-size: 9px !important;
+  line-height: 12px !important;
+  margin: 0 !important;
+}
 </style>
 
 <style id="match-result-legibility-fix">
