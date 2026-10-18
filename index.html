@@ -1294,6 +1294,19 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 .overlay.layout2 .bottom.visible{position:relative!important;inset:auto!important;display:flex!important}
 </style>
 
+<style id="layout2-center-score-highlight">
+/* Match the darker lower information panel without changing layout or opacity controls. */
+.overlay.layout2 .top .team.left .scorebox {
+  background: rgba(10,18,30,var(--overlay-opacity,.70)) !important;
+  border: 1px solid rgba(255,255,255,.35) !important;
+  border-radius: 7px !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset !important;
+}
+/* Keep the score prominent against the dark center panel. */
+.overlay.layout2 .top .team.left .scorebox .score { color: #fff !important; }
+.overlay.layout2 .top .team.left .scorebox .meta { color: #d8e5f5 !important; }
+</style>
+
 <style id="prematch-single-header-fix">
 /* In pre-match/toss, show ONLY the VS header; never the live five-column grid. */
 .overlay.layout2.is-prematch > .top,
