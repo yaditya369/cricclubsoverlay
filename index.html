@@ -1592,10 +1592,41 @@ function thisOverRuns(balls) {
   }
   return sum;
 }
+// Track bowler transitions at an over boundary. Keep the previous over visible
+// at 3.0 until the next bowler is selected, then clear both chips and runs.
+let previousOverBowler = null;
+let previousOverInnings = null;
+let previousOverNumber = null;
 function showBowler(v,balls,inningsOvers){
-  const verified = currentOverBalls(balls, inningsOvers);
-  const recent = verified || (Array.isArray(balls) ? balls.slice(-7) : []);
-  const overRuns = verified ? thisOverRuns(verified) : null;
+  const oversText = String(inningsOvers ?? '0.0');
+  const m = oversText.match(/^(\d+)\.(\d+)$/);
+  const completedOvers = m ? Number(m[1]) : 0;
+  const ballsInOver = m ? Number(m[2]) : 0;
+  const bowler = String(get(v,'bowlerName','--')).trim();
+  const inningsKey = String(get(v,'inningsNumber',get(v,'currentInnings',''))) + ':' + String(get(v,'battingTeamName',''));
+  const sameInnings = previousOverInnings === inningsKey;
+  const bowlerChanged = sameInnings && previousOverBowler !== null && bowler !== previousOverBowler;
+  const atBoundary = !!m && ballsInOver === 0;
+  let recent;
+  if (!Array.isArray(balls)) {
+    recent = [];
+  } else if (atBoundary && completedOvers === 0) {
+    recent = [];
+  } else if (atBoundary && bowlerChanged) {
+    recent = [];
+  } else if (atBoundary) {
+    // The scorer has completed an over, but the next bowler is not yet selected.
+    // Keep the same delivery list already used by THIS OVER.
+    recent = balls.slice(-7);
+  } else {
+    const verified = currentOverBalls(balls, inningsOvers);
+    recent = verified || balls.slice(-7);
+  }
+  // Never calculate runs from a different list than the visible delivery chips.
+  const overRuns = recent.length ? thisOverRuns(recent) : 0;
+  previousOverBowler = bowler;
+  previousOverInnings = inningsKey;
+  previousOverNumber = completedOvers;
   const chips = recent.map(b=>{
     const x=String(b);
     const extra=parseExtraBall(x);
