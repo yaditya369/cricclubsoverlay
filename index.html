@@ -1137,7 +1137,20 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
  .overlay.layout2 .top .details {padding:1px 3px!important;}
  .overlay.layout2 .top .player {padding:1px 0!important;}
 }
-.strike-indicator { color: #ffd45c; font-size: .85em; margin-left: 4px; text-shadow: 0 0 2px #222; }
+.strike-indicator { display: inline-block; color: #ffd45c; font-size: .85em; margin-left: 4px; line-height: 1; vertical-align: middle; position: relative; top: -1px; text-shadow: 0 0 2px #222; }
+
+/* Keep batting runs/balls and bowling wickets/runs at identical sizes in Layout 2. */
+.overlay.layout2 .player-stats,
+.overlay.layout2 .bowler-meta {
+  font-size: 14px !important;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 650px) {
+  .overlay.layout2 .player-stats,
+  .overlay.layout2 .bowler-meta { font-size: 10px !important; }
+}
 </style>
 
 <style id="match-result-legibility-fix">
