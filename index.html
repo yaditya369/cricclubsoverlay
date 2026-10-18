@@ -1151,6 +1151,28 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
   .overlay.layout2 .player-stats,
   .overlay.layout2 .bowler-meta { font-size: 10px !important; }
 }
+/* Center and bold every delivery in THIS OVER */
+.this-over-label { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; gap: 1px; margin-right: 5px; line-height: 1.1; }
+.this-over-label .ball-label { height: auto !important; min-width: 0 !important; margin: 0 !important; }
+.this-over-label .this-over-runs { font-size: 9px; margin: 0; font-weight: 700; white-space: nowrap; }
+.ball { display: inline-flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; font-weight: 800 !important; line-height: 1 !important; }
+.this-over-runs { display: inline-flex; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 800; margin-left: 5px; color: #fff; font-variant-numeric: tabular-nums; }
+
+/* Extras have their own color across all themes; keep 4/6/W colors intact. */
+.overlay .ball.extra, .overlay.theme-red .ball.extra {
+  background: #7547bc !important; border-color: #bca0f5 !important;
+  color: #fff !important; font-weight: 800 !important;
+}
+/* Dot ball: optically center the glyph in its delivery tile. */
+.overlay .ball.dot-ball {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  padding-bottom: 0 !important;
+}
 </style>
 
 <style id="match-result-legibility-fix">
@@ -1468,25 +1490,83 @@ function showBatters(v){
     </div>`;
 }
 
-function showBowler(v,balls){
-  const recent = Array.isArray(balls) ? balls.slice(-7) : [];
+// Only report a total when the feed's deliveries can be assigned to this over.
+function currentOverBalls(balls, overs) {
+  if (!Array.isArray(balls)) return null;
+  const m = String(overs ?? '').match(/^(\d+)\.(\d+)$/);
+  if (!m) return null;
+  const legalTarget = Number(m[2]);
+  if (legalTarget < 1 || legalTarget > 5) return null;
+  let legal = 0, start = balls.length;
+  while (start > 0 && legal < legalTarget) {
+    start--;
+    if (!/(?:WD|WIDE|NB|NO.?BALL)/i.test(String(balls[start]))) legal++;
+  }
+  if (legal !== legalTarget) return null;
+  // Extras before the first legal delivery cannot be assigned reliably from
+  // a flat trailing-ball feed; avoid showing an inaccurate runs total.
+  if (start > 0 && /(?:WD|WIDE|NB|NO.?BALL)/i.test(String(balls[start - 1]))) return null;
+  return balls.slice(start);
+}
+// Preserve raw CricClubs tokens for calculations; abbreviate only their display.
+function parseExtraBall(raw) {
+  const x=String(raw).trim().toUpperCase().replace(/\s+/g,'');
+  const wide=/(?:WD|WIDE)/.test(x);
+  const noBall=/(?:NB|NOBALL|NO-BALL)/.test(x);
+  const bye=/(?:LB|BYE|(?<!N)B(?!ALL))/.test(x) && !/^(?:NB|NOBALL)$/.test(x);
+  const legBye=/(?:LB|LEGBYE)/.test(x);
+  const isExtra=wide||noBall||bye;
+  if(!isExtra) return null;
+  // A token such as 1Wd denotes the one-run wide penalty, not a bye.
+  // Additional byes must be explicitly identified by the source token.
+  const label=(wide?'Y':noBall?'N':'')+(bye?((wide||noBall)?'+':'')+(legBye?'LB':'B'):'');
+  return {label:label||'B',wide,noBall,bye};
+}
+function thisOverRuns(balls) {
+  if (!balls || !balls.length) return null;
+  let sum=0;
+  for(const raw of balls){
+    const x=String(raw).trim().toUpperCase().replace(/\s+/g,'');
+    if(x==='.'||x==='0'||x==='W') continue;
+    if(/^\d+$/.test(x)){sum+=Number(x);continue;}
+    const extra=parseExtraBall(x);
+    if(extra){
+      const nums=[...x.matchAll(/\d+/g)].map(m=>Number(m[0]));
+      // For CricClubs' '1Wd' and '1Nb', 1 is the full extra count.
+      // If a compound token is ambiguous, avoid inventing runs.
+      if(nums.length===1) sum+=nums[0];
+      else if(nums.length===0) sum+=extra.wide||extra.noBall?1:0;
+      else return null;
+      continue;
+    }
+    const wicket=x.match(/^(\d+)W$/);
+    if(wicket){sum+=Number(wicket[1]);continue;}
+    return null;
+  }
+  return sum;
+}
+function showBowler(v,balls,inningsOvers){
+  const verified = currentOverBalls(balls, inningsOvers);
+  const recent = verified || (Array.isArray(balls) ? balls.slice(-7) : []);
+  const overRuns = verified ? thisOverRuns(verified) : null;
   const chips = recent.map(b=>{
     const x=String(b);
-    let cls="ball";
-    if(x.toUpperCase().includes("W")) cls+=" wicket";
-    else if(x==="6") cls+=" boundary six";
-    else if(x==="4") cls+=" boundary";
-    return `<span class="${cls}">${escapeHTML(x)}</span>`;
-  }).join("");
-
+    const extra=parseExtraBall(x);
+    let cls='ball';
+    if(extra) cls+=' extra';
+    else if(x.trim()==='.' || x.trim()==='0') cls+=' dot-ball';
+    else if(/^W$/i.test(x)) cls+=' wicket';
+    else if(x==='6') cls+=' boundary six';
+    else if(x==='4') cls+=' boundary';
+    return `<span class="${cls}" title="${escapeHTML(x)}">${escapeHTML(extra?extra.label:x)}</span>`;
+  }).join('');
   return `
     <div class="bowler-row">
-      <div class="bowler-name">${escapeHTML(get(v,"bowlerName","--"))}</div>
-      <div class="bowler-meta">${escapeHTML(get(v,"bowlerWickets","0"))}/${escapeHTML(get(v,"bowlerRuns","0"))} (${escapeHTML(formatOvers(get(v,"bowlerOvers","0.0")))})</div>
+      <div class="bowler-name">${escapeHTML(get(v,'bowlerName','--'))}</div>
+      <div class="bowler-meta">${escapeHTML(get(v,'bowlerWickets','0'))}/${escapeHTML(get(v,'bowlerRuns','0'))} (${escapeHTML(formatOvers(get(v,'bowlerOvers','0.0')))})</div>
     </div>
-    <div class="balls"><span class="ball-label">THIS OVER</span>${chips}</div>`;
+    <div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
 }
-
 function escapeHTML(s){
   return String(s).replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -1890,7 +1970,7 @@ function render(data){
     logo("logo1",v.firstLogo);
     logo("logo2",v.secondLogo);
     $("details1").innerHTML=showBatters(v);
-    $("details2").innerHTML=showBowler(v,data.balls);
+    $("details2").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
     if (isLayout2) $("score1").closest(".scorebox").style.display="flex";
     showSecondary(tossMessage(data,v) || "Match yet to start");
     syncHeaderHeight();
@@ -1911,7 +1991,7 @@ function render(data){
     $("score2").closest(".scorebox").style.display = "none";
 
     $("details1").innerHTML = showBatters(v);
-    $("details2").innerHTML = showBowler(v, data.balls);
+    $("details2").innerHTML = showBowler(v, data.balls, second?t2.overs:t1.overs);
 
     // Layout 2: first-innings logos corrected; preserve the working second-innings mapping.
     logo("logo1", v.firstLogo);
@@ -1971,9 +2051,9 @@ function render(data){
 
   if(!second){
     $("details1").innerHTML=showBatters(v);
-    $("details2").innerHTML=showBowler(v,data.balls);
+    $("details2").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
   }else{
-    $("details1").innerHTML=showBowler(v,data.balls);
+    $("details1").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
     $("details2").innerHTML=showBatters(v);
   }
 
