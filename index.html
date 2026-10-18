@@ -1137,6 +1137,7 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
  .overlay.layout2 .top .details {padding:1px 3px!important;}
  .overlay.layout2 .top .player {padding:1px 0!important;}
 }
+.strike-indicator { color: #ffd45c; font-size: .85em; margin-left: 4px; text-shadow: 0 0 2px #222; }
 </style>
 
 <style id="match-result-legibility-fix">
@@ -1445,7 +1446,7 @@ function showScore(n,t){
 function showBatters(v){
   return `
     <div class="player">
-      <span class="player-name">${escapeHTML(get(v,"batsman1Name","Striker"))}</span>
+      <span class="player-name">${escapeHTML(get(v,"batsman1Name","Striker"))}<span class="strike-indicator" title="On strike" aria-label="On strike">★</span></span>
       <span class="player-stats">${escapeHTML(get(v,"batsman1Runs","0"))} (${escapeHTML(get(v,"batsman1Balls","0"))})</span>
     </div>
     <div class="player">
