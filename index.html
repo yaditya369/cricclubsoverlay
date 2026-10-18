@@ -1297,10 +1297,11 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 <style id="layout2-center-score-highlight">
 /* Match the darker lower information panel without changing layout or opacity controls. */
 .overlay.layout2 .top .team.left .scorebox {
-  background: rgba(10,18,30,var(--overlay-opacity,.70)) !important;
-  border: 1px solid rgba(255,255,255,.35) !important;
+  /* Parent scoreboard already has opacity; avoid stacking a second full-opacity layer. */
+  background: rgba(10,18,30,calc(var(--overlay-opacity,.70) * .55)) !important;
+  border: 1px solid rgba(255,255,255,calc(var(--overlay-opacity,.70) * .35)) !important;
   border-radius: 7px !important;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,calc(var(--overlay-opacity,.70) * .06)) inset !important;
 }
 /* Keep the score prominent against the dark center panel. */
 .overlay.layout2 .top .team.left .scorebox .score { color: #fff !important; }
