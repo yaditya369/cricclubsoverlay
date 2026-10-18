@@ -1409,8 +1409,12 @@ function teamScore(v,p){
 function showScore(n, t) {
   $("name" + n).textContent = t.name;
 
-  const isZeroZero =
-    Number(t.total) === 0 && Number(t.wickets) === 0;
+  // Suppress the initial 0/0 only in Layout 1 before a ball has been bowled.
+  // Layout 2 must always display the batting score, including 0/0.
+  const isLayout2 = document.querySelector(".overlay").classList.contains("layout2");
+  const isZeroZero = !isLayout2 &&
+    Number(t.total) === 0 && Number(t.wickets) === 0 &&
+    !(overBalls(t.overs) > 0);
 
   $("score" + n).style.visibility =
     isZeroZero ? "hidden" : "visible";
@@ -1867,10 +1871,10 @@ function render(data){
     $("name2").textContent=t2.name;
     $("preTeam1").textContent=t1.name;
     $("preTeam2").textContent=t2.name;
-    prematchLogo("preLogo1","preInitials1",t1.name,v.secondLogo);
-    prematchLogo("preLogo2","preInitials2",t2.name,v.firstLogo);
-    logo("logo1",v.secondLogo);
-    logo("logo2",v.firstLogo);
+    prematchLogo("preLogo1","preInitials1",t1.name,v.firstLogo);
+    prematchLogo("preLogo2","preInitials2",t2.name,v.secondLogo);
+    logo("logo1",v.firstLogo);
+    logo("logo2",v.secondLogo);
     $("details1").innerHTML=showBatters(v);
     $("details2").innerHTML=showBowler(v,data.balls);
     if (isLayout2) $("score1").closest(".scorebox").style.display="flex";
