@@ -1174,6 +1174,21 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
   padding-bottom: 0 !important;
 }
 
+/* Larger, optically centered dot for dot-ball tiles (landscape). */
+.overlay .ball.dot-ball {
+  font-size: 0 !important;
+  position: relative;
+}
+.overlay .ball.dot-ball::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 7px;
+}
+
 /* Landscape repair: the two-line THIS OVER label must not be clipped by
    the older fixed 19px delivery-row height. Keep the scoreboard size. */
 .overlay.layout2 .top .balls {
