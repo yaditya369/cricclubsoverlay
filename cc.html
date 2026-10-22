@@ -1353,6 +1353,47 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 .overlay.is-prematch > #prematchTemplate:not([hidden]) { display:grid !important; }
 .overlay.is-prematch .bottom { position:relative !important; }
 </style>
+
+<style id="layout2-compact-fixed-55px">
+/* Regression: override inherited flex-basis 70px/25px and outer 1px borders. */
+.overlay.layout2 {border-width:0!important;box-sizing:border-box!important;}
+.overlay.layout2:not(.is-prematch) > .top {flex:0 0 40px!important;}
+.overlay.layout2 > .bottom.visible {flex:0 0 15px!important;}
+/* Unconditional Layout 2 sizing: WebView CSS viewport may be <900px even
+   when the CameraX output is 3840x2160. Layout 1 remains untouched. */
+.overlay.layout2:not(.is-prematch) > .top {
+ height:40px!important;min-height:40px!important;max-height:40px!important;
+ box-sizing:border-box!important;padding:0!important;overflow:hidden!important;
+}
+.overlay.layout2 > .bottom.visible {
+ height:15px!important;min-height:15px!important;max-height:15px!important;
+ box-sizing:border-box!important;padding:0 8px!important;
+ line-height:14px!important;overflow:hidden!important;
+}
+.overlay.layout2 > .bottom.visible #bottomText {font-size:10px!important;line-height:14px!important;}
+.overlay.layout2 > .bottom.visible .powered-credit {font-size:7px!important;}
+.overlay.layout2:not(.is-prematch) > .top .identity {padding:1px 3px!important;gap:2px!important;overflow:hidden!important;}
+.overlay.layout2:not(.is-prematch) > .top .logo {width:27px!important;height:25px!important;}
+.overlay.layout2:not(.is-prematch) > .top .team-name {font-size:9px!important;line-height:1!important;}
+.overlay.layout2:not(.is-prematch) > .top .details {padding:1px 6px!important;overflow:hidden!important;}
+.overlay.layout2:not(.is-prematch) > .top .player {font-size:10px!important;padding:1px 0!important;line-height:1.05!important;gap:3px!important;}
+.overlay.layout2:not(.is-prematch) > .top .player + .player {padding-top:1px!important;}
+.overlay.layout2:not(.is-prematch) > .top .player-name,
+.overlay.layout2:not(.is-prematch) > .top .bowler-name {font-size:11px!important;line-height:13px!important;}
+.overlay.layout2:not(.is-prematch) > .top .player-stats,
+.overlay.layout2:not(.is-prematch) > .top .bowler-meta {font-size:10px!important;line-height:13px!important;}
+.overlay.layout2:not(.is-prematch) > .top .bowler-row {padding-bottom:1px!important;}
+.overlay.layout2:not(.is-prematch) > .top .balls {margin-top:1px!important;gap:3px!important;min-height:18px!important;height:18px!important;overflow:hidden!important;flex-wrap:nowrap!important;}
+.overlay.layout2:not(.is-prematch) > .top .this-over-label {height:18px!important;min-height:18px!important;flex:0 0 auto!important;}
+.overlay.layout2:not(.is-prematch) > .top .this-over-label .ball-label,
+.overlay.layout2:not(.is-prematch) > .top .this-over-label .this-over-runs {font-size:8px!important;line-height:9px!important;}
+.overlay.layout2:not(.is-prematch) > .top .ball {height:17px!important;min-width:17px!important;font-size:10px!important;padding:0 3px!important;flex:0 0 auto!important;}
+.overlay.layout2:not(.is-prematch) > .top .team.left .scorebox {height:35px!important;min-height:0!important;padding:1px 4px!important;}
+.overlay.layout2:not(.is-prematch) > .top .score {font-size:21px!important;line-height:22px!important;}
+.overlay.layout2:not(.is-prematch) > .top .meta {font-size:9px!important;line-height:10px!important;margin-top:0!important;}
+/* Preserve prematch header and footer behavior without allowing old min-heights. */
+.overlay.layout2.is-prematch > #prematchTemplate:not([hidden]) {height:40px!important;min-height:40px!important;max-height:40px!important;box-sizing:border-box!important;overflow:hidden!important;}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1790,6 +1831,24 @@ function eventKind(x) {
   if(/^6$|^6\b|SIX/.test(b))return "six";
   return "";
 }
+// Native Android callback: fired once for each newly observed FOUR/SIX delivery.
+// No callback on initial load, refresh of unchanged data, or preview animations.
+function notifyAndroidBoundary(kind, signature, second, overs) {
+  if (kind !== "four" && kind !== "six") return;
+  try {
+    const bridge = window.AndroidBridge;
+    if (!bridge || typeof bridge.onBoundary !== "function") return;
+    bridge.onBoundary(JSON.stringify({
+      type: kind === "four" ? "FOUR" : "SIX",
+      matchId: String(params.get("matchId") || ""),
+      clubId: String(params.get("clubId") || ""),
+      innings: second ? 2 : 1,
+      over: String(overs ?? ""),
+      deliveryId: signature,
+      timestamp: Date.now()
+    }));
+  } catch (err) { console.info("Android boundary callback unavailable", err); }
+}
 function watchLastBall(data,v,second) {
   const balls=Array.isArray(data.balls)?data.balls:[];
   const t=second?teamScore(v,"t2"):teamScore(v,"t1");
@@ -1798,7 +1857,16 @@ function watchLastBall(data,v,second) {
   if(eventReady && signature!==lastEventSignature && last) {
     const previous=lastEventSignature?.split("|");
     const changedScore=previous && (previous[1]!==t.total || previous[2]!==t.wickets || previous[3]!==t.overs);
-    if(changedScore) showEvent(eventKind(last));
+    if(changedScore) {
+      const kind = eventKind(last);
+      showEvent(kind);
+      // Only exact bat boundaries; wides/no-balls and their boundary extras
+      // must not be reported as a batter's FOUR/SIX.
+      if ((last.trim() === "4" && kind === "four") ||
+          (last.trim() === "6" && kind === "six")) {
+        notifyAndroidBoundary(kind, signature, second, t.overs);
+      }
+    }
   }
   lastEventSignature=signature;
   eventReady=true;
