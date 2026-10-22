@@ -1,0 +1,2316 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cricket Score Overlay</title>
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:transparent;
+  font-family:Arial,Helvetica,sans-serif;
+  color:#fff;
+}
+html{height:100%}
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-width: 0;
+}
+
+.team {
+  display: grid;
+  min-width: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.team.left {
+  grid-template-columns:
+    clamp(65px, 8vw, 112px)
+    minmax(0, 1fr)
+    clamp(90px, 11vw, 150px);
+}
+
+.team.right {
+  grid-template-columns:
+    clamp(90px, 11vw, 150px)
+    minmax(0, 1fr)
+    clamp(65px, 8vw, 112px);
+}
+
+.identity {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 5px;
+  overflow: hidden;
+}
+
+.logo {
+  display: block;
+  width: min(58px, 100%);
+  height: 48px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.team-name {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  font-size: clamp(10px, 1.3vw, 20px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.scorebox {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px clamp(5px, 1vw, 10px);
+  border-left: 1px solid #62758a;
+  border-right: 1px solid #62758a;
+}
+.right .scorebox{grid-column:1;grid-row:1;border-left:0;border-right:1px solid #62758a}
+
+.score {
+  min-width: 0;
+  font-size: clamp(20px, 3vw, 43px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -1px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 7px;
+  font-size: clamp(9px, 1.1vw, 16px);
+  line-height: 1.2;
+  color: #d1dbe8;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.balls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.ball-label {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  margin: 0 3px 0 0;
+  font-size: 10px;
+  line-height: 1;
+  color: #9eb1c7;
+  white-space: nowrap;
+}
+
+.ball {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 26px;
+  padding: 0 5px;
+  line-height: 1;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.details {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px clamp(5px, 1vw, 12px);
+}
+.left .details{grid-column:2;grid-row:1}
+.right .details{grid-column:2;grid-row:1}
+.player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 7px 0;
+  font-size: clamp(9px, 1vw, 14px);
+}
+
+.player-name {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-stats {
+  min-width: 0;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.section-label{font-size:10px;color:#9eb1c7;letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px}
+.bowler-name,
+.bowler-meta {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+
+.ball.wicket{background:#c63c4b;color:#fff}
+.ball.boundary{background:#e6bb5d;color:#17263a}
+.right .identity{grid-column:3;grid-row:1}
+.right .scorebox{grid-column:1;grid-row:1}
+.right .details{grid-column:2;grid-row:1}
+.bottom{display:none;min-height:53px;align-items:center;justify-content:center;text-align:center;padding:10px 12px;background:#0b1421;border-top:1px solid #33465c;color:#ffd16e;font-weight:800;font-size:20px}
+.bottom.visible{display:flex}
+.powered{font-size:9px;letter-spacing:1px;font-weight:500;color:#9aabbe;margin-left:14px;white-space:nowrap}
+.error{display:none;padding:5px 10px;background:#672a36;font-size:11px}
+@media(max-width:900px){
+ .top{min-height:115px}
+ .team.left{grid-template-columns:72px minmax(0,1fr) 105px}
+ .team.right{grid-template-columns:105px minmax(0,1fr) 75px}
+ .identity{padding:10px 3px 6px}
+ .logo{width:43px;height:37px}
+ .team-name{font-size:14px}
+ .score{font-size:31px}
+ .meta{font-size:12px;margin-top:5px}
+ .details{padding:8px}
+ .player{font-size:11px;margin:5px 0}
+ .bowler-name{font-size:12px}
+ .bowler-meta{font-size:11px;margin-top:5px}
+ .balls{gap:4px;margin-top:8px}
+ .ball{height:25px;min-width:25px;font-size:11px;padding:0 4px}
+ .bottom{font-size:15px}
+}
+
+@media (max-width: 520px) {
+  .meta {
+    gap: 4px;
+    font-size: 9px;
+    margin-top: 5px;
+  }
+
+  .balls {
+    flex-wrap: nowrap;
+    gap: 3px;
+    margin-top: 6px;
+  }
+
+  .ball-label {
+    height: 19px;
+    font-size: 8px;
+    margin-right: 1px;
+  }
+
+  .ball {
+    height: 19px;
+    min-width: 17px;
+    padding: 0 3px;
+    font-size: 8px;
+  }
+}
+
+
+/* Compact, translucent charcoal scoreboard */
+.overlay {
+  width:100%;
+  margin-top:auto;
+  background: rgba(24, 27, 31, var(--overlay-opacity, 0.70));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Reduce overall row height */
+.top {
+  min-height: 0;
+}
+
+.team.left,
+.team.right {
+  min-height: 0;
+}
+
+/* Smaller logos and tighter team identity */
+.identity {
+  gap: 2px;
+  padding: 3px 5px;
+}
+
+.logo {
+  width: 30px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.team-name {
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.05;
+}
+
+/* Reduce space around player and bowler details */
+.details {
+  padding: 3px 6px;
+}
+
+.player {
+  margin: 2px 0;
+  line-height: 1.05;
+}
+
+.player-name,
+.player-stats,
+.bowler-name {
+  color: #fff;
+  line-height: 1.1;
+}
+
+.bowler-meta,
+.meta {
+  color: rgba(255, 255, 255, 0.78);
+  margin-top: 2px;
+  line-height: 1.05;
+}
+
+/* Smaller score panel */
+.scorebox {
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.score {
+  color: #fff;
+  font-size: clamp(20px, 2.3vw, 30px);
+  line-height: 1;
+}
+
+.balls {
+  margin-top: 4px;
+  gap: 3px;
+}
+
+.ball,
+.ball-label {
+  height: 19px;
+}
+
+.ball {
+  min-width: 19px;
+  padding: 0 4px;
+}
+
+/* Compact bottom row for chase/result */
+.bottom {
+  min-height: 0;
+  padding: 4px 8px;
+  background: rgba(15, 17, 20, 0.78);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 13px;
+}
+
+.powered {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Smaller screens */
+@media (max-width: 520px) {
+  .identity {
+    padding: 3px;
+    gap: 1px;
+  }
+
+  .logo {
+    width: 23px;
+    height: 21px;
+  }
+
+  .team-name {
+    font-size: 9px;
+  }
+
+  .details {
+    padding: 3px;
+  }
+
+  .scorebox {
+    padding: 3px 5px;
+  }
+
+  .score {
+    font-size: 19px;
+  }
+
+  .player {
+    margin: 1px 0;
+  }
+
+  .ball,
+  .ball-label {
+    height: 16px;
+  }
+
+  .ball {
+    min-width: 16px;
+    padding: 0 3px;
+    font-size: 9px;
+  }
+
+  .bottom {
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+}
+
+/* Put Overs and Run Rate on separate lines */
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  line-height: 1.1;
+  margin-top: 3px;
+}
+
+
+
+/* Layout 2: reference broadcast scoreboard. Layout 1 above remains unchanged. */
+.overlay.layout2 {
+  width: 100%;
+  margin-top: auto;
+  overflow: hidden;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(24,27,31,var(--overlay-opacity,.70));
+  color: #fff;
+}
+.layout2 .top {
+  display: grid;
+  grid-template-columns: clamp(78px,8vw,120px) minmax(130px,1fr) clamp(150px,20vw,270px) minmax(130px,1fr) clamp(78px,8vw,120px);
+  height: auto;
+  min-height: 115px;
+  align-items: stretch;
+}
+.layout2 .team { display: contents; }
+.layout2 .team .identity,
+.layout2 .team .details,
+.layout2 .team .scorebox { min-width: 0; }
+.layout2 #logo1 { grid-column: 1; grid-row: 1; }
+.layout2 #name1 { grid-column: 1; grid-row: 1; }
+.layout2 .team.left .identity { grid-column: 1; grid-row: 1; border: 0; }
+.layout2 #details1 { grid-column: 2; grid-row: 1; border: 0; padding: 7px 16px; }
+.layout2 .team.left .scorebox { grid-column: 3; grid-row: 1; z-index: 1; }
+.layout2 #details2 { grid-column: 4; grid-row: 1; border: 0; padding: 7px 16px; }
+.layout2 .team.right .identity { grid-column: 5; grid-row: 1; border: 0; }
+.layout2 .team.right .scorebox { display: none !important; }
+.layout2 .team.left .scorebox {
+  box-sizing: border-box;
+  align-self: center;
+  justify-self: center;
+  width: calc(100% - 12px);
+  height: 82px;
+  background: rgba(8,20,37,.42);
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 6px;
+  padding: 8px 10px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.layout2 .score { font-size: clamp(26px,3vw,42px); }
+.layout2 .meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  white-space: nowrap;
+  font-size: clamp(11px,1.15vw,17px);
+  margin-top: 8px;
+}
+.layout2 .meta span + span::before {
+  content: "·";
+  display: inline-block;
+  margin: 0 10px;
+  color: rgba(255,255,255,.78);
+}
+.layout2 .meta { column-gap: 0; }
+.layout2 .identity { gap: 7px; padding: 6px 5px; }
+.layout2 .logo { width: min(58px,100%); height: 48px; }
+.layout2 .team-name { font-size: clamp(10px,1.1vw,17px); }
+.layout2 .player { font-size: clamp(14px,1.45vw,21px); margin: 0; padding: 13px 0; gap: 8px; }
+.layout2 .player-name,
+.layout2 .bowler-name { font-size: 16px; }
+/* Reference screenshot has a thin divider between the two batter rows. */
+.layout2 #details1 .player:first-child { border-bottom: 1px solid rgba(190,218,250,.42); }
+.layout2 #details1 .player + .player { padding-top: 13px; }
+.layout2 .section-label { font-size: clamp(9px,.85vw,12px); }
+.layout2 .bowler-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(190,218,250,.42); }
+.layout2 .bowler-name { font-size: 16px; white-space: nowrap; }
+.layout2 .bowler-meta { font-size: 14px; font-weight: 700; margin-top: 0; white-space: nowrap; }
+.layout2 .balls {
+  margin-top: 10px;
+  gap: 5px;
+  flex-wrap: wrap;
+  overflow: visible;
+  max-width: 100%;
+}
+.layout2 .ball-label {
+  font-size: clamp(10px,1vw,14px);
+  font-weight: 700;
+  margin-right: 3px;
+  white-space: nowrap;
+}
+.layout2 .ball {
+  min-width: 27px;
+  height: 32px;
+  padding: 0 5px;
+  flex: 0 1 auto;
+  box-sizing: border-box;
+  border: 1px solid rgba(190,218,250,.65);
+  background: rgba(255,255,255,.05);
+  border-radius: 3px;
+  font-size: 14px;
+}
+.layout2 .ball.wicket { background: #d92f45; border-color: #ff8794; color: #fff; font-weight: 800; }
+.layout2 .ball.boundary { background: #e6bb5d; border-color: #ffdc85; color: #17263a; font-weight: 800; }
+.layout2 .ball.six { background: #36a269; border-color: #79e0a8; color: #fff; font-weight: 800; }
+.layout2 .bottom {
+  display: none;
+  min-height: 0;
+  padding: 7px 16px;
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,.35);
+  border-radius: 0 0 8px 8px;
+  font-size: clamp(13px,1.25vw,19px);
+  font-weight: 700;
+  text-align: center;
+  justify-content: center;
+  background: rgba(10,18,30,.80);
+  color: #fff;
+}
+.layout2 .bottom.visible { display: flex; }
+.layout2 #score2, .layout2 #meta2, .layout2 #overs2, .layout2 #rr2 { display: none !important; }
+.layout2.theme-blue { background: rgba(20,57,105,var(--overlay-opacity,.70)); }
+.layout2.theme-blue .team.left .scorebox { background: rgba(35,79,128,.88); }
+.layout2.theme-blue .bottom { background: rgba(12,39,77,.94); }
+.layout2.theme-blue .team.left .identity,
+.layout2.theme-blue #details1,
+.layout2.theme-blue #details2,
+.layout2.theme-blue .team.right .identity { border-color: rgba(190,218,250,.48); }
+.layout2.theme-blue .team.left .scorebox { border-color: rgba(190,218,250,.35); }
+.layout2.theme-blue .meta,
+.layout2.theme-blue .bowler-meta { color: #d5e6ff; }
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 48px minmax(80px,1fr) 100px minmax(80px,1fr) 48px;
+    height: auto;
+    min-height: 90px;
+  }
+  .layout2 .team.left .identity,
+  .layout2 .team.right .identity { padding: 5px 2px; }
+  .layout2 .logo { width: 27px; height: 25px; }
+  .layout2 .team-name { font-size: 8px; }
+  .layout2 #details1, .layout2 #details2 { padding: 5px 6px; }
+  .layout2 .team.left .scorebox { width: calc(100% - 6px); height: 60px; padding: 4px; }
+  .layout2 .score { font-size: 22px; }
+  .layout2 .meta { font-size: 9px; }
+  .layout2 .player { font-size: 10px; margin: 0; padding: 7px 0; gap: 3px; }
+  .layout2 .balls { gap: 3px; margin-top: 6px; }
+  .layout2 .ball { min-width: 17px; height: 18px; padding: 0 3px; font-size: 9px; }
+  .layout2 .ball-label { font-size: 8px; margin-right: 1px; }
+}
+
+
+/* Layout 2 compact sizing: keep the same content-driven height as Layout 1. */
+.layout2 .top { min-height: 0; height: auto; }
+.layout2 .identity { gap: 2px; padding: 3px 4px; }
+.layout2 .logo { width: 30px; height: 26px; }
+.layout2 .team-name { font-size: 12px; line-height: 1.05; }
+.layout2 #details1, .layout2 #details2 { padding: 3px 8px; }
+.layout2 .player { font-size: 14px; margin: 0; padding: 5px 0; line-height: 1.1; }
+.layout2 .player-name, .layout2 .bowler-name { font-size: 14px; }
+.layout2 #details1 .player + .player { padding-top: 5px; }
+.layout2 .bowler-row { padding-bottom: 5px; }
+.layout2 .bowler-meta { font-size: 12px; }
+.layout2 .balls { margin-top: 5px; gap: 3px; flex-wrap: nowrap; overflow: hidden; }
+.layout2 .ball { min-width: 20px; height: 21px; padding: 0 3px; font-size: 11px; }
+.layout2 .ball-label { height: 21px; font-size: 10px; margin-right: 2px; }
+.layout2 .team.left .scorebox { height: 62px; padding: 4px 6px; }
+.layout2 .score { font-size: clamp(20px,2.3vw,30px); }
+.layout2 .meta { font-size: clamp(9px,1vw,12px); margin-top: 4px; }
+.layout2 .meta span + span::before { margin: 0 5px; }
+@media (max-width: 650px) {
+  .layout2 .top { min-height: 0; }
+  .layout2 .team.left .scorebox { height: 56px; }
+  .layout2 .player { padding: 4px 0; font-size: 10px; }
+  .layout2 #details1 .player + .player { padding-top: 4px; }
+  .layout2 .player-name, .layout2 .bowler-name { font-size: 10px; }
+  .layout2 .ball { min-width: 17px; height: 18px; font-size: 9px; }
+}
+
+/* Keep bowler figures identical to batsmen score typography. */
+.layout2 .bowler-meta {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+@media (max-width: 650px) {
+  .layout2 .bowler-meta { font-size: 10px; }
+}
+
+/* Give team names more horizontal room without adding another line. */
+.layout2 .top {
+  grid-template-columns: clamp(95px, 9vw, 135px) minmax(110px, 1fr) clamp(125px, 15vw, 195px) minmax(110px, 1fr) clamp(95px, 9vw, 135px);
+}
+.layout2 .team-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  font-size: clamp(10px, 1vw, 14px);
+}
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 68px minmax(65px, 1fr) 88px minmax(65px, 1fr) 68px;
+  }
+  .layout2 .team-name { font-size: 9px; }
+}
+
+
+/* Layout 2: breathing room above and below the central score panel.
+   Keep the surrounding scoreboard content-driven and compact. */
+.layout2 .team.left .scorebox {
+  height: 54px;
+  margin-block: 4px;
+  padding: 3px 8px;
+  align-self: center;
+  border-radius: 6px;
+}
+@media (max-width: 650px) {
+  .layout2 .team.left .scorebox {
+    height: 48px;
+    margin-block: 3px;
+    padding: 3px 4px;
+  }
+}
+
+
+/* Team names: modestly wider than the original, maximum two lines. */
+.layout2 .top {
+  grid-template-columns: clamp(105px, 9.5vw, 145px) minmax(110px, 1fr) clamp(125px, 15vw, 195px) minmax(110px, 1fr) clamp(105px, 9.5vw, 145px);
+}
+.layout2 .team-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  line-height: 1.12;
+  font-size: clamp(10px, 1vw, 14px);
+}
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 76px minmax(65px, 1fr) 88px minmax(65px, 1fr) 76px;
+  }
+  .layout2 .team-name { font-size: 9px; }
+}
+
+/* Intermediate team-name width; preserve two-line wrapping. */
+@media (min-width: 651px) {
+  .layout2 .top {
+    grid-template-columns: clamp(100px, 9.25vw, 140px) minmax(110px, 1fr) clamp(125px, 15vw, 195px) minmax(110px, 1fr) clamp(100px, 9.25vw, 140px);
+  }
+}
+@media (max-width: 650px) {
+  .layout2 .top {
+    grid-template-columns: 72px minmax(65px, 1fr) 88px minmax(65px, 1fr) 72px;
+  }
+}
+
+/* Match phases, compact secondary bar, and event animations */
+.overlay .bottom {position:relative; gap:8px; padding-right:145px; min-height:27px;}
+.overlay .bottom.visible {display:flex;}
+.overlay .bottom .powered-credit {position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;letter-spacing:.2px;font-weight:600;color:#c9d8ec;white-space:nowrap;}
+.overlay .bottom .powered-credit a {color:inherit;text-decoration:none;}
+.overlay .bottom #bottomText {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.layout2 .top.pre-match .details {visibility:hidden;}
+.layout2 .top.pre-match .scorebox {visibility:hidden!important;}
+.layout2 .top.pre-match .identity {visibility:visible;}
+.layout2 .top.pre-match {min-height:72px;}
+.layout2 .top.pre-match .team.left .scorebox {display:flex!important;}
+.event-animation {position:fixed;left:50%;top:65%;transform:translate(-50%,-50%) scale(.7);z-index:1000;pointer-events:none;opacity:0;display:flex;flex-direction:column;align-items:center;gap:5px;filter:drop-shadow(0 6px 20px rgba(0,0,0,.8));}
+.event-animation.active {animation:score-event 2.4s ease-in-out both;}
+.event-animation .event-emoji {font-size:clamp(45px,7vw,90px);}
+.event-animation .event-text {font-size:clamp(32px,6vw,78px);font-weight:900;letter-spacing:2px;text-shadow:0 3px 0 #142640,0 6px 18px #000;}
+.event-animation.wicket .event-text {color:#ff657b;}
+.event-animation.four .event-text {color:#ffd36a;}
+.event-animation.six .event-text {color:#71f6aa;}
+@keyframes score-event {0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}15%,72%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
+@media(max-width:650px){.overlay .bottom{padding-right:112px;font-size:11px}.overlay .bottom .powered-credit{right:5px;font-size:8px;}}
+
+
+
+
+
+
+@media(max-width:650px){}
+
+.prematch-side{display:flex;align-items:center;justify-content:center;gap:15px;min-width:0;}
+.prematch-logo{width:clamp(48px,6vw,84px);height:clamp(48px,6vw,84px);object-fit:contain;flex:0 0 auto;}
+.prematch-side span{min-width:0;}
+@media(max-width:650px){.prematch-side{gap:5px;flex-direction:column}.prematch-logo{width:40px;height:40px}}
+/* Separate pre-match presentation; never use the five-column live scoreboard. */
+.prematch-template[hidden]{display:none!important}
+.prematch-template{display:grid;grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr);align-items:center;min-height:92px;padding:12px 28px;background:linear-gradient(115deg,rgba(11,34,67,.96),rgba(30,74,119,.94),rgba(11,34,67,.96));text-align:center;gap:12px;}
+.prematch-side{font-size:clamp(17px,2.4vw,32px);font-weight:900;letter-spacing:.4px;line-height:1.1;overflow-wrap:break-word;}
+.prematch-versus{font-size:clamp(23px,3.5vw,45px);font-weight:1000;color:#ffd26d;text-shadow:0 2px 12px #ffbd4260;}
+.overlay.is-prematch .top{display:none!important;}
+.overlay .bottom.projection{justify-content:center;}
+.overlay .bottom.projection #bottomText{position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 260px);text-align:center;font-weight:800;}
+/* Celebrations: layered burst, confetti, motion and a distinctive theme for each event */
+.event-animation{top:58%;width:min(640px,92vw);height:260px;justify-content:center;isolation:isolate;}
+.event-animation .event-rays{position:absolute;width:210px;height:210px;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.24) 0deg 8deg,transparent 8deg 24deg);opacity:0;z-index:-1;}
+.event-animation .event-particles{position:absolute;inset:0;z-index:-1;}
+.event-animation .particle{position:absolute;left:50%;top:48%;width:9px;height:15px;border-radius:2px;background:var(--particle,#ffd45b);opacity:0;}
+.event-animation.active .particle{animation:particle-burst 1.4s cubic-bezier(.1,.6,.2,1) forwards;animation-delay:var(--delay);}
+.event-animation.active .event-rays{animation:ray-burst 2s ease-out forwards;}
+.event-animation .event-emoji{font-size:clamp(48px,7vw,85px);line-height:1;transform-origin:center;}
+.event-animation .event-text{font-size:clamp(42px,7vw,88px);line-height:1;font-style:italic;letter-spacing:3px;-webkit-text-stroke:1px rgba(255,255,255,.45);}
+.event-animation .event-subtitle{font-size:clamp(12px,1.7vw,19px);font-weight:900;letter-spacing:4px;text-shadow:0 3px 12px #000;}
+.event-animation.wicket .event-text{color:#ff647e;text-shadow:0 0 22px #ff355b,0 4px 0 #74142d;}
+.event-animation.four .event-text{color:#ffd456;text-shadow:0 0 25px #fba923,0 4px 0 #8e520a;}
+.event-animation.six .event-text{color:#70f8c7;text-shadow:0 0 25px #00c9a5,0 4px 0 #09634e;}
+.event-animation.wicket .event-emoji{animation:wicket-shake .7s ease-in-out 2;}
+.event-animation.four .event-emoji{animation:four-slide 1.2s ease-out both;}
+.event-animation.six .event-emoji{animation:six-launch 1.6s ease-out both;}
+@keyframes particle-burst{0%{opacity:1;transform:translate(0,0) rotate(0)}70%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}}
+@keyframes ray-burst{0%{opacity:0;transform:scale(.2) rotate(0)}20%{opacity:1}100%{opacity:0;transform:scale(2) rotate(60deg)}}
+@keyframes wicket-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-18deg)}40%{transform:rotate(16deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(8deg)}}
+@keyframes four-slide{0%{transform:translateX(-180px) rotate(-30deg);opacity:0}60%{transform:translateX(20px) rotate(10deg);opacity:1}100%{transform:translateX(0) rotate(0)}}
+@keyframes six-launch{0%{transform:translateY(120px) scale(.4);opacity:0}55%{transform:translateY(-35px) scale(1.25);opacity:1}100%{transform:translateY(0) scale(1)}}
+@media(max-width:650px){.prematch-template{grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);padding:12px 8px;gap:5px;min-height:70px}.prematch-side{font-size:14px}.overlay .bottom.projection #bottomText{max-width:calc(100% - 145px);font-size:10px;}}
+/* Fallback team crests: initials appear if CricClubs has no logo or image fails. */
+.prematch-emblem{position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:clamp(48px,6vw,84px);height:clamp(48px,6vw,84px);border-radius:50%;background:linear-gradient(145deg,#357da6,#153a66);border:2px solid rgba(208,233,255,.65);box-shadow:0 2px 12px rgba(0,0,0,.3);overflow:hidden}
+.prematch-side:last-child .prematch-emblem{background:linear-gradient(145deg,#268c81,#14545e)}
+.prematch-emblem .prematch-logo{width:100%;height:100%;object-fit:contain;position:relative;z-index:1}
+.prematch-emblem .prematch-logo[hidden]{display:none}
+.prematch-initials{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(17px,2.5vw,30px);font-weight:900;letter-spacing:-1px;color:white}
+@media(max-width:650px){.prematch-emblem{width:40px;height:40px}.prematch-initials{font-size:15px}}
+
+/* Uniform broadcast header: pre-game/toss and both innings share the same frame. */
+.layout2 .top { min-height: 86px; }
+.layout2 .prematch-template {
+  box-sizing: border-box;
+  min-height: 86px;
+  padding: 5px 14px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.layout2.theme-blue .prematch-template { background: transparent; }
+.layout2 .prematch-emblem { width: 44px; height: 44px; }
+.layout2 .prematch-logo { width: 100%; height: 100%; }
+.layout2 .prematch-side { font-size: clamp(12px,1.2vw,17px); }
+.layout2 .prematch-versus { font-size: clamp(22px,2.4vw,32px); }
+/* Secondary-bar messages all use the same geometric center, including chase and result. */
+.layout2 .bottom.visible { justify-content: center; }
+.layout2 .bottom.visible #bottomText {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 255px);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 800;
+}
+@media(max-width:650px){
+ .layout2 .top,.layout2 .prematch-template{min-height:76px;}
+ .layout2 .prematch-template{padding:5px 7px;}
+ .layout2 .prematch-emblem{width:36px;height:36px;}
+ .layout2 .bottom.visible #bottomText{max-width:calc(100% - 135px);font-size:10px;}
+}
+
+/* Compact pre-game/toss: match the live scorecard height without enlarging innings. */
+.layout2 .top { min-height: 0; }
+.layout2 .prematch-template {
+  height: 72px;
+  min-height: 0;
+  padding: 3px 12px;
+  align-items: center;
+}
+.layout2 .prematch-emblem { width: 34px; height: 34px; }
+.layout2 .prematch-side { font-size: clamp(11px,1.1vw,15px); line-height: 1.05; gap: 3px; }
+.layout2 .prematch-versus { font-size: clamp(20px,2.2vw,28px); }
+@media (max-width:650px) {
+  .layout2 .top { min-height: 0; }
+  .layout2 .prematch-template { height: 66px; min-height: 0; padding: 2px 6px; }
+  .layout2 .prematch-emblem { width: 30px; height: 30px; }
+  .layout2 .prematch-side { font-size: 11px; }
+}
+
+/* Exact height synchronization: pre-match uses measured live innings header height. */
+.layout2 .prematch-template {
+  height: var(--live-header-height, 72px) !important;
+  min-height: 0 !important;
+  max-height: var(--live-header-height, 72px) !important;
+  padding: 2px 10px !important;
+  overflow: hidden;
+}
+.layout2 .prematch-side { min-height: 0; }
+
+/* Camera WebView: keep the viewport transparent and anchor the visible bar. */
+html, body { width:100%; height:100%; margin:0; background:transparent !important; }
+body { position:relative; min-height:100vh; }
+.overlay { position:fixed !important; left:0; right:0; bottom:var(--scoreboard-bottom-offset, 0px) !important; top:auto !important; width:100%; height:auto !important; margin:0 !important; z-index:10; }
+
+/* Camera compact mode: same header height for every match phase.
+   Only the WebView fills the screen; the scoreboard does not. */
+.layout2 .top,
+.layout2 .prematch-template {
+  box-sizing: border-box !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  overflow: hidden;
+}
+.layout2 .prematch-template { padding: 2px 10px !important; }
+.layout2 .bottom { min-height: 0 !important; padding-top: 5px !important; padding-bottom: 5px !important; }
+@media(max-width:650px) {
+  .layout2 .top,.layout2 .prematch-template {
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+  }
+  .layout2 .prematch-emblem { width: 30px; height: 30px; }
+}
+.innings-break-detail{font-size:clamp(10px,1.2vw,14px);font-weight:800;letter-spacing:.6px;text-align:center;opacity:.85;padding:8px 2px;}
+
+/* Compact footer correction: retain original 76px/70px scoreboard height.
+   The footer stays in normal flow, below the header, without oversized minimums. */
+.layout2 .top, .layout2 .prematch-template {
+  overflow: hidden !important;
+}
+.layout2 .bottom.visible {
+  box-sizing: border-box !important;
+  height: 27px !important;
+  min-height: 27px !important;
+  max-height: 27px !important;
+  padding: 3px 145px 3px 12px !important;
+  flex-shrink: 0;
+  overflow: hidden;
+  align-items: center;
+}
+.layout2 .bottom.visible #bottomText { line-height: 1.1; }
+@media(max-width:650px) {
+  .layout2 .bottom.visible {
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+    padding: 2px 112px 2px 8px !important;
+  }
+}
+@media (orientation: portrait) {
+  .overlay { bottom: max(var(--scoreboard-bottom-offset, 16px), env(safe-area-inset-bottom, 0px)) !important; }
+}
+
+/* Full landscape innings-break broadcast graphic; hidden during normal play. */
+#fullInningsBreak{display:none;position:fixed;left:1.2%;right:1.2%;bottom:var(--scoreboard-bottom-offset,0px);z-index:100;color:#f5faff;font:600 clamp(10px,1.05vw,17px)/1.24 system-ui,Arial,sans-serif;box-sizing:border-box;max-height:96dvh;overflow:auto;pointer-events:none}
+body.show-full-break #fullInningsBreak{display:block}
+body.show-full-break .overlay{display:none!important}
+.ib-header,.ib-panel,.ib-foot{background:linear-gradient(125deg,rgba(3,21,45,.96),rgba(7,51,96,.94));border:2px solid #368ad0;border-radius:12px;box-shadow:0 4px 20px #00152e80}
+.ib-header{display:grid;grid-template-columns:1fr 1.05fr 1fr;align-items:center;text-align:center;padding:8px 18px;margin-bottom:8px;gap:8px}
+.ib-header .ib-team{font-size:clamp(14px,1.8vw,29px);font-weight:900;overflow-wrap:anywhere}
+.ib-header .ib-center strong{display:block;color:#ffda63;letter-spacing:2px;font-size:clamp(12px,1.35vw,22px)}
+.ib-header .ib-score{font-size:clamp(24px,3vw,50px);font-weight:950}
+.ib-target{color:#ffda63;font-weight:900}
+.ib-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:8px;align-items:start}
+.ib-panel{overflow:hidden;padding-bottom:6px}
+.ib-panel h3{margin:0;padding:7px 12px;background:#0a4179;font-size:clamp(12px,1.25vw,20px);letter-spacing:.6px}
+.ib-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:clamp(9px,.94vw,16px)}
+.ib-table th{color:#b9d9fa;font-weight:700;text-align:right;padding:6px 6px;background:#071e3b}
+.ib-table td{text-align:right;padding:5px 6px;border-top:1px solid #285176;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ib-table .ib-name,.ib-table .ib-how{text-align:left;overflow:hidden;text-overflow:ellipsis}
+.ib-table .ib-name{font-weight:800}
+.ib-table .ib-runs{font-weight:900;color:#fff}
+.ib-table .ib-how{color:#bcd7f2;font-weight:500}
+.ib-summary{padding:6px 10px;border-top:1px solid #37638d;color:#d4eaff;font-size:clamp(9px,.91vw,15px)}
+.ib-summary b{color:#ffdb69}
+.ib-right{display:grid;gap:8px}
+.ib-extras{padding:6px 12px;display:grid;grid-template-columns:1fr auto;gap:5px;font-size:clamp(10px,.95vw,16px)}
+.ib-extras .ib-total{color:#ffdb69;font-weight:900;border-top:1px solid #4a7298;padding-top:5px}
+.ib-foot{text-align:center;padding:10px;font-size:clamp(11px,1.2vw,19px);font-weight:900;color:#ffda63}
+.ib-status{padding:14px;color:#f9d27a;text-align:center}
+@media (max-aspect-ratio: 1/1){#fullInningsBreak{left:1%;right:1%;font-size:10px;max-height:92dvh}.ib-grid{grid-template-columns:1fr}.ib-table{font-size:10px}.ib-table td,.ib-table th{padding:4px 3px}.ib-header{padding:6px}.ib-right{grid-template-columns:1fr}.ib-panel h3{font-size:12px}}
+
+/* Compact landscape summary: centered for 5 seconds after each completed over. */
+#overSummary{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(660px,88vw);z-index:200;box-sizing:border-box;color:#f6fbff;font:600 clamp(11px,1.05vw,16px)/1.35 system-ui,Arial,sans-serif;background:rgba(9,35,63,.96);border:2px solid #277cc2;border-radius:12px;padding:10px;box-shadow:0 10px 35px #0009;pointer-events:none}
+body.show-over-summary #overSummary{display:block}
+body.show-over-summary .overlay,body.show-over-summary #fullInningsBreak{display:none!important}
+.os-head,.os-foot{background:#146cb5;border-radius:5px;padding:7px 10px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.os-head{font-weight:900;letter-spacing:.6px}.os-score{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 5px}.os-score strong{font-size:clamp(20px,2.1vw,29px)}
+.os-second-score{border-top:1px solid #466784;padding-top:7px}.os-second-score[hidden]{display:none!important}.os-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.os-panel{background:#193c60;border-radius:6px;padding:9px 12px;min-width:0}.os-panel h3{color:#afcbe6;margin:0 0 8px;font-size:12px;letter-spacing:.6px}.os-row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}.os-row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.os-row span:last-child{white-space:nowrap}.os-foot{margin-top:9px;font-size:12px}
+@media(max-width:520px){#overSummary{width:95vw;padding:6px}.os-panel{padding:6px}.os-grid{gap:5px}.os-row{font-size:10px}.os-foot{font-size:10px}}
+/* Match summary: center each team score independently of name/overs widths. */
+#overSummary .os-score {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+  align-items: center;
+  column-gap: 12px;
+}
+#overSummary .os-score > span:first-child {
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#overSummary .os-score > strong {
+  justify-self: center;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+#overSummary .os-score > span:last-child {
+  justify-self: end;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Keep the second innings row hidden despite the higher-specificity centered grid. */
+#overSummary .os-second-score[hidden] { display: none !important; }
+
+/* Money Heist-inspired crimson broadcast theme; theme=red. */
+.layout2.theme-red, .overlay.theme-red {
+  background: rgba(138, 12, 24, var(--overlay-opacity, .70)) !important;
+  color: #fff8f5;
+  font-family: "Arial Narrow", "Roboto Condensed", "Arial", sans-serif;
+}
+.overlay.theme-red .top,
+.overlay.theme-red .prematch-template {
+  background: linear-gradient(110deg, rgba(105, 8, 18, var(--overlay-opacity, .70)), rgba(189, 19, 36, var(--overlay-opacity, .70)) 50%, rgba(99, 8, 18, var(--overlay-opacity, .70))) !important;
+}
+.overlay.theme-red .scorebox,
+.overlay.theme-red .team.left .scorebox {
+  background: rgba(55, 7, 14, var(--overlay-opacity, .70)) !important;
+  border-color: rgba(255, 226, 214, .38) !important;
+}
+.overlay.theme-red .identity,
+.overlay.theme-red #details1,
+.overlay.theme-red #details2,
+.overlay.theme-red .team.right .identity {
+  border-color: rgba(255, 218, 205, .36) !important;
+}
+.overlay.theme-red .score,
+.overlay.theme-red .team-name,
+.overlay.theme-red .prematch-team-name {
+  color: #fffaf6 !important;
+  font-weight: 900;
+  letter-spacing: .035em;
+  text-shadow: 0 1px 2px rgba(28, 0, 0, .5);
+}
+.overlay.theme-red .meta,
+.overlay.theme-red .bowler-meta,
+.overlay.theme-red .prematch-side { color: #ffe1d9 !important; }
+.overlay.theme-red .bottom,
+.overlay.theme-red .bottom.visible {
+  background: rgba(67, 6, 15, var(--overlay-opacity, .70)) !important;
+  border-top-color: rgba(255, 213, 199, .4) !important;
+  color: #fff6f0 !important;
+}
+.overlay.theme-red .ball { border-color: rgba(255, 221, 208, .55); }
+.overlay.theme-red .ball.wicket { background: #3b050d !important; border-color: #ff8c92 !important; color: #fff !important; }
+.overlay.theme-red .ball.boundary { background: #f1c76c !important; border-color: #ffe2a4 !important; color: #401017 !important; }
+.overlay.theme-red .ball.six { background: #f5e9df !important; border-color: #fff !important; color: #6f0c1b !important; }
+/* Match summary and innings-break panels share the selected red palette. */
+body.theme-red-active #overSummary {
+  background: rgba(68, 7, 16, var(--overlay-opacity, .70)) !important;
+  border-color: #e43a4a !important;
+  color: #fff6f2 !important;
+  font-family: "Arial Narrow", "Roboto Condensed", Arial, sans-serif !important;
+}
+body.theme-red-active #overSummary .os-head,
+body.theme-red-active #overSummary .os-foot { background: rgba(184, 20, 41, var(--overlay-opacity, .70)) !important; }
+body.theme-red-active #overSummary .os-panel { background: rgba(117, 19, 32, var(--overlay-opacity, .70)) !important; }
+body.theme-red-active #overSummary .os-panel h3 { color: #ffd9c8 !important; }
+body.theme-red-active #fullInningsBreak { border-color: #e43a4a !important; }
+body.theme-red-active #fullInningsBreak .ib-header,
+body.theme-red-active #fullInningsBreak .ib-foot { background: rgba(165, 16, 37, var(--overlay-opacity, .70)) !important; }
+
+/* Keep innings-break and prematch red panels consistent with opacity. */
+body.theme-red-active #fullInningsBreak .ib-panel {
+  background: rgba(80, 9, 21, var(--overlay-opacity, .70)) !important;
+}
+.overlay.theme-red .prematch-emblem {
+  background: rgba(105, 8, 18, var(--overlay-opacity, .70)) !important;
+}
+
+
+/* 2026-10-13 compact reference: one bottom-anchored scoreboard and footer.
+   Keep this after older layout rules to avoid conflicting min-heights. */
+.overlay.layout2 {
+  display: flex !important;
+  flex-direction: column;
+  bottom: var(--scoreboard-bottom-offset, 0px) !important;
+}
+.layout2 .top, .layout2 .prematch-template {
+  flex: 0 0 70px !important;
+  height: 70px !important;
+  min-height: 70px !important;
+  max-height: 70px !important;
+  overflow: hidden !important;
+}
+.layout2 #details1, .layout2 #details2 { padding: 3px 10px !important; }
+.layout2 .player { padding: 5px 0 !important; gap: 4px; }
+.layout2 #details1 .player + .player { padding-top: 5px !important; }
+.layout2 .bowler-row { padding-bottom: 4px !important; }
+.layout2 .balls { margin-top: 5px !important; gap: 4px; }
+.layout2 .ball { height: 22px; min-width: 22px; font-size: 11px; padding: 0 3px; }
+.layout2 .team.left .scorebox { height: 48px !important; margin-block: 0 !important; padding: 3px 6px !important; }
+.layout2 .meta { margin-top: 2px !important; gap: 0; }
+.layout2 .identity { gap: 2px; padding: 3px 4px; }
+.layout2 .logo { height: 33px; width: min(42px,100%); }
+.layout2 .bottom.visible {
+  position: relative !important;
+  display: flex !important;
+  flex: 0 0 25px !important;
+  height: 25px !important;
+  min-height: 25px !important;
+  max-height: 25px !important;
+  padding: 2px 125px 2px 8px !important;
+  box-sizing: border-box !important;
+  overflow: hidden;
+  align-items: center;
+}
+.layout2 .bottom.visible #bottomText { line-height: 1.2; }
+@media (max-width:650px) {
+  .layout2 .top, .layout2 .prematch-template { flex-basis: 64px !important; height:64px !important; min-height:64px !important; max-height:64px !important; }
+  .layout2 #details1, .layout2 #details2 { padding: 2px 4px !important; }
+  .layout2 .player-name, .layout2 .bowler-name { font-size: 11px; }
+  .layout2 .bowler-meta { font-size: 10px; }
+  .layout2 .team.left .scorebox { height: 42px !important; }
+  .layout2 .bottom.visible { flex-basis: 23px !important; height:23px !important; min-height:23px !important; max-height:23px !important; padding: 2px 90px 2px 5px !important; }
+}
+@media (orientation:portrait) {
+  .overlay.layout2 { bottom: max(var(--scoreboard-bottom-offset, 0px), env(safe-area-inset-bottom, 0px)) !important; }
+}
+
+
+/* Transparent camera canvas: no full-screen backdrop or stray shadow.
+   Keep the existing compact scoreboard and footer dimensions unchanged. */
+html, body {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+body::before, body::after { content: none !important; }
+.overlay {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  box-shadow: none !important;
+  background-clip: padding-box;
+}
+.overlay::before, .overlay::after { content: none !important; }
+/* Preserve the selected theme background only on the visible scoreboard. */
+.overlay.layout2 { height: auto !important; min-height: 0 !important; }
+
+
+/* Theme palette repair: the transparent camera canvas must not erase
+   the visible Blue and Graphite scoreboard surfaces. */
+.overlay.theme-blue { background: rgba(20,57,105,var(--overlay-opacity,.70)) !important; color:#fff; }
+.overlay.theme-blue .top, .overlay.theme-blue .prematch-template { background: rgba(20,57,105,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-blue .scorebox, .overlay.theme-blue .team.left .scorebox { background: rgba(35,79,128,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-blue .bottom, .overlay.theme-blue .bottom.visible { background: rgba(12,39,77,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-graphite { background: rgba(24,27,31,var(--overlay-opacity,.70)) !important; color:#fff; }
+.overlay.theme-graphite .top, .overlay.theme-graphite .prematch-template { background: rgba(35,40,47,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-graphite .scorebox, .overlay.theme-graphite .team.left .scorebox { background: rgba(57,64,74,var(--overlay-opacity,.70)) !important; }
+.overlay.theme-graphite .bottom, .overlay.theme-graphite .bottom.visible { background: rgba(18,22,28,var(--overlay-opacity,.70)) !important; }
+
+
+/* Opacity regression repair. Use a single translucent paint layer per visible
+   surface; never stack a tinted outer wrapper behind tinted child panels. */
+.overlay.theme-red, .overlay.theme-blue, .overlay.theme-graphite {
+  background: transparent !important;
+}
+.overlay .team { background: transparent !important; box-shadow: none !important; }
+.overlay.theme-blue .top, .overlay.theme-blue .prematch-template {
+  background: rgba(20,57,105,var(--overlay-opacity,.70)) !important;
+}
+.overlay.theme-graphite .top, .overlay.theme-graphite .prematch-template {
+  background: rgba(35,40,47,var(--overlay-opacity,.70)) !important;
+}
+.overlay.theme-red .top, .overlay.theme-red .prematch-template {
+  background: rgba(138,12,24,var(--overlay-opacity,.70)) !important;
+}
+/* No second translucent background behind the primary top surface. */
+.overlay.theme-blue .scorebox, .overlay.theme-blue .team.left .scorebox,
+.overlay.theme-graphite .scorebox, .overlay.theme-graphite .team.left .scorebox,
+.overlay.theme-red .scorebox, .overlay.theme-red .team.left .scorebox {
+  background: transparent !important;
+}
+/* Match summary and innings break surfaces use the same query-controlled alpha. */
+body:not(.theme-red-active) #overSummary {background:rgba(9,35,63,var(--overlay-opacity,.70)) !important;}
+body:not(.theme-red-active) #overSummary .os-panel {background:rgba(25,60,96,var(--overlay-opacity,.70)) !important;}
+body:not(.theme-red-active) #fullInningsBreak .ib-header,
+body:not(.theme-red-active) #fullInningsBreak .ib-panel,
+body:not(.theme-red-active) #fullInningsBreak .ib-foot {
+  background:rgba(7,51,96,var(--overlay-opacity,.70)) !important;
+}
+body:not(.theme-red-active) #fullInningsBreak .ib-panel h3,
+body:not(.theme-red-active) #fullInningsBreak .ib-table th {background:rgba(7,51,96,var(--overlay-opacity,.70)) !important;}
+/* At opacity=0, keep foreground text and animation visible. */
+
+
+/* Keep celebration anchored to the WebView viewport, not the clipped scoreboard.
+   The scoreboard itself retains its compact dimensions and bottom anchoring. */
+body > #scoreEvent.event-animation {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  z-index: 2147483000 !important;
+  pointer-events: none;
+}
+
+/* Regression repair: content fits its own compact row; footer stays in normal flow. */
+.overlay.layout2 { display:flex!important; flex-direction:column!important; }
+.overlay.layout2 .top { display:grid!important; grid-template-columns:minmax(0,1fr) minmax(0,1fr); flex:0 0 70px!important; height:70px!important; min-height:70px!important; max-height:70px!important; overflow:hidden!important; }
+.overlay.layout2 .top .team { min-height:0!important; height:70px!important; overflow:hidden!important; }
+.overlay.layout2 .top .details { min-height:0!important; padding:2px 7px!important; justify-content:center!important; overflow:hidden!important; }
+.overlay.layout2 .top .player { margin:0!important; padding:2px 0!important; line-height:1.1!important; font-size:clamp(10px,1vw,14px)!important; }
+.overlay.layout2 .top .player + .player { margin:0!important; padding:2px 0!important; }
+.overlay.layout2 .top .bowler-row { margin:0!important; padding:0 0 2px!important; }
+.overlay.layout2 .top .balls { margin:2px 0 0!important; padding:0!important; height:19px!important; gap:3px!important; }
+.overlay.layout2 .top .ball, .overlay.layout2 .top .ball-label { height:18px!important; min-width:18px!important; }
+.overlay.layout2 .top .identity { min-height:0!important; padding:2px 3px!important; gap:2px!important; }
+.overlay.layout2 .top .scorebox { min-height:0!important; padding:2px 5px!important; }
+.overlay.layout2 .bottom.visible { position:relative!important; inset:auto!important; flex:0 0 25px!important; height:25px!important; min-height:25px!important; max-height:25px!important; margin:0!important; padding:2px 125px 2px 8px!important; align-items:center!important; overflow:hidden!important; }
+body.show-final-result .overlay.layout2 .top { display:grid!important; }
+@media(max-width:650px){
+ .overlay.layout2 .top,.overlay.layout2 .top .team {height:64px!important;min-height:64px!important;max-height:64px!important;}
+ .overlay.layout2 .bottom.visible {height:23px!important;min-height:23px!important;max-height:23px!important;flex-basis:23px!important;padding:2px 90px 2px 5px!important;}
+ .overlay.layout2 .top .details {padding:1px 3px!important;}
+ .overlay.layout2 .top .player {padding:1px 0!important;}
+}
+.strike-indicator { display: inline-block; color: #ffd45c; font-size: .85em; margin-left: 4px; line-height: 1; vertical-align: middle; position: relative; top: -1px; text-shadow: 0 0 2px #222; }
+
+/* Keep batting runs/balls and bowling wickets/runs at identical sizes in Layout 2. */
+.overlay.layout2 .player-stats,
+.overlay.layout2 .bowler-meta {
+  font-size: 14px !important;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 650px) {
+  .overlay.layout2 .player-stats,
+  .overlay.layout2 .bowler-meta { font-size: 10px !important; }
+}
+/* Center and bold every delivery in THIS OVER */
+.this-over-label { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; gap: 1px; margin-right: 5px; line-height: 1.1; }
+.this-over-label .ball-label { height: auto !important; min-width: 0 !important; margin: 0 !important; }
+.this-over-label .this-over-runs { font-size: 9px; margin: 0; font-weight: 700; white-space: nowrap; }
+.ball { display: inline-flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; font-weight: 800 !important; line-height: 1 !important; }
+.this-over-runs { display: inline-flex; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 800; margin-left: 5px; color: #fff; font-variant-numeric: tabular-nums; }
+
+/* Extras have their own color across all themes; keep 4/6/W colors intact. */
+.overlay .ball.extra, .overlay.theme-red .ball.extra {
+  background: #7547bc !important; border-color: #bca0f5 !important;
+  color: #fff !important; font-weight: 800 !important;
+}
+/* Dot ball: optically center the glyph in its delivery tile. */
+.overlay .ball.dot-ball {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Larger, optically centered dot for dot-ball tiles (landscape). */
+.overlay .ball.dot-ball {
+  font-size: 0 !important;
+  position: relative;
+}
+.overlay .ball.dot-ball::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 7px;
+}
+
+/* Landscape repair: the two-line THIS OVER label must not be clipped by
+   the older fixed 19px delivery-row height. Keep the scoreboard size. */
+.overlay.layout2 .top .balls {
+  height: auto !important;
+  min-height: 25px !important;
+  overflow: visible !important;
+  align-items: center !important;
+}
+.overlay.layout2 .top .this-over-label {
+  height: 25px !important;
+  min-height: 25px !important;
+  display: inline-flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0 !important;
+  line-height: 1 !important;
+  margin-right: 4px !important;
+}
+.overlay.layout2 .top .this-over-label .ball-label {
+  height: auto !important;
+  min-height: 0 !important;
+  font-size: 9px !important;
+  line-height: 12px !important;
+}
+.overlay.layout2 .top .this-over-label .this-over-runs {
+  height: auto !important;
+  font-size: 9px !important;
+  line-height: 12px !important;
+  margin: 0 !important;
+}
+
+/* Landscape compact 55px scoreboard: 40px primary + 15px secondary */
+@media (orientation: landscape) and (min-width: 900px) {
+ .overlay.layout2 { border-radius: 5px; }
+ .layout2 .top, .layout2 .top.pre-match { height:40px!important; min-height:40px!important; max-height:40px!important; }
+ .layout2 #details1,.layout2 #details2 {padding:2px 7px!important; overflow:hidden;}
+ .layout2 .identity {padding:1px 3px!important;gap:2px!important;overflow:hidden;}
+ .layout2 .logo {width:27px!important;height:25px!important;}
+ .layout2 .team-name {font-size:9px!important;line-height:1!important;}
+ .layout2 .player {font-size:10px!important;padding:1px 0!important;gap:3px!important;line-height:1.05!important;}
+ .layout2 .player-name,.layout2 .bowler-name {font-size:11px!important;}
+ .layout2 .bowler-meta,.layout2 .player-score {font-size:10px!important;}
+ .layout2 .bowler-row {padding-bottom:1px!important;gap:3px!important;}
+ .layout2 .balls {margin-top:2px!important;gap:3px!important;flex-wrap:nowrap!important;align-items:center!important;}
+ .layout2 .ball {height:17px!important;min-width:17px!important;padding:0 3px!important;font-size:10px!important;}
+ .layout2 .ball-label {font-size:8px!important;}
+ .layout2 .this-over-runs {font-size:8px!important;margin:0!important;}
+ .layout2 .this-over-label {gap:0!important;line-height:1!important;}
+ .overlay.layout2 .top .this-over-label .ball-label,
+ .overlay.layout2 .top .this-over-label .this-over-runs {
+   font-size:8px!important;line-height:9px!important;min-height:0!important;height:auto!important;
+ }
+ .overlay.layout2 .top .this-over-label {display:flex!important;flex-direction:column!important;justify-content:center!important;flex:0 0 auto!important;}
+ .overlay.layout2 .top .balls {min-width:0!important;overflow:hidden!important;}
+ .overlay.layout2 .top .ball {flex:0 0 auto!important;box-sizing:border-box!important;}
+
+ .layout2 .team.left .scorebox {height:35px!important;padding:1px 4px!important;}
+ .layout2 .score {font-size:21px!important;line-height:1!important;}
+ .layout2 .meta {font-size:9px!important;margin-top:1px!important;gap:3px!important;}
+ .layout2 .meta span + span::before {margin:0 3px!important;}
+ .layout2 .bottom,.overlay.layout2 .bottom {height:15px!important;min-height:15px!important;max-height:15px!important;box-sizing:border-box!important;padding:0 8px!important;font-size:10px!important;line-height:14px!important;}
+ .layout2 .bottom #bottomText {line-height:14px!important;}
+ .layout2 .bottom .powered-credit {font-size:7px!important;}
+ .layout2 .prematch-template {height:40px!important;min-height:40px!important;padding:1px 12px!important;}
+ .layout2 .prematch-side {font-size:13px!important;}
+ .layout2 .prematch-emblem {width:28px!important;height:28px!important;}
+ .layout2 .prematch-versus {font-size:18px!important;}
+}
+</style>
+
+<style id="match-result-legibility-fix">
+/* Match result: balanced two-team rows, with overs alongside scores. */
+#finalMatchResult{
+  width:min(460px,90vw);
+  padding:15px 20px 14px;
+}
+#finalMatchResult .mr-teams{
+  display:grid;
+  gap:10px;
+  padding:2px 0 12px;
+}
+#finalMatchResult .mr-team{
+  display:grid;
+  grid-template-columns:40px minmax(0,1fr);
+  gap:12px;
+  width:min(285px,100%);
+  margin:0 auto;
+  align-items:center;
+  justify-content:initial;
+  text-align:left;
+}
+#finalMatchResult .mr-team img{width:40px;height:40px;grid-column:1;grid-row:1;}
+#finalMatchResult .mr-team > div{grid-column:2;grid-row:1;min-width:0;}
+#finalMatchResult .mr-name{
+  font-size:clamp(15px,1.55vw,18px);
+  line-height:1.2;
+  margin-bottom:2px;
+}
+#finalMatchResult .mr-scoreline{
+  display:flex;
+  align-items:baseline;
+  justify-content:flex-start;
+  gap:10px;
+}
+#finalMatchResult .mr-team strong{
+  font-size:clamp(25px,2.45vw,30px);
+  line-height:1.1;
+}
+#finalMatchResult .mr-team small{font-size:12px;white-space:nowrap;}
+@media(max-height:500px){
+ #finalMatchResult{padding:9px 16px}
+ #finalMatchResult .mr-teams{gap:5px;padding-bottom:7px}
+ #finalMatchResult .mr-team{grid-template-columns:30px minmax(0,1fr);gap:8px;width:min(260px,100%)}
+ #finalMatchResult .mr-team img{width:30px;height:30px}
+ #finalMatchResult .mr-team strong{font-size:23px}
+}
+</style>
+
+<style id="layout2-grid-regression-fix">
+/* Restore the five-slot broadcast grid. Previous regression CSS replaced it
+   with two columns while .team remained display:contents. */
+.overlay.layout2 .top{
+ display:grid!important;
+ grid-template-columns:clamp(68px,9%,116px) minmax(0,1fr) clamp(112px,16%,220px) minmax(0,1fr) clamp(68px,9%,116px)!important;
+ grid-template-rows:minmax(0,1fr)!important;
+ align-items:stretch!important;
+}
+.overlay.layout2 .top .team{display:contents!important}
+.overlay.layout2 .top .team.left .identity{grid-column:1!important;grid-row:1!important}
+.overlay.layout2 .top #details1{grid-column:2!important;grid-row:1!important}
+.overlay.layout2 .top .team.left .scorebox{grid-column:3!important;grid-row:1!important;align-self:center!important}
+.overlay.layout2 .top #details2{grid-column:4!important;grid-row:1!important}
+.overlay.layout2 .top .team.right .identity{grid-column:5!important;grid-row:1!important}
+.overlay.layout2 .top .team.right .scorebox{display:none!important}
+.overlay.layout2 .top .identity,.overlay.layout2 .top .details{height:100%!important;box-sizing:border-box!important}
+.overlay.layout2 .top #details1,.overlay.layout2 .top #details2{min-width:0!important;overflow:hidden!important}
+.overlay.layout2 .top .player{grid-template-columns:minmax(0,1fr) auto!important}
+.overlay.layout2 .top .player-name{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.overlay.layout2 .top .player-stats{white-space:nowrap!important}
+.overlay.layout2 .bottom.visible{position:relative!important;inset:auto!important;display:flex!important}
+</style>
+
+<style id="layout2-center-score-highlight">
+/* Match the darker lower information panel without changing layout or opacity controls. */
+.overlay.layout2 .top .team.left .scorebox {
+  /* Parent scoreboard already has opacity; avoid stacking a second full-opacity layer. */
+  background: rgba(10,18,30,calc(var(--overlay-opacity,.70) * .55)) !important;
+  border: 1px solid rgba(255,255,255,calc(var(--overlay-opacity,.70) * .35)) !important;
+  border-radius: 7px !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,calc(var(--overlay-opacity,.70) * .06)) inset !important;
+}
+/* Keep the score prominent against the dark center panel. */
+.overlay.layout2 .top .team.left .scorebox .score { color: #fff !important; }
+.overlay.layout2 .top .team.left .scorebox .meta { color: #d8e5f5 !important; }
+</style>
+
+<style id="prematch-single-header-fix">
+/* In pre-match/toss, show ONLY the VS header; never the live five-column grid. */
+.overlay.layout2.is-prematch > .top,
+.overlay.is-prematch > .top { display:none !important; }
+.overlay.is-prematch > #prematchTemplate:not([hidden]) { display:grid !important; }
+.overlay.is-prematch .bottom { position:relative !important; }
+</style>
+</head>
+<body>
+<div class="overlay">
+  <div class="prematch-template" id="prematchTemplate" hidden>
+  <div class="prematch-side"><span class="prematch-emblem"><img class="prematch-logo" id="preLogo1" alt=""><span class="prematch-initials" id="preInitials1">TA</span></span><span id="preTeam1">TEAM A</span></div>
+  <div class="prematch-versus">VS</div>
+  <div class="prematch-side"><span class="prematch-emblem"><img class="prematch-logo" id="preLogo2" alt=""><span class="prematch-initials" id="preInitials2">TB</span></span><span id="preTeam2">TEAM B</span></div>
+</div>
+<div class="top">
+    <section class="team left">
+      <div class="identity">
+        <img class="logo" id="logo1" alt="">
+        <div class="team-name" id="name1">TEAM 1</div>
+      </div>
+      <div class="details" id="details1"></div>
+      <div class="scorebox">
+        <div class="score" id="score1">--/--</div>
+        <div class="meta" id="meta1">
+  <span id="overs1">Overs --</span>
+  <span id="rr1">RR --</span>
+</div>
+      </div>
+    </section>
+
+    <section class="team right">
+      <div class="scorebox">
+        <div class="score" id="score2">--/--</div>
+        <div class="meta" id="meta2">
+  <span id="overs2">Overs --</span>
+  <span id="rr2">RR --</span>
+</div>
+      </div>
+      <div class="details" id="details2"></div>
+      <div class="identity">
+        <img class="logo" id="logo2" alt="">
+        <div class="team-name" id="name2">TEAM 2</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="bottom" id="bottom">
+    <span id="bottomText"></span><span class="powered-credit">Powered by <a href="https://cricclubs.com" target="_blank" rel="noopener noreferrer">CricClubs</a></span>
+  </div>
+  <div class="error" id="error"></div>
+</div>
+
+<!-- Full-viewport event layer: sibling of clipped bottom scoreboard. -->
+  <div class="event-animation" id="scoreEvent" aria-live="polite">
+    <div class="event-rays"></div><div class="event-particles"></div>
+    <span class="event-emoji"></span><span class="event-text"></span><span class="event-subtitle"></span>
+  </div>
+
+<div id="fullInningsBreak" aria-live="polite" aria-label="First innings full scorecard">
+ <div class="ib-header"><div class="ib-team" id="ibBatTeam">BATTING TEAM</div><div class="ib-center"><strong>INNINGS BREAK</strong><div class="ib-score" id="ibScore">—</div><span id="ibOvers">— overs</span></div><div class="ib-team" id="ibBowlTeam">BOWLING TEAM<br><span class="ib-target" id="ibTarget"></span></div></div>
+ <div class="ib-grid"><section class="ib-panel"><h3 id="ibBatTitle">BATTING</h3><table class="ib-table"><colgroup><col style="width:24%"><col style="width:32%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:12%"></colgroup><thead><tr><th class="ib-name">BATSMAN</th><th class="ib-how">HOW OUT</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody id="ibBatRows"></tbody></table><div class="ib-summary" id="ibFoW"></div></section>
+ <div class="ib-right"><section class="ib-panel"><h3 id="ibBowlTitle">BOWLING</h3><table class="ib-table"><colgroup><col style="width:37%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:15%"></colgroup><thead><tr><th class="ib-name">BOWLER</th><th>O</th><th>M</th><th>R</th><th>W</th><th>ECON</th></tr></thead><tbody id="ibBowlRows"></tbody></table></section><section class="ib-panel"><h3>EXTRAS BREAKDOWN</h3><div class="ib-extras" id="ibExtras"></div></section><div class="ib-foot" id="ibFoot">SECOND INNINGS STARTING SOON</div></div></div>
+</div>
+
+<div id="overSummary" aria-live="polite"><div class="os-head"><span id="osTitle">OVER SUMMARY</span><span id="osOvers"></span></div><div class="os-score" id="osFirstRow"><span id="osTeam">TEAM</span><strong id="osScore">—</strong><span id="osRR"></span></div><div class="os-score os-second-score" id="osSecondRow" hidden><span id="osSecondTeam">TEAM B</span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div><div class="os-grid"><section class="os-panel"><h3>TOP BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>TOP BOWLERS</h3><div id="osBowlers"></div></section></div><div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div></div>
+<!-- Match-complete card is viewport centered and independent of the bottom scoreboard. -->
+<div id="finalMatchResult" role="status" aria-live="polite" hidden>
+  <h2>MATCH RESULT</h2>
+  <div class="mr-teams">
+    <div class="mr-team"><img id="mrLogo1" alt="" hidden><div><div class="mr-name" id="mrName1"></div><div class="mr-scoreline"><strong id="mrScore1"></strong><small id="mrOvers1"></small></div></div></div>
+    <div class="mr-team"><img id="mrLogo2" alt="" hidden><div><div class="mr-name" id="mrName2"></div><div class="mr-scoreline"><strong id="mrScore2"></strong><small id="mrOvers2"></small></div></div></div>
+  </div>
+  <div class="mr-result" id="mrWinner"></div>
+  <div class="mr-pom" id="mrPom"></div>
+  <div class="mr-powered">POWERED BY CRICCLUBS</div>
+</div>
+<style>
+#finalMatchResult[hidden]{display:none!important}
+/* Result card is an independent layer. Keep the scorecard's original grid
+   and footer in the SAME flex column; never fix the footer to the viewport. */
+body.show-final-result .overlay{display:flex!important;flex-direction:column!important}
+body.show-final-result .overlay .top{display:grid!important;visibility:visible!important}
+body.show-final-result .overlay #prematchTemplate,
+body.show-final-result .overlay #error{display:none!important}
+body.show-final-result .overlay #bottom.visible{
+  display:flex!important;
+  position:relative!important;
+  inset:auto!important;
+  width:auto!important;
+  margin:0!important;
+  z-index:auto!important;
+}
+#finalMatchResult{position:fixed;left:50%;top:calc((100% - var(--result-bottom-reserve, 105px))/2);transform:translate(-50%,-50%);z-index:400;width:min(430px,90vw);max-height:calc(100vh - var(--result-bottom-reserve, 105px) - 12px);overflow:auto;box-sizing:border-box;padding:13px 20px 12px;background:rgba(17,19,23,.96);border-radius:10px;color:#fff;text-align:center;font-family:system-ui,Arial,sans-serif;box-shadow:0 12px 38px #0008;pointer-events:none}
+#finalMatchResult h2{font-size:clamp(19px,2vw,26px);letter-spacing:1px;margin:0 0 9px;padding-bottom:8px;border-bottom:1px solid #ffffff2b}
+.mr-teams{display:grid;gap:6px;padding-bottom:9px;border-bottom:1px solid #ffffff24}
+.mr-team{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0}
+.mr-team img{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.mr-name{font-size:clamp(15px,1.6vw,19px);font-weight:700;overflow-wrap:anywhere}
+.mr-scoreline{display:flex;align-items:baseline;justify-content:center;gap:12px;white-space:nowrap}.mr-team strong{display:inline;font-size:clamp(23px,2.6vw,30px);line-height:1.12}
+.mr-team small{display:inline;color:#c3cbd5;font-size:12px}
+.mr-result{color:#74d38b;font-weight:800;font-size:clamp(16px,1.6vw,22px);margin:8px 0 3px;overflow-wrap:anywhere}
+.mr-pom{font-size:13px;color:#c4c4c4;overflow-wrap:anywhere}
+.mr-powered{font-size:10px;letter-spacing:1px;color:#85878d;margin-top:8px}
+@media(max-height:500px){#finalMatchResult{padding:8px 16px}.mr-teams{gap:3px;padding-bottom:5px}.mr-team img{height:26px;width:26px}#finalMatchResult h2{margin-bottom:4px;padding-bottom:4px;font-size:17px}.mr-name{font-size:14px}.mr-team strong{font-size:22px}.mr-result{font-size:14px;margin:5px 0 2px}.mr-powered{margin-top:4px}}
+/* Match result must follow the selected theme, not default to graphite. */
+body.theme-blue-active #finalMatchResult {background:rgba(15,48,88,var(--overlay-opacity,.88));border:1px solid #4c83bc}
+body.theme-blue-active #finalMatchResult h2 {border-bottom-color:#75a6d0}
+body.theme-blue-active #finalMatchResult .mr-result {color:#b5e5ff}
+body.theme-graphite-active #finalMatchResult {background:rgba(23,27,33,var(--overlay-opacity,.88));border:1px solid #69717c}
+body.theme-graphite-active #finalMatchResult .mr-result {color:#8fdfa5}
+body.theme-red-active #finalMatchResult {background:rgba(119,12,29,var(--overlay-opacity,.88));border:1px solid #e45662}
+body.theme-red-active #finalMatchResult h2 {border-bottom-color:#ec8c92}
+body.theme-red-active #finalMatchResult .mr-result {color:#ffe09a}
+
+</style>
+<script>
+const params = new URLSearchParams(location.search);
+const clubId = params.get("clubId") || "22594";
+const matchId = params.get("matchId") || "1374";
+
+// refresh is expressed in seconds (e.g. refresh=5).
+// Legacy refreshInterval remains supported in milliseconds for older links.
+const refreshSeconds = Number(params.get("refresh") ?? "5");
+const legacyRefreshMs = Number(params.get("refreshInterval") ?? "5000");
+
+const opacityValue = Number(params.get("opacity"));
+
+const overlayOpacity = params.has("opacity") && Number.isFinite(opacityValue)
+  ? Math.max(0, Math.min(1, opacityValue))
+  : 0.70;
+
+document.documentElement.style.setProperty(
+  "--overlay-opacity",
+  overlayOpacity
+);
+
+// Layout and theme are independent query parameters.
+// layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
+const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
+const overlayLayout = requestedLayout === "2" ? "2" : "1";
+const requestedTheme = (params.get("theme") || "blue").trim().toLowerCase();
+const overlayTheme = ["blue", "graphite", "red"].includes(requestedTheme) ? requestedTheme : "graphite";
+document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
+document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
+document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
+document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
+document.body.classList.toggle("theme-red-active", overlayTheme === "red");
+document.body.classList.toggle("theme-blue-active", overlayTheme === "blue");
+document.body.classList.toggle("theme-graphite-active", overlayTheme === "graphite");
+
+const requestedRefreshMs = params.has("refresh") ? refreshSeconds * 1000 : legacyRefreshMs;
+const REFRESH_MS = Number.isFinite(requestedRefreshMs) && requestedRefreshMs > 0
+  ? Math.max(1000, Math.min(requestedRefreshMs, 60000))
+  : 5000;
+
+const API = `https://cricclubs.com/liveScoreOverlayData.do?clubId=${encodeURIComponent(clubId)}&matchId=${encodeURIComponent(matchId)}`;
+
+let stopped = false;
+let timer;
+
+const $ = id => document.getElementById(id);
+const get = (o,k,d="") => o?.[k] == null || o[k] === "" ? d : String(o[k]);
+const truthy = x => ["true","1","yes"].includes(String(x).toLowerCase());
+
+function logo(id,path){
+  const img = $(id);
+  if(!path){img.style.visibility="hidden";return;}
+  img.style.visibility="visible";
+  img.src = path.startsWith("http") ? path : new URL(path,"https://cricclubs.com").href;
+  img.onerror = () => {img.style.visibility="hidden";};
+}
+
+function teamInitials(name){
+  const words=String(name||'TEAM').trim().split(/\s+/).filter(Boolean);
+  return (words.length>1 ? words.slice(0,2).map(w=>w[0]).join('') : (words[0]||'T').slice(0,2)).toUpperCase();
+}
+function prematchLogo(id, initialsId, name, path){
+  const img=$(id);
+  $(initialsId).textContent=teamInitials(name);
+  img.onerror=()=>{img.hidden=true;img.removeAttribute('src');};
+  if(!path){img.hidden=true;img.removeAttribute('src');return;}
+  img.hidden=false;
+  img.src=/^(https?:|data:|\/\/)/i.test(String(path)) ? path : new URL(path,'https://cricclubs.com').href;
+}
+function teamScore(v,p){
+  return {
+    name:get(v,p+"Name",p==="t1"?"Team A":"Team B"),
+    total:get(v,p+"Total","0"),
+    wickets:get(v,p+"Wickets","0"),
+    overs:get(v,p+"Overs","0.0"),
+    rr:get(v,p+"RR","--")
+  };
+}
+
+function showScore(n, t) {
+  $("name" + n).textContent = t.name;
+
+  // Suppress the initial 0/0 only in Layout 1 before a ball has been bowled.
+  // Layout 2 must always display the batting score, including 0/0.
+  const isLayout2 = document.querySelector(".overlay").classList.contains("layout2");
+  const isZeroZero = !isLayout2 &&
+    Number(t.total) === 0 && Number(t.wickets) === 0 &&
+    !(overBalls(t.overs) > 0);
+
+  $("score" + n).style.visibility =
+    isZeroZero ? "hidden" : "visible";
+
+  $("overs" + n).style.visibility =
+    isZeroZero ? "hidden" : "visible";
+
+  $("rr" + n).style.visibility =
+    isZeroZero ? "hidden" : "visible";
+
+  if (!isZeroZero) {
+    $("score" + n).textContent = `${t.total}/${t.wickets}`;
+    const shownOvers = document.querySelector(".overlay").classList.contains("layout2")
+      ? formatOvers(t.overs)
+      : t.overs;
+    $("overs" + n).textContent = `Overs ${shownOvers}`;
+    $("rr" + n).textContent = `RR ${t.rr}`;
+  }
+}
+/*
+function showScore(n,t){
+  $("name"+n).textContent=t.name;
+  $("score"+n).textContent=`${t.total}/${t.wickets}`;
+  $("overs"+n).textContent=`Overs ${t.overs}`;
+  $("rr"+n).textContent=`RR ${t.rr}`;
+}
+*/
+function showBatters(v){
+  return `
+    <div class="player">
+      <span class="player-name">${escapeHTML(get(v,"batsman1Name","Striker"))}<span class="strike-indicator" title="On strike" aria-label="On strike">★</span></span>
+      <span class="player-stats">${escapeHTML(get(v,"batsman1Runs","0"))} (${escapeHTML(get(v,"batsman1Balls","0"))})</span>
+    </div>
+    <div class="player">
+      <span class="player-name">${escapeHTML(get(v,"batsman2Name","Non-striker"))}</span>
+      <span class="player-stats">${escapeHTML(get(v,"batsman2Runs","0"))} (${escapeHTML(get(v,"batsman2Balls","0"))})</span>
+    </div>`;
+}
+
+// Only report a total when the feed's deliveries can be assigned to this over.
+function currentOverBalls(balls, overs) {
+  if (!Array.isArray(balls)) return null;
+  const m = String(overs ?? '').match(/^(\d+)\.(\d+)$/);
+  if (!m) return null;
+  const legalTarget = Number(m[2]);
+  if (legalTarget < 1 || legalTarget > 5) return null;
+  let legal = 0, start = balls.length;
+  while (start > 0 && legal < legalTarget) {
+    start--;
+    if (!/(?:WD|WIDE|NB|NO.?BALL)/i.test(String(balls[start]))) legal++;
+  }
+  if (legal !== legalTarget) return null;
+  // Extras before the first legal delivery cannot be assigned reliably from
+  // a flat trailing-ball feed; avoid showing an inaccurate runs total.
+  if (start > 0 && /(?:WD|WIDE|NB|NO.?BALL)/i.test(String(balls[start - 1]))) return null;
+  return balls.slice(start);
+}
+// Preserve raw CricClubs tokens for calculations; abbreviate only their display.
+function parseExtraBall(raw) {
+  const x=String(raw).trim().toUpperCase().replace(/\s+/g,'');
+  const wide=/(?:WD|WIDE)/.test(x);
+  const noBall=/(?:NB|NOBALL|NO-BALL)/.test(x);
+  const bye=/(?:LB|BYE|(?<!N)B(?!ALL))/.test(x) && !/^(?:NB|NOBALL)$/.test(x);
+  const legBye=/(?:LB|LEGBYE)/.test(x);
+  const isExtra=wide||noBall||bye;
+  if(!isExtra) return null;
+  // A token such as 1Wd denotes the one-run wide penalty, not a bye.
+  // Additional byes must be explicitly identified by the source token.
+  const label=(wide?'Y':noBall?'N':'')+(bye?((wide||noBall)?'+':'')+(legBye?'LB':'B'):'');
+  return {label:label||'B',wide,noBall,bye};
+}
+function thisOverRuns(balls) {
+  if (!balls || !balls.length) return null;
+  let sum=0;
+  for(const raw of balls){
+    const x=String(raw).trim().toUpperCase().replace(/\s+/g,'');
+    if(x==='.'||x==='0'||x==='W') continue;
+    if(/^\d+$/.test(x)){sum+=Number(x);continue;}
+    const extra=parseExtraBall(x);
+    if(extra){
+      const nums=[...x.matchAll(/\d+/g)].map(m=>Number(m[0]));
+      // For CricClubs' '1Wd' and '1Nb', 1 is the full extra count.
+      // If a compound token is ambiguous, avoid inventing runs.
+      if(nums.length===1) sum+=nums[0];
+      else if(nums.length===0) sum+=extra.wide||extra.noBall?1:0;
+      else return null;
+      continue;
+    }
+    const wicket=x.match(/^(\d+)W$/);
+    if(wicket){sum+=Number(wicket[1]);continue;}
+    return null;
+  }
+  return sum;
+}
+// Track bowler transitions at an over boundary. Keep the previous over visible
+// at 3.0 until the next bowler is selected, then clear both chips and runs.
+let previousOverBowler = null;
+let previousOverInnings = null;
+let previousOverNumber = null;
+function showBowler(v,balls,inningsOvers){
+  const oversText = String(inningsOvers ?? '0.0');
+  const m = oversText.match(/^(\d+)\.(\d+)$/);
+  const completedOvers = m ? Number(m[1]) : 0;
+  const ballsInOver = m ? Number(m[2]) : 0;
+  const bowler = String(get(v,'bowlerName','--')).trim();
+  const inningsKey = String(get(v,'inningsNumber',get(v,'currentInnings',''))) + ':' + String(get(v,'battingTeamName',''));
+  const sameInnings = previousOverInnings === inningsKey;
+  const bowlerChanged = sameInnings && previousOverBowler !== null && bowler !== previousOverBowler;
+  const atBoundary = !!m && ballsInOver === 0;
+  let recent;
+  if (!Array.isArray(balls)) {
+    recent = [];
+  } else if (atBoundary && completedOvers === 0) {
+    recent = [];
+  } else if (atBoundary && bowlerChanged) {
+    recent = [];
+  } else if (atBoundary) {
+    // The scorer has completed an over, but the next bowler is not yet selected.
+    // Keep the same delivery list already used by THIS OVER.
+    recent = balls.slice(-7);
+  } else {
+    const verified = currentOverBalls(balls, inningsOvers);
+    recent = verified || balls.slice(-7);
+  }
+  // Never calculate runs from a different list than the visible delivery chips.
+  const overRuns = recent.length ? thisOverRuns(recent) : 0;
+  previousOverBowler = bowler;
+  previousOverInnings = inningsKey;
+  previousOverNumber = completedOvers;
+  const chips = recent.map(b=>{
+    const x=String(b);
+    const extra=parseExtraBall(x);
+    let cls='ball';
+    if(extra) cls+=' extra';
+    else if(x.trim()==='.' || x.trim()==='0') cls+=' dot-ball';
+    else if(/^W$/i.test(x)) cls+=' wicket';
+    else if(x==='6') cls+=' boundary six';
+    else if(x==='4') cls+=' boundary';
+    return `<span class="${cls}" title="${escapeHTML(x)}">${escapeHTML(extra?extra.label:x)}</span>`;
+  }).join('');
+  return `
+    <div class="bowler-row">
+      <div class="bowler-name">${escapeHTML(get(v,'bowlerName','--'))}</div>
+      <div class="bowler-meta">${escapeHTML(get(v,'bowlerWickets','0'))}/${escapeHTML(get(v,'bowlerRuns','0'))} (${escapeHTML(formatOvers(get(v,'bowlerOvers','0.0')))})</div>
+    </div>
+    <div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
+}
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+function formatOvers(overs) {
+  const value = String(overs ?? "").trim();
+  if (!value) return "0.0";
+
+  // CricClubs may return completed overs as "15", "15.", or "15.0".
+  // Normalize all completed-over representations to include the .0 suffix.
+  const completedOvers = value.match(/^(\\d+)\\.?$/);
+  if (completedOvers) return `${completedOvers[1]}.0`;
+
+  return value;
+}
+
+function overBalls(overs){
+  const p=String(overs||"").split(".");
+  const o=Number(p[0]), b=p.length>1?Number(p[1]):0;
+  return Number.isFinite(o)&&Number.isFinite(b)?o*6+b:null;
+}
+
+function completed(data,v){
+  return [
+    data.isMatchEnded,data.matchEnded,data.isCompleted,
+    v.isMatchEnded,v.matchEnded,v.isCompleted
+  ].some(truthy);
+}
+
+
+const optional = (...xs) => xs.find(x => x !== undefined && x !== null && String(x).trim() !== "") ?? "";
+const textField = (data,v,keys) => optional(...keys.map(k => v[k]),...keys.map(k => data[k]));
+const urlParam = k => params.get(k) || "";
+let lastEventSignature = null;
+let eventReady = false;
+let animationTimer;
+// Place boundary-horn.mp3 beside index.html on the same website.
+// Enabled by default; add &sound=0 to mute, or &soundVolume=0.5 to adjust volume.
+const soundEnabled = !/^(0|false|off|no)$/i.test(String(params.get("sound") ?? "1"));
+const soundVolumeRaw = Number(params.get("soundVolume") ?? "0.8");
+const soundVolume = Number.isFinite(soundVolumeRaw) ? Math.max(0,Math.min(1,soundVolumeRaw)) : 0.8;
+const eventAudio = new Audio("boundary-horn.mp3");
+eventAudio.preload = "auto";
+eventAudio.volume = soundVolume;
+function playEventSound(){
+  if(!soundEnabled) return;
+  try {
+    eventAudio.pause();
+    eventAudio.currentTime = 0;
+    const attempt=eventAudio.play();
+    if(attempt && typeof attempt.catch === "function") attempt.catch(e=>console.info("Event audio blocked or unavailable:",e.message));
+  } catch(e) { console.info("Event audio unavailable:",e.message); }
+}
+function showEvent(kind) {
+  const el=$("scoreEvent");
+  const visual={wicket:["🏏","WICKET!"],four:["🏏","FOUR!"],six:["🚀","SIX!"]}[kind];
+  if(!visual) return;
+  el.style.removeProperty("display");
+  if(kind === "four" || kind === "six") playEventSound();
+  clearTimeout(animationTimer);
+  el.className="event-animation "+kind;
+  const visuals={wicket:["💥","WICKET!",""],four:["🏏","FOUR!","RACING TO THE BOUNDARY"],six:["🚀","SIX!","OUT OF THE PARK"]};
+  const v=visuals[kind];
+  el.querySelector(".event-emoji").textContent=v[0];
+  el.querySelector(".event-text").textContent=v[1];
+  el.querySelector(".event-subtitle").textContent=v[2];
+  const particles=el.querySelector(".event-particles");
+  particles.replaceChildren();
+  for(let i=0;i<26;i++){
+    const part=document.createElement("span");
+    part.className="particle";
+    const angle=(i/26)*Math.PI*2;
+    const radius=95+(i%5)*23;
+    part.style.setProperty("--dx",Math.cos(angle)*radius+"px");
+    part.style.setProperty("--dy",Math.sin(angle)*radius+"px");
+    part.style.setProperty("--rot",(i*53)+"deg");
+    part.style.setProperty("--delay",(i%5)*.035+"s");
+    part.style.setProperty("--particle",kind==="wicket"?"#ff647e":kind==="six"?"#6df6c2":"#ffd456");
+    particles.appendChild(part);
+  }
+  void el.offsetWidth;
+  el.classList.add("active");
+  animationTimer=setTimeout(()=>el.classList.remove("active"),2500);
+}
+function eventKind(x) {
+  const b=String(x).trim().toUpperCase();
+  if(/(^|[^A-Z])W($|[^A-Z])|WICKET|RUN\s*OUT|STUMPED/.test(b))return "wicket";
+  if(/^4$|^4\b|FOUR/.test(b))return "four";
+  if(/^6$|^6\b|SIX/.test(b))return "six";
+  return "";
+}
+function watchLastBall(data,v,second) {
+  const balls=Array.isArray(data.balls)?data.balls:[];
+  const t=second?teamScore(v,"t2"):teamScore(v,"t1");
+  const last=balls.length?String(balls[balls.length-1]):"";
+  const signature=[second?"2":"1",t.total,t.wickets,t.overs,balls.length,last].join("|");
+  if(eventReady && signature!==lastEventSignature && last) {
+    const previous=lastEventSignature?.split("|");
+    const changedScore=previous && (previous[1]!==t.total || previous[2]!==t.wickets || previous[3]!==t.overs);
+    if(changedScore) showEvent(eventKind(last));
+  }
+  lastEventSignature=signature;
+  eventReady=true;
+}
+function projectedScore(v,t) {
+  const balls=overBalls(t.overs);
+  const limit=Number(optional(v.totalOvers,v.oversLimit,v.matchOvers,urlParam("overs")));
+  const runs=Number(t.total);
+  if(!(balls>0 && limit>0 && Number.isFinite(runs)))return "";
+  return `Projected ${Math.round(runs/balls*limit*6)} (${limit} overs)`;
+}
+function tossMessage(data,v) {
+  // Prefer CricClubs' complete toss announcement, wherever it appears in the payload.
+  // Do not infer the decision from batting order or overwrite a genuine message.
+  const seen=new Set();
+  function findAnnouncement(obj,depth=0){
+    if(obj==null || depth>5)return "";
+    if(typeof obj==="string"){
+      const text=obj.replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+      const match=text.match(/(?:[A-Za-z0-9][^.!?]{0,130}?)\s+won the toss\s+(?:and\s+)?(?:chose|choose|elected|opted)\s+to\s+(?:bat|bowl|field)(?:\s+first)?/i);
+      return match?match[0].trim():"";
+    }
+    if(typeof obj!=="object" || seen.has(obj))return "";
+    seen.add(obj);
+    for(const [key,value] of Object.entries(obj)){
+      if(typeof value==="string" && /toss|message|status|description|comment/i.test(key)){
+        const found=findAnnouncement(value,depth+1);
+        if(found)return found;
+      }
+    }
+    for(const value of Object.values(obj)){
+      const found=findAnnouncement(value,depth+1);
+      if(found)return found;
+    }
+    return "";
+  }
+  const announcement=findAnnouncement(data);
+  if(announcement)return announcement;
+  // CricClubs response shapes differ between leagues; look in common nested objects.
+  const sources=[data,v,data?.match,data?.matchDetails,data?.matchInfo,data?.toss,
+    v?.match,v?.matchDetails,v?.matchInfo,v?.toss].filter(x=>x&&typeof x==="object");
+  const read=(keys)=>{
+    for(const obj of sources)for(const key of keys){
+      const value=obj[key];
+      if(value!==undefined && value!==null && String(value).trim())return value;
+    }
+    return "";
+  };
+  const rawWinner=read(["tossWonBy","tossWinner","tossWonByTeam","tossWinnerName",
+    "tossWinningTeam","tossWonTeam","toss_winner","wonBy","winner"])||urlParam("tossWinner");
+  const rawChoice=read(["tossDecision","electedTo","tossChoice","electedToDo",
+    "toss_decision","decision","optedTo"])||urlParam("tossDecision");
+  const winner=typeof rawWinner==="object"?(rawWinner.name||rawWinner.teamName||""):String(rawWinner||"").trim();
+  if(!winner)return "";
+  const choice=String(rawChoice||"").trim().replace(/^elected\s+to\s+/i,"");
+  return `${winner} won the toss${choice?" and elected to "+choice:""}`;
+}
+function postMatchMessage(data,v) {
+  const result=textField(data,v,["result","matchResult"]) || "Match completed";
+  const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"]) || urlParam("pom");
+  return [result,pom?`POM: ${pom}`:""].filter(Boolean).join(" · ");
+}
+function showFinalMatchResult(data,v,t1,t2){
+  const panel=$("finalMatchResult");
+  const setText=(id,value)=>$(id).textContent=String(value??"");
+  [t1,t2].forEach((t,i)=>{
+    const n=i+1;
+    setText("mrName"+n,t.name);
+    setText("mrScore"+n,`${t.total}/${t.wickets}`);
+    setText("mrOvers"+n,`(${formatOvers(t.overs)} ov)`);
+    const img=$("mrLogo"+n);
+    // Match the existing CricClubs logo mapping used by layout 1.
+    const path=i===0?v.secondLogo:v.firstLogo;
+    if(path){img.src=/^(https?:|data:|\/\/)/i.test(String(path))?path:new URL(path,"https://cricclubs.com").href;img.hidden=false;img.onerror=()=>{img.hidden=true};}
+    else {img.hidden=true;img.removeAttribute("src")}
+  });
+  setText("mrWinner",textField(data,v,["result","matchResult"])||"Match completed");
+  const pom=textField(data,v,["playerOfMatch","playerOfTheMatch","pomName","manOfTheMatch"])||urlParam("pom");
+  setText("mrPom",pom?`Player of the Match: ${pom}`:"");
+  panel.hidden=false;
+  const bottomOverlay=document.querySelector('.overlay');
+  const reserve=bottomOverlay ? Math.ceil(bottomOverlay.getBoundingClientRect().height)+8 : 105;
+  document.documentElement.style.setProperty('--result-bottom-reserve',reserve+'px');
+  const eventEl=document.getElementById("scoreEvent");
+  if(eventEl && !params.has("highlight")){eventEl.classList.remove("show","active");eventEl.style.display="none";}
+  document.body.classList.add("show-final-result");
+  document.body.classList.remove("show-over-summary","show-full-break");
+  showSecondary(postMatchMessage(data,v));
+}
+function showSecondary(message) {
+  $("bottomText").textContent=message;
+  $("bottom").classList.add("visible");
+  $("bottom").classList.add("projection");
+}
+function matchNotStarted(data,v,t1,t2,second) {
+  const status=textField(data,v,["matchStatus","status","statusText"]).toLowerCase();
+  if(/live|in progress|innings break|completed|finished/.test(status))return false;
+  if(/not started|upcoming|scheduled|toss/.test(status))return true;
+  return !(Array.isArray(data.balls) && data.balls.length) && !second && Number(t1.total)===0 && Number(t2.total)===0 &&
+    overBalls(t1.overs)===0 && overBalls(t2.overs)===0;
+}
+
+// Between innings: prefer an explicit CricClubs status, with score-based fallback.
+function inningsBreak(data,v,t1,t2,second){
+  if(second || completed(data,v))return false;
+  const status=textField(data,v,["matchStatus","status","statusText","matchState","inningsStatus"]).toLowerCase();
+  if(/innings?\s*break|interval|between innings|first innings (ended|complete|completed)/.test(status))return true;
+  // A full allotment of overs or ten wickets ends a standard innings.
+  // Require evidence that the innings was actually played, not a zeroed pre-match score.
+  const balls=overBalls(t1.overs);
+  const limit=Number(optional(v.totalOvers,v.oversLimit,v.matchOvers,urlParam("overs")));
+  return balls>0 && (Number(t1.wickets)>=10 || (Number.isFinite(limit) && limit>0 && balls>=limit*6));
+}
+function breakMessage(t1){
+  const runs=Number(t1.total);
+  return `INNINGS BREAK${Number.isFinite(runs)?` · Target ${runs+1}`:""}`;
+}
+
+// Full scorecard data contract: { batting:[{name,howOut,r,b,fours,sixes,sr}],
+// bowling:[{name,overs,maidens,runs,wickets,econ}], extras:{byes,legByes,wides,noBalls,penalty}, fallOfWickets:[...], battingTeam,bowlingTeam,total,wickets,overs }.
+// Provide via ?scorecardUrl=https://your-cors-enabled-service/... (same-origin or CORS required).
+const demoFullCard = {
+ battingTeam:'RAGING BULLS',bowlingTeam:'CSK YORKERS',total:156,wickets:8,overs:'20.0',
+ batting:[
+  {name:'Rahul Sharma',howOut:'c Patel b Kumar',r:36,b:36,fours:6,sixes:1},
+  {name:'Aditya Reddy',howOut:'b Singh',r:27,b:21,fours:3,sixes:1},
+  {name:'Vikram Rao',howOut:'lbw b Kumar',r:18,b:16,fours:2,sixes:0},
+  {name:'Sandeep Patel',howOut:'c Shah b Reddy',r:32,b:24,fours:4,sixes:2},
+  {name:'Kiran R',howOut:'run out (Singh)',r:12,b:10,fours:1,sixes:0},
+  {name:'Naresh Regunta',howOut:'c & b Patel',r:8,b:9,fours:1,sixes:0},
+  {name:'Vamsi K',howOut:'st Shah b Patel',r:6,b:7,fours:0,sixes:0},
+  {name:'Rohit Verma',howOut:'not out',r:4,b:3,fours:0,sixes:0},
+  {name:'Deepak M',howOut:'c Shah b Kumar',r:1,b:2,fours:0,sixes:0},
+  {name:'Karthik S',howOut:'did not bat',r:null,b:null},
+  {name:'Manoj T',howOut:'did not bat',r:null,b:null}
+ ],
+ bowling:[{name:'Kumar',overs:'4.0',maidens:0,runs:28,wickets:2},{name:'Singh',overs:'4.0',maidens:0,runs:26,wickets:1},{name:'Patel',overs:'4.0',maidens:0,runs:32,wickets:2},{name:'Reddy',overs:'4.0',maidens:0,runs:30,wickets:1},{name:'Shah',overs:'4.0',maidens:0,runs:35,wickets:1}],
+ extras:{byes:2,legByes:3,wides:6,noBalls:1,penalty:0},
+ fallOfWickets:[]
+};
+// Demo is intentionally a UI illustration, not a validated CricClubs match scorecard.
+let loadedFullCard=null;
+let fullCardLoading=false;
+let lastFullCardAttempt=0;
+const scorecardUrl=params.get('scorecardUrl');
+function escapeScore(s){return String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function numberOrDash(n){return n===null||n===undefined?'—':escapeScore(n);}
+function showFullScorecard(card,live){
+ document.body.classList.add('show-full-break');
+ const d=card||{};const a=Array.isArray(d.batting)?d.batting:[];const b=Array.isArray(d.bowling)?d.bowling:[];
+ const battingTeam=d.battingTeam||live?.t1?.name||'BATTING TEAM';const bowlingTeam=d.bowlingTeam||live?.t2?.name||'BOWLING TEAM';
+ const total=d.total??live?.t1?.total??'—';const wickets=d.wickets??live?.t1?.wickets??'—';const overs=d.overs??live?.t1?.overs??'—';
+ $('ibBatTeam').textContent=battingTeam;$('ibBowlTeam').textContent=bowlingTeam;
+ $('ibScore').textContent=total+'/'+wickets;$('ibOvers').textContent=overs+' overs';
+ $('ibTarget').textContent=Number.isFinite(Number(total))?'Target: '+(Number(total)+1):'';
+ $('ibBatTitle').textContent=battingTeam+' BATTING';$('ibBowlTitle').textContent=bowlingTeam+' BOWLING';
+ $('ibBatRows').innerHTML=a.length?a.map(p=>{const sr=p.sr??(Number(p.b)>0?(Number(p.r)*100/Number(p.b)).toFixed(1):'—');return `<tr><td class="ib-name">${escapeScore(p.name)}</td><td class="ib-how" title="${escapeScore(p.howOut||'')}">${escapeScore(p.howOut||'not out')}</td><td class="ib-runs">${numberOrDash(p.r)}</td><td>${numberOrDash(p.b)}</td><td>${numberOrDash(p.fours)}</td><td>${numberOrDash(p.sixes)}</td><td>${numberOrDash(sr)}</td></tr>`}).join(''):'<tr><td colspan="7" class="ib-status">Waiting for full batting scorecard feed</td></tr>';
+ $('ibBowlRows').innerHTML=b.length?b.map(p=>{const o=String(p.overs??'0');const parts=o.split('.');const balls=Number(parts[0])*6+Number(parts[1]||0);const econ=p.econ??(balls>0?(Number(p.runs)*6/balls).toFixed(2):'—');return `<tr><td class="ib-name">${escapeScore(p.name)}</td><td>${numberOrDash(p.overs)}</td><td>${numberOrDash(p.maidens)}</td><td>${numberOrDash(p.runs)}</td><td>${numberOrDash(p.wickets)}</td><td>${numberOrDash(econ)}</td></tr>`}).join(''):'<tr><td colspan="6" class="ib-status">Waiting for full bowling scorecard feed</td></tr>';
+ const ex=d.extras||{};const fields=[['Byes',ex.byes],['Leg byes',ex.legByes],['Wides',ex.wides],['No balls',ex.noBalls],['Penalty',ex.penalty]];const known=fields.every(x=>Number.isFinite(Number(x[1]))&&x[1]!==undefined&&x[1]!==null);const sum=known?fields.reduce((n,x)=>n+Number(x[1]),0):null;
+ $('ibExtras').innerHTML=fields.map(([name,val])=>`<span>${name}</span><span>${numberOrDash(val)}</span>`).join('')+`<span class="ib-total">Total Extras</span><span class="ib-total">${numberOrDash(sum)}</span>`;
+ $('ibFoW').innerHTML='<b>Fall of wickets: </b>'+escapeScore(Array.isArray(d.fallOfWickets)&&d.fallOfWickets.length?d.fallOfWickets.join(', '):'Not available');
+ $('ibFoot').textContent=Number.isFinite(Number(total))?`${bowlingTeam} need ${Number(total)+1} runs to win · SECOND INNINGS STARTING SOON`:'SECOND INNINGS STARTING SOON';
+}
+async function fetchFullScorecard(force=false){
+ if(!scorecardUrl||fullCardLoading||(!force&&Date.now()-lastFullCardAttempt<15000))return;
+ lastFullCardAttempt=Date.now();fullCardLoading=true;
+ try{const res=await fetch(scorecardUrl,{cache:'no-store'});if(!res.ok)throw Error('Scorecard HTTP '+res.status);const obj=await res.json();if(!Array.isArray(obj.batting)||!Array.isArray(obj.bowling))throw Error('Expected batting and bowling arrays');loadedFullCard=obj;}
+ catch(e){console.warn('Full scorecard feed unavailable:',e);}
+ finally{fullCardLoading=false;}
+}
+
+
+// Summary data uses the optional full scorecard JSON feed; missing stats are never fabricated.
+// Independent switches; both disabled by default.
+// summary=1 remains an alias for the end-of-over summary for older links.
+const summaryParams = new URLSearchParams(location.search);
+const enabledFlag = value => /^(1|true|on|yes)$/i.test(String(value ?? '0'));
+const overSummaryEnabled = enabledFlag(summaryParams.get('overSummary') ?? summaryParams.get('summary'));
+// Innings-break summary is disabled by default; opt in with ?inningsBreakSummary=1.
+const inningsBreakSummaryEnabled = enabledFlag(summaryParams.get('inningsBreakSummary') ?? '0');
+// summaryDuration is seconds (default 5) or "nextBall" to wait for the first legal ball.
+const summaryDurationRaw = String(new URLSearchParams(location.search).get('summaryDuration') ?? '5').trim();
+const summaryUntilNextBall = /^(nextball|next-ball|ball)$/i.test(summaryDurationRaw);
+const summarySeconds = Number(summaryDurationRaw);
+const OVER_SUMMARY_MS = !summaryUntilNextBall && Number.isFinite(summarySeconds) && summarySeconds > 0
+  ? Math.min(summarySeconds, 3600) * 1000 : 5000;
+let awaitingNextBall = null;
+let overSummaryTimer=null;
+let previousOverState=null;
+let lastShownOverKey=null;
+function dismissOverSummary(){
+  if(overSummaryTimer){clearTimeout(overSummaryTimer);overSummaryTimer=null;}
+  awaitingNextBall = null;
+  document.body.classList.remove('show-over-summary');
+}
+function renderCompactSummary(card,t,second,overNo,breakMode,balls){
+  const d=card||{};
+  $('osTitle').textContent='MATCH SUMMARY';
+  $('osOvers').textContent=`${t.overs} OVERS`;
+  $('osTeam').textContent=t.name;
+  $('osScore').textContent=`${t.total}/${t.wickets}`;
+  $('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;
+  $('osSecondRow').hidden=true;
+  $('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo} COMPLETE`;
+  const bat=Array.isArray(d.batting)?d.batting.slice().filter(x=>Number.isFinite(Number(x.r))).sort((a,b)=>Number(b.r)-Number(a.r)).slice(0,3):[];
+  const bowl=Array.isArray(d.bowling)?d.bowling.slice().filter(x=>x.wickets!=null&&x.runs!=null).sort((a,b)=>Number(b.wickets)-Number(a.wickets)||Number(a.runs)-Number(b.runs)).slice(0,3):[];
+  $('osBatters').innerHTML=bat.length?bat.map(p=>{
+    const notOut=p.notOut===true||/^(not out|retired hurt)$/i.test(String(p.howOut||'').trim());
+    return `<div class="os-row"><span>${escapeScore(p.name)}${notOut?'*':''}</span><span>${escapeScore(p.r)} (${numberOrDash(p.b)})</span></div>`;
+  }).join(''):'<div class="os-row">Player stats unavailable</div>';
+  $('osBowlers').innerHTML=bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${escapeScore(p.wickets)}/${escapeScore(p.runs)} (${numberOrDash(p.overs)})</span></div>`).join(''):'<div class="os-row">Bowling stats unavailable</div>';
+  const ex=d.extras||{};
+  const extras=ex.total??(Object.values(ex).length&&Object.values(ex).every(x=>Number.isFinite(Number(x)))?Object.values(ex).reduce((a,b)=>a+Number(b),0):null);
+  $('osExtras').textContent=extras==null?'':`EXTRAS ${extras}`;
+  $('osFooter').textContent=breakMode?`TARGET ${Number(t.total)+1} · 2ND INNINGS SOON`:(Array.isArray(balls)&&balls.length?`RECENT: ${balls.slice(-6).map(x=>String(x)).join(' · ')}`:'');
+}
+function renderBothTeamsSummary(card,first,second,overNo,balls){
+  renderCompactSummary(card,second,true,overNo,false,balls);
+  $('osSecondRow').hidden=false;
+  $('osTeam').textContent=first.name;
+  $('osScore').textContent=`${first.total}/${first.wickets}`;
+  $('osRR').textContent=`${first.overs} OV`;
+  $('osSecondTeam').textContent=second.name;
+  $('osSecondScore').textContent=`${second.total}/${second.wickets}`;
+  $('osSecondRR').textContent=`${second.overs} OV · RR ${second.rr}`;
+  const need=Math.max(0,Number(first.total)+1-Number(second.total));
+  $('osFooter').textContent=`TARGET ${Number(first.total)+1} · NEED ${need} RUNS`;
+}
+function observeCompletedOver(data,v,t1,t2,second,onBreak){
+  if(!overSummaryEnabled)return;
+  const t=second?t2:t1;
+  const n=overBalls(t.overs);
+  const key=(second?'2':'1')+':'+Math.floor((n||0)/6);
+  const valid=n!==null&&n>0&&n%6===0;
+  // Establish baseline on first load: don't replay a summary from hours ago.
+  if(previousOverState===null){previousOverState={second,n};return;}
+  const prev=previousOverState;
+  previousOverState={second,n};
+  // For nextBall mode, dismiss when the next over's first delivery has been recorded.
+  // Any increase in delivered-ball count after the completed over qualifies.
+  if(awaitingNextBall && (awaitingNextBall.second !== second || (n !== null && n > awaitingNextBall.n))) {
+    dismissOverSummary();
+  }
+  if(onBreak||completed(data,v)||!valid||prev.second!==second||prev.n===null||n<=prev.n||lastShownOverKey===key)return;
+  lastShownOverKey=key;
+  if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
+  else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
+  document.body.classList.add('show-over-summary');
+  if(overSummaryTimer)clearTimeout(overSummaryTimer);
+  if(summaryUntilNextBall) awaitingNextBall={second,n};
+  else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
+  // Fetch updated full scorecard when configured. Only refresh the popup if still showing this over.
+  if(scorecardUrl){fetchFullScorecard(true).then(()=>{
+    if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key)
+      if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
+  else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
+  });}
+}
+
+function render(data){
+  const v=data.values||{};
+  const second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
+  const t1=teamScore(v,"t1");
+  const t2=teamScore(v,"t2");
+  const isLayout2 = document.querySelector(".overlay").classList.contains("layout2");
+  const bottom=$("bottom");
+  const bottomText=$("bottomText");
+  const powered=$("powered");
+  const onBreak=inningsBreak(data,v,t1,t2,second);
+  const isFinished=completed(data,v) && Boolean(textField(data,v,["result","matchResult"]));
+  if(isFinished) showFinalMatchResult(data,v,t1,t2);
+  else {$("finalMatchResult").hidden=true;document.body.classList.remove("show-final-result");}
+  if(isFinished||onBreak) dismissOverSummary();
+  observeCompletedOver(data,v,t1,t2,second,onBreak);
+  const showDemoFull=params.get('demo')==='inningsBreak';
+  if(onBreak && !inningsBreakSummaryEnabled) document.body.classList.remove('show-over-summary');
+  if(onBreak && inningsBreakSummaryEnabled){
+    document.body.classList.remove('show-full-break');
+    renderCompactSummary(showDemoFull?demoFullCard:loadedFullCard,t1,false,0,true,data.balls);
+    document.body.classList.add('show-over-summary');
+    if(scorecardUrl)fetchFullScorecard(true).then(()=>{
+      if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls);
+    });
+  } else if((!overSummaryTimer && !awaitingNextBall) || !(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
+  const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
+  const overlayEl=document.querySelector(".overlay");
+  overlayEl.classList.toggle("is-prematch",preMatch);
+  $("prematchTemplate").hidden=!preMatch;
+  $("bottom").classList.remove("projection");
+  document.querySelector(".top").classList.toggle("pre-match",preMatch && isLayout2);
+  if (!preMatch && !onBreak && !isFinished) watchLastBall(data,v,second);
+  if (preMatch) {
+    $("name1").textContent=t1.name;
+    $("name2").textContent=t2.name;
+    $("preTeam1").textContent=t1.name;
+    $("preTeam2").textContent=t2.name;
+    prematchLogo("preLogo1","preInitials1",t1.name,v.firstLogo);
+    prematchLogo("preLogo2","preInitials2",t2.name,v.secondLogo);
+    logo("logo1",v.firstLogo);
+    logo("logo2",v.secondLogo);
+    $("details1").innerHTML=showBatters(v);
+    $("details2").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
+    if (isLayout2) $("score1").closest(".scorebox").style.display="flex";
+    showSecondary(tossMessage(data,v) || "Match yet to start");
+    syncHeaderHeight();
+    return;
+  }
+
+
+  if (isLayout2) {
+    // Layout 2 always puts the current batting side on the left and bowling side on the right.
+    const battingTeam = second ? t2 : t1;
+    const bowlingTeam = second ? t1 : t2;
+
+    $("name1").textContent = battingTeam.name;
+    $("name2").textContent = bowlingTeam.name;
+    showScore(1, battingTeam);
+    $("score1").closest(".scorebox").style.display = "flex";
+    $("score1").closest(".scorebox").style.visibility = "visible";
+    $("score2").closest(".scorebox").style.display = "none";
+
+    $("details1").innerHTML = showBatters(v);
+    $("details2").innerHTML = showBowler(v, data.balls, second?t2.overs:t1.overs);
+
+    // Layout 2: first-innings logos corrected; preserve the working second-innings mapping.
+    logo("logo1", v.firstLogo);
+    logo("logo2", v.secondLogo);
+
+    if (isFinished) {
+      showSecondary(postMatchMessage(data,v));
+      // Preserve the bottom result/footer while showing the centered result.
+      stopped = true;
+      if (timer) clearTimeout(timer);
+      return;
+    }
+
+    if (onBreak) {
+      $("details1").innerHTML = '<div class="innings-break-detail">FIRST INNINGS COMPLETE</div>';
+      $("details2").innerHTML = '<div class="innings-break-detail">SECOND INNINGS TO FOLLOW</div>';
+      showSecondary(breakMessage(t1));
+      return;
+    }
+
+    if (second) {
+      const first = Number(get(v,"t1Total",""));
+      const current = Number(t2.total);
+      const needed = first + 1 - current;
+      const limit = Number(get(v,"totalOvers",get(v,"oversLimit",get(v,"matchOvers",""))));
+      const ballsBowled = overBalls(t2.overs);
+      let message = get(v,"showMsgForScoreNeeded","");
+
+      if (Number.isFinite(first) && Number.isFinite(current) && first >= 0) {
+        if (needed <= 0) {
+          message = "Target achieved";
+        } else {
+          message = `Need ${needed} runs to win`;
+          if (Number.isFinite(limit) && limit > 0 && ballsBowled !== null) {
+            const left = Math.max(0, limit * 6 - ballsBowled);
+            if (left > 0) message += ` · ${left} balls left · RRR ${(needed * 6 / left).toFixed(2)}`;
+          }
+        }
+      }
+      showSecondary(message);
+    } else {
+      // No chase bar during the first innings.
+      showSecondary(projectedScore(v,t1) || "First innings");
+    }
+    return;
+  }
+
+  // Layout 1: original design preserved.
+  showScore(1,t1);
+  showScore(2,t2);
+  $("score1").closest(".scorebox").style.display = "";
+  $("score2").closest(".scorebox").style.display = "";
+  $("score1").closest(".scorebox").style.visibility = "visible";
+  $("score2").closest(".scorebox").style.visibility = "visible";
+  logo("logo1", v.secondLogo);
+  logo("logo2", v.firstLogo);
+
+  if(!second){
+    $("details1").innerHTML=showBatters(v);
+    $("details2").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
+  }else{
+    $("details1").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
+    $("details2").innerHTML=showBatters(v);
+  }
+
+  if(isFinished){
+    showSecondary(postMatchMessage(data,v));
+    if(powered) powered.style.display="inline";
+    stopped=true;
+    if(timer)clearTimeout(timer);
+    return;
+  }
+
+  if(onBreak){
+    $("details1").innerHTML='<div class="innings-break-detail">FIRST INNINGS COMPLETE</div>';
+    $("details2").innerHTML='<div class="innings-break-detail">SECOND INNINGS TO FOLLOW</div>';
+    showSecondary(breakMessage(t1));
+    if(powered)powered.style.display="inline";
+    return;
+  }
+
+  if(second){
+    const first=Number(get(v,"t1Total",""));
+    const current=Number(t2.total);
+    const needed=first+1-current;
+    const limit=Number(get(v,"totalOvers",get(v,"oversLimit",get(v,"matchOvers",""))));
+    const ballsBowled=overBalls(t2.overs);
+    let message="";
+
+    if(Number.isFinite(first)&&Number.isFinite(current)&&first>=0){
+      if(needed<=0){
+        message="Target achieved";
+      }else{
+        message=`Need ${needed} runs to win`;
+        if(Number.isFinite(limit)&&limit>0&&ballsBowled!==null){
+          const left=Math.max(0,limit*6-ballsBowled);
+          if(left>0) message+=` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
+        }
+      }
+    }else{
+      message=get(v,"showMsgForScoreNeeded","");
+    }
+    showSecondary(message);
+    if(powered) powered.style.display="none";
+  }else{
+    showSecondary(projectedScore(v,t1) || "First innings");
+  }
+}
+async function refresh(){
+  if(stopped)return;
+  try{
+    const response=await fetch(API,{cache:"no-store"});
+    if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    render(await response.json());
+    $("error").style.display="none";
+  }catch(e){
+    console.error(e);
+    $("error").textContent="Live score temporarily unavailable. Retrying…";
+    $("error").style.display="block";
+  }
+  if(!stopped)timer=setTimeout(refresh,REFRESH_MS);
+}
+
+// Optional browser-only vertical adjustment. Default is 0px for Android WebView.
+// Example: &bottomOffset=24 moves the scoreboard 24 CSS pixels upward.
+(function applyBottomOffset() {
+  const raw = new URLSearchParams(window.location.search).get('bottomOffset');
+  const parsed = raw === null || raw.trim() === '' ? 0 : Number(raw);
+  const offset = Number.isFinite(parsed) ? Math.min(250, Math.max(0, parsed)) : 0;
+  document.documentElement.style.setProperty('--scoreboard-bottom-offset', offset + 'px');
+})();
+
+// Optional animation preview. Does not change match data or scoring.
+// highlight=four|six|wicket&highlightCount=3
+(function previewHighlightFromQuery() {
+  const raw = (params.get('highlight') || '').trim().toLowerCase();
+  const kinds = {four:'four', '4':'four', six:'six', '6':'six', wicket:'wicket', w:'wicket'};
+  const kind = kinds[raw];
+  if (!kind) return;
+  const requested = Number(params.get('highlightCount') ?? '1');
+  const count = Number.isFinite(requested) ? Math.max(1, Math.min(20, Math.floor(requested))) : 1;
+  // Each celebration lasts 2.5 seconds; wait until it has finished before replaying.
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => { const eventLayer=document.getElementById("scoreEvent"); if(eventLayer) eventLayer.style.removeProperty("display"); showEvent(kind); }, 600 + i * 2900);
+  }
+})();
+
+// Standalone preview of the final result layout, without live match data.
+if(params.get("demo")==="matchResult"){
+  render({matchStatus:"Completed",isMatchEnded:true,isSecondInningsStarted:true,
+    result:"Vikings won by 6 Wickets",playerOfMatch:"KRISHNA TEJA REDDY VAVVETI",
+    values:{t1Name:"Lords",t1Total:"111",t1Wickets:"10",t1Overs:"19.1",t1RR:"5.79",
+      t2Name:"Vikings",t2Total:"112",t2Wickets:"4",t2Overs:"15.2",t2RR:"7.30"},balls:[]});
+}
+// Production: load CricClubs live data and refresh until the match is completed.
+function syncHeaderHeight() {
+  const overlay=document.querySelector('.overlay');
+  const top=overlay.querySelector('.top');
+  const pre=overlay.classList.contains('is-prematch');
+  if(pre)overlay.classList.remove('is-prematch');
+  const height=Math.ceil(top.getBoundingClientRect().height);
+  if(pre)overlay.classList.add('is-prematch');
+  if(height>0)overlay.style.setProperty('--live-header-height',height+'px');
+}
+window.addEventListener('resize',syncHeaderHeight);
+if (urlParam("demo") === "matchResult") {
+  // Preview card is already rendered above; do not fetch or overwrite it.
+} else if (overSummaryEnabled && urlParam("demo") === "secondInningsSummary") {
+  const a={name:'TEAM A',total:156,wickets:8,overs:'20.0',rr:'7.80'};
+  const b={name:'TEAM B',total:74,wickets:2,overs:'10.0',rr:'7.40'};
+  renderBothTeamsSummary(demoFullCard,a,b,10,['1','4','0','2','1','0']);
+  document.body.classList.add('show-over-summary');
+} else if (overSummaryEnabled && urlParam("demo") === "overSummary") {
+  const t={name:'RAGING BULLS',total:63,wickets:2,overs:'8.0',rr:'7.88'};
+  renderCompactSummary(demoFullCard,t,false,8,false,['1','4','0','2','1','0']);
+  document.body.classList.add('show-over-summary');
+} else if (inningsBreakSummaryEnabled && urlParam("demo") === "inningsBreak") {
+  render({
+    matchStatus: "Innings Break",
+    isSecondInningsStarted: false,
+    values: {
+      t1Name: "Team A", t1Total: "156", t1Wickets: "8", t1Overs: "20.0", t1RR: "7.80",
+      t2Name: "Team B", t2Total: "0", t2Wickets: "0", t2Overs: "0.0",
+      totalOvers: "20"
+    }, balls: []
+  });
+} else {
+  refresh();
+}
+</script>
+</body>
+</html>
