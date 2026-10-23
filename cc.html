@@ -1833,7 +1833,7 @@ function eventKind(x) {
 }
 // Native Android callback: fired once for each newly observed FOUR/SIX delivery.
 // No callback on initial load, refresh of unchanged data, or preview animations.
-function notifyAndroidBoundary(kind, signature, second, overs) {
+function notifyAndroidBoundary(kind, signature, second, overs, deliveryToken = "") {
   if (kind !== "four" && kind !== "six") return;
   try {
     const bridge = window.AndroidBridge;
@@ -1845,6 +1845,8 @@ function notifyAndroidBoundary(kind, signature, second, overs) {
       innings: second ? 2 : 1,
       over: String(overs ?? ""),
       deliveryId: signature,
+      delivery: deliveryToken,
+      isNoBall: /^(?:N|NB|NOBALL|NO-BALL)\\+/.test(deliveryToken),
       timestamp: Date.now()
     }));
   } catch (err) { console.info("Android boundary callback unavailable", err); }
@@ -1860,11 +1862,14 @@ function watchLastBall(data,v,second) {
     if(changedScore) {
       const kind = eventKind(last);
       showEvent(kind);
-      // Only exact bat boundaries; wides/no-balls and their boundary extras
-      // must not be reported as a batter's FOUR/SIX.
-      if ((last.trim() === "4" && kind === "four") ||
-          (last.trim() === "6" && kind === "six")) {
-        notifyAndroidBoundary(kind, signature, second, t.overs);
+      // FOUR/SIX plus no-ball boundaries (N+4/N+6). Wide boundaries
+      // and byes are not batter boundaries and must not trigger callbacks.
+      const token = last.trim().toUpperCase().replace(/\\s+/g, "");
+      const noBallBoundary = /^(?:N|NB|NOBALL|NO-BALL)\\+(4|6)$/.exec(token);
+      const boundaryKind = token === "4" || noBallBoundary?.[1] === "4" ? "four"
+                         : token === "6" || noBallBoundary?.[1] === "6" ? "six" : "";
+      if (boundaryKind) {
+        notifyAndroidBoundary(boundaryKind, signature, second, t.overs, token);
       }
     }
   }
