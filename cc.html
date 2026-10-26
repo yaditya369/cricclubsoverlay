@@ -1643,6 +1643,52 @@ html body .overlay.layout4.theme-graphite > .top {
 }
 </style>
 
+
+<style id="layout4-final-refinements">
+/* Layout 4 exclusively: 50px top, existing 15px footer; bottom-aligned. */
+html body .overlay.layout4:not(.is-prematch) {
+  height:65px!important;min-height:65px!important;max-height:65px!important;
+  margin-top:auto!important;margin-bottom:0!important;
+  display:flex!important;flex-direction:column!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top {
+  flex:0 0 50px!important;height:50px!important;min-height:50px!important;max-height:50px!important;
+  margin:0!important;transform:none!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout4:not(.is-prematch) > .bottom.visible {
+  flex:0 0 15px!important;height:15px!important;min-height:15px!important;max-height:15px!important;
+  margin:0!important;
+}
+/* Profile photos and their initials are truly circular, with no image leakage. */
+html body .overlay.layout4 #details1 .l3-portrait,
+html body .overlay.layout4 #details2 .l3-bowler-block .l3-bowler-portrait {
+  width:32px!important;height:32px!important;flex:0 0 32px!important;
+  border-radius:50%!important;border:1.5px solid #ffd54a!important;
+  box-sizing:border-box!important;overflow:hidden!important;
+  background:rgba(255,255,255,.10)!important;
+}
+html body .overlay.layout4 #details1 .l3-portrait img,
+html body .overlay.layout4 #details2 .l3-bowler-block .l3-bowler-portrait img {
+  width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;
+  border-radius:50%!important;object-fit:cover!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block {
+  grid-template-columns:32px minmax(0,1fr)!important;
+}
+/* Avoid rectangle fills on player blocks and preserve room for the team names. */
+html body .overlay.layout4 #details1 .l3-batter {background:transparent!important;}
+html body .overlay.layout4 > .top .team .identity {gap:1px!important;}
+html body .overlay.layout4 > .top .team .team-name {max-height:20px!important;overflow:hidden!important;}
+@media(max-width:650px){
+ html body .overlay.layout4 #details1 .l3-portrait,
+ html body .overlay.layout4 #details2 .l3-bowler-block .l3-bowler-portrait {
+   width:26px!important;height:26px!important;flex-basis:26px!important;
+ }
+ html body .overlay.layout4 #details2 .l3-bowler-block {grid-template-columns:26px minmax(0,1fr)!important;}
+}
+</style>
+
 </head>
 <body>
 <div class="overlay">
@@ -1654,9 +1700,9 @@ html body .overlay.layout4.theme-graphite > .top {
 <div class="top">
 <svg class="l4-svg-panels" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
   <g fill="var(--l4-fill,rgba(138,12,24,.80))" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="16,2 425,2 441,50 425,98 16,98 1,50"/>
+    <polygon points="16,2 409,2 425,50 409,98 16,98 1,50"/>
     <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"/>
-    <polygon points="575,2 984,2 999,50 984,98 575,98 559,50"/>
+    <polygon points="591,2 984,2 999,50 984,98 591,98 575,50"/>
   </g>
 </svg>
     <section class="team left">
