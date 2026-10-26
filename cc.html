@@ -1547,6 +1547,21 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
  .overlay.layout3 #details2 .bowler-row .l3-bowler-initial {font-size:11px;}
 }
 </style>
+
+<style id="layout3-bowler-stacked-fix">
+/* Layout 3: portrait left; bowler name and bowling figures on SAME top row; THIS OVER on second row. */
+.overlay.layout3 #details2 .l3-bowler-block {display:grid!important;grid-template-columns:30px minmax(0,1fr);column-gap:5px;align-items:center;height:100%;min-height:0;width:100%;}
+.overlay.layout3 #details2 .l3-bowler-block .l3-bowler-portrait {grid-column:1;grid-row:1;position:relative;width:30px;height:38px;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:2px;background:rgba(255,255,255,.12);}
+.overlay.layout3 #details2 .l3-bowler-block .l3-bowler-portrait img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;z-index:1;}
+.overlay.layout3 #details2 .l3-bowler-block .l3-bowler-content {grid-column:2;grid-row:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:1px;overflow:hidden;}
+.overlay.layout3 #details2 .l3-bowler-block .bowler-row {display:flex;align-items:center;justify-content:space-between;min-width:0;gap:5px;margin:0!important;padding:0!important;border:0!important;line-height:12px!important;}
+.overlay.layout3 #details2 .l3-bowler-block .bowler-name {flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800;}
+.overlay.layout3 #details2 .l3-bowler-block .bowler-meta {flex:0 0 auto;margin-left:auto;white-space:nowrap;text-align:right;}
+.overlay.layout3 #details2 .l3-bowler-block .balls {margin:0!important;padding:0!important;height:19px!important;min-height:19px!important;overflow:hidden!important;display:flex;align-items:center;gap:3px;flex-wrap:nowrap;}
+.overlay.layout3 #details2 .l3-bowler-block .this-over-label {height:18px!important;min-height:18px!important;margin-right:2px!important;}
+.overlay.layout3 #details2 .l3-bowler-block .ball {height:16px!important;min-width:16px!important;font-size:9px!important;padding:0 2px!important;}
+@media(max-width:650px){.overlay.layout3 #details2 .l3-bowler-block {grid-template-columns:24px minmax(0,1fr);column-gap:3px;}.overlay.layout3 #details2 .l3-bowler-block .l3-bowler-portrait {width:24px;height:35px;}}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -2004,16 +2019,19 @@ function showBowler(v,balls,inningsOvers){
     return `<span class="${cls}" title="${escapeHTML(x)}">${cls.includes("dot-ball") ? "" : escapeHTML(extra?extra.label:x)}</span>`;
   }).join('');
   if (!bowler) return "";
-  return `
-    <div class="bowler-row">
-      ${overlayLayout === "3" ? (() => {
-        const image = cricclubsProfileUrl(get(v, 'bowlerProfileImange', ''));
-        const initial = escapeHTML(bowlerPortraitInitials(bowler));
-        return `<div class="l3-bowler-identity"><div class="l3-bowler-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none';this.setAttribute('data-image-failed','true')">` : ''}<span class="l3-bowler-initial">${initial}</span></div><div class="bowler-name">${escapeHTML(bowler)}</div></div>`;
-      })() : `<div class="bowler-name">${escapeHTML(bowler)}</div>`}
-      <div class="bowler-meta">${escapeHTML(get(v,'bowlerWickets','0'))}/${escapeHTML(get(v,'bowlerRuns','0'))} (${escapeHTML(formatOvers(get(v,'bowlerOvers','0.0')))})</div>
-    </div>
-    <div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
+  const overLine = `<div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
+  if (overlayLayout === "3") {
+    const image = cricclubsProfileUrl(get(v, 'bowlerProfileImange', ''));
+    const initial = escapeHTML(bowlerPortraitInitials(bowler));
+    return `<div class="l3-bowler-block">
+      <div class="l3-bowler-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none';this.setAttribute('data-image-failed','true')">` : ''}<span class="l3-bowler-initial">${initial}</span></div>
+      <div class="l3-bowler-content">
+        <div class="bowler-row"><div class="bowler-name">${escapeHTML(bowler)}</div><div class="bowler-meta">${escapeHTML(get(v,'bowlerWickets','0'))}/${escapeHTML(get(v,'bowlerRuns','0'))} (${escapeHTML(formatOvers(get(v,'bowlerOvers','0.0')))})</div></div>
+        ${overLine}
+      </div>
+    </div>`;
+  }
+  return `<div class="bowler-row"><div class="bowler-name">${escapeHTML(bowler)}</div><div class="bowler-meta">${escapeHTML(get(v,'bowlerWickets','0'))}/${escapeHTML(get(v,'bowlerRuns','0'))} (${escapeHTML(formatOvers(get(v,'bowlerOvers','0.0')))})</div></div>${overLine}`;
 }
 function escapeHTML(s){
   return String(s).replace(/[&<>"']/g,c=>({
