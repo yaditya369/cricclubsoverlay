@@ -1957,17 +1957,12 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
       <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
     </linearGradient>
   </defs>
-  <!-- Batting and bowling wings continue UNDER the center panel.
-       No side-panel pointed ends or transparent V gaps are exposed. -->
-  <g fill="url(#l4-panel-gradient)" stroke="none">
-    <polygon points="16,2 455,2 455,100 16,100 1,50"/>
-    <polygon points="545,2 984,2 999,50 984,100 545,100"/>
+  <!-- Three original panels: coordinates taken directly from cclayout4v1.html. -->
+  <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
+    <polygon points="16,2 409,2 425,50 409,98 16,98 1,50"/>
+    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50" fill="url(#l4-center-dark-gradient)"/>
+    <polygon points="591,2 984,2 999,50 984,98 591,98 575,50"/>
   </g>
-  <!-- Center is drawn LAST, masking the overlapping wings. It is not
-       vertically displaced; its 2px gold outline supplies the raised look. -->
-  <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"
-    fill="url(#l4-center-dark-gradient)" stroke="#FFD54A"
-    stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
 </svg>
     <section class="team left">
       <div class="identity">
@@ -2190,6 +2185,25 @@ html body .overlay.layout4:not(.is-prematch) > .top .l4-svg-panels {
   overflow:visible!important;
 }
 html body .overlay.layout4:not(.is-prematch) > .bottom {
+  z-index:1!important;
+}
+</style>
+<style id="layout4-reference-joined-shape-final">
+/* Screenshot geometry: one uninterrupted body, center inset on top, footer attached. */
+html body .overlay.layout4:not(.is-prematch) > .top {
+  position:relative!important; z-index:4!important; overflow:visible!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top .l4-svg-panels {
+  overflow:visible!important; z-index:0!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  position:absolute!important;top:49px!important;bottom:auto!important;
+  left:1.6%!important;right:1.6%!important;width:96.8%!important;max-width:96.8%!important;
+  height:16px!important;min-height:16px!important;max-height:16px!important;
+  margin:0!important;box-sizing:border-box!important;
+  border:0!important;box-shadow:none!important;clip-path:none!important;
+  background:linear-gradient(90deg,#78040e,#b50a19 25%,#65000e 50%,#b50a19 75%,#78040e)!important;
   z-index:1!important;
 }
 </style>
