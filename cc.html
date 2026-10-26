@@ -1691,8 +1691,9 @@ html body .overlay.layout4 > .top .team .team-name {max-height:20px!important;ov
 
 
 <style id="layout4-center-real-transparency-fix">
-/* Only layout 4: disable the legacy MH center hex's opaque pseudo-fill and
-   its duplicate border. The shared SVG above draws the gold center border. */
+/* Layout 4: keep the center hex fill inside the gold SVG only. Disable
+   the legacy duplicate center background and border so areas OUTSIDE
+   the three SVG polygons remain truly transparent. */
 html body .overlay.layout4 > .top .team.left .scorebox::before,
 html body .overlay.layout4.theme-mh > .top .team.left .scorebox::before,
 html body .overlay.layout2.layout4.theme-mh > .top .team.left .scorebox::before,
@@ -1722,7 +1723,7 @@ html body .overlay.layout4 > .top {background:transparent!important;background-i
 <svg class="l4-svg-panels" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
   <g fill="var(--l4-fill,rgba(138,12,24,.80))" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
     <polygon points="16,2 409,2 425,50 409,98 16,98 1,50"/>
-    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50" fill="none"/>
+    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"/>
     <polygon points="591,2 984,2 999,50 984,98 591,98 575,50"/>
   </g>
 </svg>
