@@ -1905,6 +1905,32 @@ html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom
   z-index:2!important;
 }
 </style>
+
+<style id="layout4-actually-connected-footer-v2">
+/* One uninterrupted lower band; no separate inset rectangle or 1px overlap. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  top:50px!important;left:0!important;right:0!important;
+  width:100%!important;max-width:100%!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
+  margin:0!important;padding:0 125px 0 8px!important;
+  border:0!important;border-radius:0!important;clip-path:none!important;
+  -webkit-clip-path:none!important;box-shadow:none!important;
+  background:linear-gradient(90deg,#6e000a 0%,#c30816 17%,#9e0714 40%,#65000d 50%,#9e0714 60%,#c30816 83%,#6e000a 100%)!important;
+  z-index:1!important;overflow:hidden!important;
+}
+/* Center label stays centered in the entire 100% bar. */
+html body .overlay.layout2.layout4 > .bottom.visible #bottomText {
+  position:absolute!important;left:12%!important;right:12%!important;
+  width:76%!important;max-width:76%!important;text-align:center!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
+  position:absolute!important;right:10px!important;left:auto!important;z-index:2!important;
+}
+/* Avoid any top/footer separating stroke. */
+html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:none!important;}
+</style>
 </head>
 <body>
 <div class="overlay">
