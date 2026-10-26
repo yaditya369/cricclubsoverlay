@@ -1957,14 +1957,15 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
       <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
     </linearGradient>
   </defs>
-  <!-- One continuous silhouette: the side panels extend under the center panel,
-       removing the two exposed triangular notches at the footer junction. -->
+  <!-- Batting and bowling wings continue UNDER the center panel.
+       No side-panel pointed ends or transparent V gaps are exposed. -->
   <g fill="url(#l4-panel-gradient)" stroke="none">
-    <polygon points="16,2 409,2 425,50 441,100 16,100 1,50"/>
-    <polygon points="591,2 984,2 999,50 984,100 559,100 575,50"/>
+    <polygon points="16,2 455,2 455,100 16,100 1,50"/>
+    <polygon points="545,2 984,2 999,50 984,100 545,100"/>
   </g>
-  <!-- Draw the center last so its gold outline remains fully visible. -->
-  <polygon points="441,2 559,2 575,50 559,100 441,100 425,50"
+  <!-- Center is drawn LAST, masking the overlapping wings. It is not
+       vertically displaced; its 2px gold outline supplies the raised look. -->
+  <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"
     fill="url(#l4-center-dark-gradient)" stroke="#FFD54A"
     stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
 </svg>
@@ -2166,7 +2167,7 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
   border:0!important;border-radius:0!important;
   box-shadow:none!important;overflow:hidden!important;
   background:linear-gradient(90deg,#850713,#ba0a1a 22%,#65000e 50%,#ba0a1a 78%,#850713)!important;
-  z-index:2!important;
+  z-index:1!important;
 }
 html body .overlay.layout2.layout4 > .bottom.visible #bottomText {
   position:absolute!important;left:12%!important;right:12%!important;
@@ -2175,6 +2176,21 @@ html body .overlay.layout2.layout4 > .bottom.visible #bottomText {
 }
 html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
   right:8px!important;left:auto!important;
+}
+</style>
+<style id="layout4-wings-behind-center-final">
+/* Preserve the original 50px height; overlapping wings are inside the SVG.
+   Center gold outline stays on top of the wings, not underneath the footer. */
+html body .overlay.layout4:not(.is-prematch) > .top {
+  position:relative!important;
+  z-index:3!important;
+  overflow:visible!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top .l4-svg-panels {
+  overflow:visible!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .bottom {
+  z-index:1!important;
 }
 </style>
 <script>
