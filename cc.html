@@ -1711,6 +1711,20 @@ html body .overlay.layout4 > .top .team.left .scorebox .mh-hex-outline {
 /* Clear any remaining legacy top-row shading at the center join. */
 html body .overlay.layout4 > .top {background:transparent!important;background-image:none!important;}
 </style>
+
+<style id="layout4-unified-player-font-and-strike">
+/* Layout 4 only: identical bold names and a visible gold striker star. */
+html body .overlay.layout4 #details1 .l3-batter-name,
+html body .overlay.layout4 #details2 .bowler-name {
+  font-size:12px!important; font-weight:800!important; line-height:1.1!important;
+}
+html body .overlay.layout4 #details1 .l3-batter-score,
+html body .overlay.layout4 #details2 .bowler-meta {font-weight:800!important;}
+html body .overlay.layout4 #details1 .l3-batter-name .l4-strike-star {
+  color:#ffd700!important; font-size:12px!important; font-weight:900!important;
+  display:inline!important; margin-right:3px; text-shadow:0 0 2px #3b2200;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1895,6 +1909,20 @@ html body .overlay.layout4 > .top .team.left .scorebox::after {
 }
 /* Center red fill and its single gold border remain on the l4-svg-panels polygon. */
 </style>
+<style id="layout4-footer-align-to-svg">
+/* Align the footer to the straight vertical edges of the outer gold panels,
+   rather than extending all the way to the screen edges. The SVG outer
+   vertices are x=1/999, while the panel shoulders are x=16/984 of 1000. */
+html body .overlay.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout4:not(.is-prematch) > .bottom.visible {
+  width:96.8%!important;
+  max-width:96.8%!important;
+  margin-left:1.6%!important;
+  margin-right:1.6%!important;
+  box-sizing:border-box!important;
+  border-radius:0!important;
+}
+</style>
 <script>
 const params = new URLSearchParams(location.search);
 const clubId = params.get("clubId") || "22594";
@@ -2070,7 +2098,7 @@ function showBattersLayout3(v) {
     const fallback = escapeHTML(name.slice(0,1).toUpperCase());
     return `<div class="l3-batter">
       <div class="l3-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none'">` : ''}<span class="l3-initial">${fallback}</span></div>
-      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${n===1?' ★':''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
+      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${overlayLayout === "4" && n===1 ? '<span class="l4-strike-star" title="On strike" aria-label="On strike">★</span>' : ''}${escapeHTML(name)}${overlayLayout !== "4" && n===1 ? ' ★' : ''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
     </div>`;
   }).join("");
 }
