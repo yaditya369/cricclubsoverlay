@@ -1524,6 +1524,29 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
   .overlay.layout3 #details1 .l3-batter-score {font-size:9px;}
 }
 </style>
+<style id="layout3-bowler">
+/* Layout 3 only: bowler portrait beside existing name and figures. */
+.overlay.layout3 #details2 .bowler-row .l3-bowler-identity {
+ display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto;
+}
+.overlay.layout3 #details2 .bowler-row .l3-bowler-portrait {
+ position:relative;display:flex;align-items:center;justify-content:center;
+ flex:0 0 30px;width:30px;height:40px;overflow:hidden;
+ background:rgba(255,255,255,.12);border-radius:2px;
+}
+.overlay.layout3 #details2 .bowler-row .l3-bowler-portrait img {
+ position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+ object-position:center 20%;z-index:1;
+}
+.overlay.layout3 #details2 .bowler-row .l3-bowler-initial {font-size:15px;font-weight:800;color:#fff;}
+.overlay.layout3 #details2 .bowler-row .bowler-name {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.overlay.layout3 #details2 .bowler-row .bowler-meta {flex:0 0 auto;}
+@media(max-width:650px){
+ .overlay.layout3 #details2 .bowler-row .l3-bowler-identity {gap:2px;}
+ .overlay.layout3 #details2 .bowler-row .l3-bowler-portrait {flex-basis:20px;width:20px;height:32px;}
+ .overlay.layout3 #details2 .bowler-row .l3-bowler-initial {font-size:11px;}
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1817,6 +1840,38 @@ function cricclubsProfileUrl(path) {
     return url.protocol === "https:" && url.hostname === "cricclubs.com" ? url.href : "";
   } catch (_) { return ""; }
 }
+// Layout 3 portrait cache: retain the actual loaded <img> nodes across score refreshes.
+// A new player/profile URL creates a new image; unchanged URLs are never re-requested
+// by our rendering logic. Browser/WebView HTTP caching handles future visits.
+const layout3PortraitCache = new Map();
+const LAYOUT3_PORTRAIT_LIMIT = 24;
+function setPlayerDetails(el, html) {
+  if (overlayLayout !== "3") { el.innerHTML = html; return; }
+  // Save the live image nodes before replacing score/name text.
+  for (const img of el.querySelectorAll('.l3-portrait img, .l3-bowler-portrait img')) {
+    const key = img.dataset.portraitKey || img.getAttribute('src');
+    if (key) {
+      layout3PortraitCache.delete(key);
+      layout3PortraitCache.set(key, img);
+    }
+  }
+  el.innerHTML = html;
+  for (const img of [...el.querySelectorAll('.l3-portrait img, .l3-bowler-portrait img')]) {
+    const key = img.getAttribute('src');
+    const cached = layout3PortraitCache.get(key);
+    if (cached && cached !== img) {
+      cached.dataset.portraitKey = key;
+      // Keep failed-image fallback hidden instead of retrying every score tick.
+      img.replaceWith(cached);
+    } else if (key) {
+      img.dataset.portraitKey = key;
+      layout3PortraitCache.set(key, img);
+    }
+  }
+  while (layout3PortraitCache.size > LAYOUT3_PORTRAIT_LIMIT) {
+    layout3PortraitCache.delete(layout3PortraitCache.keys().next().value);
+  }
+}
 function showBattersLayout3(v) {
   return [1,2].map(n => {
     const name = validDisplayName(get(v, "batsman"+n+"Name", ""));
@@ -1902,6 +1957,11 @@ function thisOverRuns(balls) {
 let previousOverBowler = null;
 let previousOverInnings = null;
 let previousOverNumber = null;
+function bowlerPortraitInitials(name) {
+  const words = String(name || "").trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return "?";
+  return (words.length === 1 ? words[0].slice(0, 2) : words[0][0] + words[words.length - 1][0]).toUpperCase();
+}
 function showBowler(v,balls,inningsOvers){
   const oversText = String(inningsOvers ?? '0.0');
   const m = oversText.match(/^(\d+)\.(\d+)$/);
@@ -1946,7 +2006,11 @@ function showBowler(v,balls,inningsOvers){
   if (!bowler) return "";
   return `
     <div class="bowler-row">
-      <div class="bowler-name">${escapeHTML(validDisplayName(get(v,'bowlerName','')))}</div>
+      ${overlayLayout === "3" ? (() => {
+        const image = cricclubsProfileUrl(get(v, 'bowlerProfileImange', ''));
+        const initial = escapeHTML(bowlerPortraitInitials(bowler));
+        return `<div class="l3-bowler-identity"><div class="l3-bowler-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none';this.setAttribute('data-image-failed','true')">` : ''}<span class="l3-bowler-initial">${initial}</span></div><div class="bowler-name">${escapeHTML(bowler)}</div></div>`;
+      })() : `<div class="bowler-name">${escapeHTML(bowler)}</div>`}
       <div class="bowler-meta">${escapeHTML(get(v,'bowlerWickets','0'))}/${escapeHTML(get(v,'bowlerRuns','0'))} (${escapeHTML(formatOvers(get(v,'bowlerOvers','0.0')))})</div>
     </div>
     <div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
@@ -2493,8 +2557,8 @@ function render(data){
     $("score1").closest(".scorebox").style.visibility = "visible";
     $("score2").closest(".scorebox").style.display = "none";
 
-    $("details1").innerHTML = showBatters(v);
-    $("details2").innerHTML = showBowler(v, data.balls, second?t2.overs:t1.overs);
+    setPlayerDetails($("details1"), showBatters(v));
+    setPlayerDetails($("details2"), showBowler(v, data.balls, second?t2.overs:t1.overs));
 
     // Layout 2: first-innings logos corrected; preserve the working second-innings mapping.
     logo("logo1", v.firstLogo);
