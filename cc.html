@@ -1867,6 +1867,44 @@ html body .overlay.layout2.layout4 > .bottom.visible #bottomText {
   overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important;
 }
 </style>
+<style id="layout4-footer-geometry-authoritative">
+/* Layout 4 only. One coordinate system for the 50px SVG top and 15px footer.
+   The SVG's outer vertical shoulders are x=16 and x=984 in a 1000-unit viewBox. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible,
+html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  position:absolute!important;
+  top:50px!important;bottom:auto!important;
+  left:1.6%!important;right:1.6%!important;
+  width:auto!important;max-width:none!important;
+  margin:0!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
+  flex:0 0 15px!important;
+  padding:0 120px 0 8px!important;
+  box-sizing:border-box!important;
+  clip-path:none!important;-webkit-clip-path:none!important;
+  border-radius:0!important;overflow:hidden!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
+  right:8px!important;max-width:110px!important;
+  font-size:8px!important;white-space:nowrap!important;
+}
+</style>
+<style id="layout4-seamless-merged-footer">
+/* Layout 4 only: visually join the footer to the upper panels at the
+   two shoulder junctions without altering the other layouts. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible,
+html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  top:49px!important;
+  height:16px!important;min-height:16px!important;max-height:16px!important;
+  flex-basis:16px!important;
+  border-top:0!important;
+  background:linear-gradient(90deg,#6e000a 0%,#a30a18 25%,#72000e 50%,#a30a18 75%,#6e000a 100%)!important;
+  box-shadow:none!important;
+  z-index:2!important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
