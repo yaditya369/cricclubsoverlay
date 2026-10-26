@@ -1879,6 +1879,22 @@ html body .overlay.layout2.theme-mh .team.left .scorebox .meta{
 .overlay .ball.six, .overlay.theme-red .ball.six, .overlay.theme-mh .ball.six {background:#16a34a!important;border-color:#86efac!important;color:#fff!important;}
 .overlay .ball.extra, .overlay.theme-red .ball.extra, .overlay.theme-mh .ball.extra {background:#d97706!important;border-color:#fcd34d!important;color:#fff!important;}
 </style>
+
+<style id="layout4-single-center-border-final">
+/* Layout 4: the full-width l4-svg-panels already draws the center border.
+   Suppress only the legacy MH scorebox's second SVG outline and gradient.
+   This rule is intentionally AFTER the legacy MH theme CSS. */
+html body .overlay.layout2.layout4.theme-mh > .top .team.left .scorebox .mh-hex-outline,
+html body .overlay.layout4 > .top .team.left .scorebox .mh-hex-outline {
+  display:none!important;visibility:hidden!important;stroke:none!important;
+}
+html body .overlay.layout2.layout4.theme-mh > .top .team.left .scorebox::before,
+html body .overlay.layout4 > .top .team.left .scorebox::before,
+html body .overlay.layout4 > .top .team.left .scorebox::after {
+  content:none!important;display:none!important;background:none!important;
+}
+/* Center red fill and its single gold border remain on the l4-svg-panels polygon. */
+</style>
 <script>
 const params = new URLSearchParams(location.search);
 const clubId = params.get("clubId") || "22594";
