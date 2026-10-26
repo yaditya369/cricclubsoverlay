@@ -1567,42 +1567,41 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
 </style>
 
 <style id="layout3-golden-svg-section-frames">
-/* Layout 3 only: gold SVG-shaped borders around the complete batting and bowling
-   details areas. The fill is clipped to the interior; outside corners remain clear. */
-.overlay.layout3 { --l3-panel-fill: rgba(115, 9, 25, .94); }
-.overlay.layout3.theme-blue { --l3-panel-fill: rgba(21, 55, 106, .94); }
-.overlay.layout3.theme-red { --l3-panel-fill: rgba(132, 17, 31, .94); }
-.overlay.layout3.theme-graphite { --l3-panel-fill: rgba(33, 38, 47, .94); }
-.overlay.layout3.theme-mh { --l3-panel-fill: rgba(116, 10, 24, .94); }
+/* Layout 3: each complete side (team + players) is one gold outlined SVG panel.
+   The center score stays separate. The surrounding top strip is transparent. */
+.overlay.layout3 { --l3-panel-fill:rgba(115,9,25,.94); }
+.overlay.layout3.theme-blue { --l3-panel-fill:rgba(21,55,106,.94); }
+.overlay.layout3.theme-red { --l3-panel-fill:rgba(132,17,31,.94); }
+.overlay.layout3.theme-graphite { --l3-panel-fill:rgba(33,38,47,.94); }
+.overlay.layout3.theme-mh { --l3-panel-fill:rgba(116,10,24,.94); }
+html body .overlay.layout3:not(.is-prematch) .top {
+ position:relative!important; isolation:isolate!important;
+ background:transparent!important; border:0!important; box-shadow:none!important;
+ overflow:visible!important;
+}
+/* Transparent outside the gold shapes. Each panel spans its team identity + details. */
+.overlay.layout3:not(.is-prematch) .top::before,
+.overlay.layout3:not(.is-prematch) .top::after {
+ content:""; position:absolute;top:0;bottom:0;z-index:0;pointer-events:none;
+ background-color:var(--l3-panel-fill);
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 50' preserveAspectRatio='none'%3E%3Cpath d='M11 1.5 H189 L198.5 25 L189 48.5 H11 L1.5 25 Z' fill='none' stroke='%23FFD700' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+ background-size:100% 100%;background-repeat:no-repeat;
+ clip-path:polygon(11px 0,calc(100% - 11px) 0,100% 50%,calc(100% - 11px) 100%,11px 100%,0 50%);
+}
+/* Match the 5-column grid: team + details / center / details + team. */
+.overlay.layout3:not(.is-prematch) .top::before {left:0;width:42%;}
+.overlay.layout3:not(.is-prematch) .top::after {right:0;width:42%;}
+/* Gold stroke must be outside the clipping surface to remain fully visible. */
+.overlay.layout3:not(.is-prematch) .top .identity,
+.overlay.layout3:not(.is-prematch) .top #details1,
+.overlay.layout3:not(.is-prematch) .top #details2 {
+ position:relative!important;z-index:1!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+}
+.overlay.layout3:not(.is-prematch) .top .scorebox {position:relative!important;z-index:1!important;}
+/* Avoid excessive inset on individual players now that the team is inside the frame. */
 .overlay.layout3:not(.is-prematch) #details1,
-.overlay.layout3:not(.is-prematch) #details2 {
-  position:relative!important;
-  isolation:isolate;
-  background:transparent!important;
-  border:0!important;
-  box-sizing:border-box!important;
-}
-/* Color is applied only to the polygon's interior. */
-.overlay.layout3:not(.is-prematch) #details1::before,
-.overlay.layout3:not(.is-prematch) #details2::before {
-  content:"";position:absolute;inset:1px;z-index:-1;pointer-events:none;
-  background:var(--l3-panel-fill);
-  clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);
-}
-/* SVG stroke has no fill, so it cannot tint anything outside the outline. */
-.overlay.layout3:not(.is-prematch) #details1::after,
-.overlay.layout3:not(.is-prematch) #details2::after {
-  content:"";position:absolute;inset:1px;z-index:2;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 50' preserveAspectRatio='none'%3E%3Cpath d='M11 1.5 H189 L198.5 25 L189 48.5 H11 L1.5 25 Z' fill='none' stroke='%23FFD700' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
-  background-size:100% 100%;background-repeat:no-repeat;
-}
-/* Reserve a small safe area inside the angular ends without changing the grid. */
-.overlay.layout3:not(.is-prematch) #details1 {padding-left:12px!important;padding-right:12px!important;}
-.overlay.layout3:not(.is-prematch) #details2 {padding-left:12px!important;padding-right:12px!important;}
-@media(max-width:650px){
- .overlay.layout3:not(.is-prematch) #details1,
- .overlay.layout3:not(.is-prematch) #details2 {padding-left:9px!important;padding-right:9px!important;}
-}
+.overlay.layout3:not(.is-prematch) #details2 {padding-left:3px!important;padding-right:3px!important;}
 </style>
 </head>
 <body>
