@@ -1479,27 +1479,49 @@ html body .overlay .top .this-over-label .ball-label { color:#ffffff !important;
 html body .overlay .top .balls > .ball {font-weight:900!important;}
 </style>
 <style id="layout3-batting">
-/* Layout 3: broadcast-style horizontal batter portraits; layout 1/2 untouched. */
-html body .overlay.layout3:not(.is-prematch) > .top {
-  grid-template-columns: clamp(75px,8vw,115px) minmax(220px,2fr) clamp(125px,15vw,195px) minmax(110px,1fr) clamp(75px,8vw,115px);
+/* Layout 3 inherits the EXACT Layout 2 grid, score, bowling, theme and footer.
+   Only the existing batting details cell changes. */
+.overlay.layout3:not(.is-prematch) #details1 {
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:4px !important;
+  padding:2px 5px !important;
+  min-width:0 !important;
+  overflow:hidden !important;
 }
-html body .overlay.layout3:not(.is-prematch) #details1 {
-  display:flex;flex-direction:row;align-items:stretch;gap:4px;padding:1px 5px!important;min-width:0;
+.overlay.layout3 #details1 .l3-batter {
+  display:flex;align-items:center;flex:1 1 0;min-width:0;height:100%;
+  gap:4px;overflow:hidden;border-radius:2px;background:rgba(255,255,255,.10);
 }
-.layout3 .l3-batter {display:flex;align-items:center;flex:1 1 0;min-width:0;gap:5px;overflow:hidden;background:rgba(255,255,255,.12);border-radius:3px;}
-.layout3 .l3-portrait {position:relative;flex:0 0 34px;width:34px;height:40px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(255,255,255,.15);}
-.layout3 .l3-portrait img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;z-index:1;}
-.layout3 .l3-initial {font-size:16px;font-weight:800;color:#fff;}
-.layout3 .l3-batter-info {display:flex;flex-direction:column;justify-content:center;min-width:0;gap:2px;}
-.layout3 .l3-batter-name {font-size:11px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.layout3 .l3-batter-score {font-size:12px;line-height:1.1;white-space:nowrap;font-weight:800;}
-.layout3 .l3-batter-score small {font-size:10px;font-weight:600;}
+.overlay.layout3 #details1 .l3-portrait {
+  position:relative;display:flex;align-items:center;justify-content:center;
+  flex:0 0 30px;width:30px;height:40px;overflow:hidden;
+  background:rgba(255,255,255,.12);
+}
+.overlay.layout3 #details1 .l3-portrait img {
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  object-position:center 20%;z-index:1;
+}
+.overlay.layout3 #details1 .l3-initial {font-size:15px;font-weight:800;color:#fff;}
+.overlay.layout3 #details1 .l3-batter-info {
+  display:flex;flex-direction:column;justify-content:center;
+  min-width:0;flex:1;gap:2px;
+}
+.overlay.layout3 #details1 .l3-batter-name {
+  font-size:clamp(9px,.83vw,12px);font-weight:800;line-height:1.1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.overlay.layout3 #details1 .l3-batter-score {
+  font-size:clamp(10px,1vw,14px);font-weight:800;line-height:1.1;white-space:nowrap;
+}
+.overlay.layout3 #details1 .l3-batter-score small {font-size:.82em;font-weight:600;}
 @media(max-width:650px){
- html body .overlay.layout3:not(.is-prematch) > .top {grid-template-columns:48px minmax(130px,2fr) 88px minmax(65px,1fr) 48px;}
- .layout3 .l3-portrait {flex-basis:24px;width:24px;height:38px;}
- .layout3 .l3-batter {gap:2px;}
- .layout3 .l3-batter-name {font-size:9px;}
- .layout3 .l3-batter-score {font-size:10px;}
+  .overlay.layout3 #details1 {gap:2px!important;padding:1px 2px!important;}
+  .overlay.layout3 #details1 .l3-batter {gap:2px;}
+  .overlay.layout3 #details1 .l3-portrait {flex-basis:20px;width:20px;height:32px;}
+  .overlay.layout3 #details1 .l3-batter-name {font-size:8px;}
+  .overlay.layout3 #details1 .l3-batter-score {font-size:9px;}
 }
 </style>
 </head>
