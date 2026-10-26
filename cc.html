@@ -1504,6 +1504,9 @@ body.theme-red-active #finalMatchResult .mr-result {color:#ffe09a}
 
 
 /* Marvel theme matched to supplied CricBay cb.html. */
+.overlay.theme-marvel .logo {border-radius:50% !important;object-fit:contain !important;background:#fff !important;border:1px solid rgba(255,255,255,.9) !important;}
+.overlay.layout2.theme-marvel .logo {width:28px !important;height:28px !important;}
+.overlay.theme-marvel .prematch-logo {border-radius:50% !important;object-fit:contain !important;background:#fff !important;}
 .overlay.theme-marvel {color:#fff !important;}
 .overlay.theme-marvel .top,.overlay.theme-marvel .prematch-template {background:rgba(237,29,36,var(--overlay-opacity,.70)) !important;color:#fff !important;}
 .overlay.theme-marvel .bottom,.overlay.theme-marvel .bottom.visible {background:rgba(170,9,17,var(--overlay-opacity,.70)) !important;color:#fff !important;border-top-color:#ffffff99 !important;}
@@ -1546,7 +1549,7 @@ document.documentElement.style.setProperty(
 const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
 const overlayLayout = requestedLayout === "2" ? "2" : "1";
 const requestedTheme = (params.get("theme") || "blue").trim().toLowerCase();
-const overlayTheme = ["blue", "graphite", "red", "mh", "moneyheist"].includes(requestedTheme) ? requestedTheme : "graphite";
+const overlayTheme = ["blue", "graphite", "red", "marvel"].includes(requestedTheme) ? requestedTheme : "graphite";
 document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
 document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
