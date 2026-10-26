@@ -1962,7 +1962,16 @@ function observeNativeMatchState(data,v,second,t1,t2,preMatch,onBreak,isFinished
     result:String(textField(data,v,["result","matchResult"])||"")};
   const old=previousMatchSnapshot;
   previousMatchSnapshot=snap;
-  if (!old) return; // Never replay historic events on initial page load.
+  if (!old) {
+    // An active innings break is actionable even if the WebView loaded mid-break.
+    // The event key prevents duplicate delivery during this page session.
+    if(onBreak) emitNativeEvent("INNINGS_BREAK",{
+      innings:1,over:String(t1.overs),score:String(t1.total),
+      wickets:Number(t1.wickets),battingTeam:String(t1.name||""),
+      target:Number(t1.total)+1
+    },"INNINGS_BREAK");
+    return; // Do not replay other historical events on initial page load.
+  }
   const base={innings,over:String(t.overs),score:String(t.total),
     wickets:Number(t.wickets),battingTeam:String(t.name||"")};
   if(toss && toss !== old.toss) {
@@ -1976,8 +1985,14 @@ function observeNativeMatchState(data,v,second,t1,t2,preMatch,onBreak,isFinished
   }
   if(old.preMatch && !preMatch)
     emitNativeEvent("MATCH_STARTED",base,"MATCH_STARTED");
-  if(!old.onBreak && onBreak)
-    emitNativeEvent("INNINGS_BREAK",{...base,innings:1,target:Number(t1.total)+1},"INNINGS_BREAK");
+  // Emit at the first detected end-of-first-innings boundary. Some CricClubs
+  // updates jump directly from innings one to innings two between polls.
+  if((!old.onBreak && onBreak) || (!old.second && second))
+    emitNativeEvent("INNINGS_BREAK",{
+      innings:1,over:String(t1.overs),score:String(t1.total),
+      wickets:Number(t1.wickets),battingTeam:String(t1.name||""),
+      target:Number(t1.total)+1
+    },"INNINGS_BREAK");
   if(!old.second && second)
     emitNativeEvent("INNINGS_STARTED",{...base,innings:2,target:Number(t1.total)+1},"INNINGS_STARTED_2");
   if(!old.isFinished && isFinished)
