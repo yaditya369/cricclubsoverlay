@@ -1473,6 +1473,11 @@ html body .overlay.layout2.is-prematch > #prematchTemplate:not([hidden]) {height
 /* Keep THIS OVER white in every theme and both layouts. */
 html body .overlay .top .this-over-label .ball-label { color:#ffffff !important; }
 </style>
+
+<style id="bold-this-over-deliveries">
+/* Bold delivery values in THIS OVER, across themes and layouts. */
+html body .overlay .top .balls > .ball {font-weight:900!important;}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1659,8 +1664,8 @@ document.documentElement.style.setProperty(
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
 const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
 const overlayLayout = requestedLayout === "2" ? "2" : "1";
-const requestedTheme = (params.get("theme") || "blue").trim().toLowerCase();
-const overlayTheme = ["blue", "graphite", "red", "mh"].includes(requestedTheme) ? requestedTheme : "graphite";
+const requestedTheme = (params.get("theme") || "mh").trim().toLowerCase();
+const overlayTheme = ["blue", "graphite", "red", "mh"].includes(requestedTheme) ? requestedTheme : "mh";
 document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
 document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
