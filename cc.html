@@ -1792,6 +1792,81 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
   -webkit-clip-path:inset(0 1.6% 0 1.6%)!important;
 }
 </style>
+
+<style id="layout4-highlight-all-delivery-events">
+/* Layout 4 only: distinct high-contrast indicators for wickets, boundaries and extras. */
+html body .overlay.layout4 .balls .ball {
+  font-weight:800!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+}
+html body .overlay.layout4 .balls .ball.wicket {
+  background:#e53935!important;color:#fff!important;
+  border:2px solid #ffd700!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 0 3px rgba(255,215,0,.5)!important;
+}
+html body .overlay.layout4 .balls .ball.boundary:not(.six) {
+  background:#2563eb!important;color:#fff!important;
+  border:2px solid #a8d5ff!important;
+}
+html body .overlay.layout4 .balls .ball.six {
+  background:#138a3d!important;color:#fff!important;
+  border:2px solid #a5ffb9!important;
+}
+html body .overlay.layout4 .balls .ball.extra {
+  background:#f59e0b!important;color:#1d1300!important;
+  border:2px solid #ffe28a!important;
+}
+</style>
+
+<style id="layout4-delivery-center-alignment-fix">
+/* Layout 4 only: normalize glyph alignment regardless of delivery type/border. */
+html body .overlay.layout4 .top .balls > .ball {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  vertical-align:middle!important;
+  line-height:1!important;
+  padding:0 2px!important;
+  margin:0!important;
+  min-width:18px!important;
+  height:18px!important;
+  min-height:18px!important;
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html body .overlay.layout4 .top .balls {
+  display:flex!important;
+  align-items:center!important;
+}
+</style>
+
+<style id="layout4-powered-credit-visibility-fix">
+/* Layout 4 only: keep the credit fully inside the 15px footer and its SVG shoulders. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible,
+html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  position:absolute!important; top:50px!important; bottom:auto!important;
+  left:1.6%!important; right:1.6%!important; width:96.8%!important;
+  max-width:96.8%!important; margin:0!important;
+  padding:0 120px 0 8px!important; box-sizing:border-box!important;
+  clip-path:none!important; -webkit-clip-path:none!important;
+  overflow:hidden!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
+  position:absolute!important; right:9px!important; left:auto!important;
+  top:50%!important; transform:translateY(-50%)!important;
+  margin:0!important; padding:0!important;
+  font-size:8px!important; letter-spacing:0!important; line-height:12px!important;
+  white-space:nowrap!important; overflow:visible!important;
+  width:max-content!important; max-width:115px!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible #bottomText {
+  display:block!important; min-width:0!important; max-width:100%!important;
+  overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1811,11 +1886,17 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
       <stop offset="75%"  stop-color="var(--l4-grad-late,#c30816)" stop-opacity="var(--overlay-opacity,.8)"/>
       <stop offset="100%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
     </linearGradient>
+    <!-- Layout 4 center only: darker vertical MH-style gradient, like Layout 3. -->
+    <linearGradient id="l4-center-dark-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8b0b1b" stop-opacity=".97"/>
+      <stop offset="48%" stop-color="#66000e" stop-opacity=".97"/>
+      <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
+    </linearGradient>
   </defs>
   <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="16,2 409,2 425,50 409,98 16,98 1,50"/>
-    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"/>
-    <polygon points="591,2 984,2 999,50 984,98 591,98 575,50"/>
+    <polygon points="16,2 409,2 425,50 409,98 16,98 1,50" stroke="none"/>
+    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50" fill="url(#l4-center-dark-gradient)"/>
+    <polygon points="591,2 984,2 999,50 984,98 591,98 575,50" stroke="none"/>
   </g>
 </svg>
     <section class="team left">
