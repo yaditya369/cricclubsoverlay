@@ -1395,7 +1395,7 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 /* Preserve prematch header and footer behavior without allowing old min-heights. */
 .overlay.layout2.is-prematch > #prematchTemplate:not([hidden]) {height:40px!important;min-height:40px!important;max-height:40px!important;box-sizing:border-box!important;overflow:hidden!important;}
 </style>
-<style id="marvel-hard-55px-height-fix">
+<style id="mh-hard-55px-height-fix">
 /* Final cascade override: actual combined overlay box is 55px, including footer. */
 html body .overlay.layout2 {
   position:fixed!important;top:auto!important;bottom:0!important;
@@ -1420,11 +1420,11 @@ html body .overlay.layout2 .team-name {font-size:8px!important;line-height:9px!i
 html body .overlay.layout2 .prematch-emblem {width:29px!important;height:29px!important;}
 html body .overlay.layout2 .prematch-logo {width:27px!important;height:27px!important;border-radius:50%!important;}
 </style>
-<style id="marvel-gradient-actual">
+<style id="mh-gradient-actual">
 /* True Marvel gradient: override flat red background in both overlay rows. */
-html body .overlay.theme-marvel .top,
-html body .overlay.layout2.theme-marvel .top,
-html body .overlay.theme-marvel .prematch-template {
+html body .overlay.theme-mh .top,
+html body .overlay.layout2.theme-mh .top,
+html body .overlay.theme-mh .prematch-template {
  background:linear-gradient(110deg,
  rgba(112,0,12,var(--overlay-opacity,.8)) 0%,
  rgba(224,14,30,var(--overlay-opacity,.8)) 27%,
@@ -1433,15 +1433,28 @@ html body .overlay.theme-marvel .prematch-template {
  rgba(103,0,12,var(--overlay-opacity,.8)) 100%) !important;
  background-color:transparent!important;
 }
-html body .overlay.theme-marvel .bottom,
-html body .overlay.theme-marvel .bottom.visible {
+html body .overlay.theme-mh .bottom,
+html body .overlay.theme-mh .bottom.visible {
  background:linear-gradient(90deg,
  rgba(79,0,8,var(--overlay-opacity,.8)),
  rgba(171,8,22,var(--overlay-opacity,.8)) 50%,
  rgba(75,0,8,var(--overlay-opacity,.8))) !important;
  background-color:transparent!important;
 }
-</style></head>
+</style>
+<style id="mh-gold-center-panel">
+/* MH-only gold-framed central score. Preserve existing sizing and layout. */
+html body .overlay.layout2.theme-mh .top .team.left .scorebox {
+ background:linear-gradient(145deg,rgba(54,0,12,.94),rgba(111,8,24,.90) 52%,rgba(43,0,9,.96)) !important;
+ border:1.5px solid #d8ae5b !important;
+ border-radius:7px !important;
+ box-shadow:inset 0 0 0 1px rgba(255,225,149,.22),0 0 6px rgba(228,178,72,.24) !important;
+ box-sizing:border-box !important;
+}
+html body .overlay.layout2.theme-mh .top .team.left .scorebox .score {color:#fff !important;}
+html body .overlay.layout2.theme-mh .top .team.left .scorebox .meta {color:#f5dfaa !important;}
+</style>
+</head>
 <body>
 <div class="overlay">
   <div class="prematch-template" id="prematchTemplate" hidden>
@@ -1551,25 +1564,25 @@ body.theme-red-active #finalMatchResult .mr-result {color:#ffe09a}
 
 
 /* Marvel theme matched to supplied CricBay cb.html. */
-.overlay.theme-marvel .logo {border-radius:50% !important;object-fit:contain !important;background:#fff !important;border:1px solid rgba(255,255,255,.9) !important;}
-.overlay.layout2.theme-marvel .logo {width:28px !important;height:28px !important;}
-.overlay.theme-marvel .prematch-logo {border-radius:50% !important;object-fit:contain !important;background:#fff !important;}
-.overlay.theme-marvel {color:#fff !important;}
-.overlay.theme-marvel .top,.overlay.theme-marvel .prematch-template {
+.overlay.theme-mh .logo {border-radius:50% !important;object-fit:contain !important;background:#fff !important;border:1px solid rgba(255,255,255,.9) !important;}
+.overlay.layout2.theme-mh .logo {width:28px !important;height:28px !important;}
+.overlay.theme-mh .prematch-logo {border-radius:50% !important;object-fit:contain !important;background:#fff !important;}
+.overlay.theme-mh {color:#fff !important;}
+.overlay.theme-mh .top,.overlay.theme-mh .prematch-template {
 background:linear-gradient(105deg,rgba(110,0,10,var(--overlay-opacity,.70)) 0%,rgba(230,12,28,var(--overlay-opacity,.70)) 26%,rgba(245,30,42,var(--overlay-opacity,.70)) 50%,rgba(195,8,22,var(--overlay-opacity,.70)) 75%,rgba(103,0,10,var(--overlay-opacity,.70)) 100%) !important;color:#fff !important;}
-.overlay.theme-marvel .bottom,.overlay.theme-marvel .bottom.visible {background:linear-gradient(90deg,rgba(65,0,7,var(--overlay-opacity,.70)),rgba(169,7,21,var(--overlay-opacity,.70)) 50%,rgba(65,0,7,var(--overlay-opacity,.70))) !important;color:#fff !important;border-top-color:#ffffff99 !important;}
-.overlay.theme-marvel .team-name,.overlay.theme-marvel .prematch-team-name,.overlay.theme-marvel .score,.overlay.theme-marvel .meta,.overlay.theme-marvel .bowler-meta,.overlay.theme-marvel .prematch-side {color:#fff !important;}
-.overlay.theme-marvel .scorebox,.overlay.theme-marvel .team.left .scorebox {background:rgba(60,0,4,.24) !important;border-color:#ffffff99 !important;}
-.overlay.theme-marvel .identity,.overlay.theme-marvel #details1,.overlay.theme-marvel #details2,.overlay.theme-marvel .team.right .identity {border-color:#ffffff99 !important;}
-.overlay.theme-marvel .ball {border-color:#ffffffcc !important;font-weight:900 !important;}
-.overlay.theme-marvel .ball.wicket {background:#161616 !important;color:#fff !important;border-color:#fff !important;}
-.overlay.theme-marvel .ball.boundary {background:#ffe66b !important;color:#171717 !important;border-color:#ffe66b !important;}
-.overlay.theme-marvel .ball.six {background:#00c853 !important;color:#fff !important;border-color:#00c853 !important;}
-body.theme-marvel-active #overSummary,body.theme-marvel-active #finalMatchResult {background:rgba(133,8,17,.97) !important;border:1px solid #ffb5b8 !important;color:#fff !important;}
-body.theme-marvel-active #overSummary .os-head,body.theme-marvel-active #overSummary .os-foot,body.theme-marvel-active #fullInningsBreak .ib-header,body.theme-marvel-active #fullInningsBreak .ib-foot {background:#b70d19 !important;color:#fff !important;}
-body.theme-marvel-active #overSummary .os-panel,body.theme-marvel-active #fullInningsBreak .ib-panel {background:#850811 !important;color:#fff !important;}
-body.theme-marvel-active #overSummary .os-panel h3,body.theme-marvel-active #finalMatchResult .mr-result {color:#ffe66b !important;}
-body.theme-marvel-active #fullInningsBreak {border-color:#ffb5b8 !important;}
+.overlay.theme-mh .bottom,.overlay.theme-mh .bottom.visible {background:linear-gradient(90deg,rgba(65,0,7,var(--overlay-opacity,.70)),rgba(169,7,21,var(--overlay-opacity,.70)) 50%,rgba(65,0,7,var(--overlay-opacity,.70))) !important;color:#fff !important;border-top-color:#ffffff99 !important;}
+.overlay.theme-mh .team-name,.overlay.theme-mh .prematch-team-name,.overlay.theme-mh .score,.overlay.theme-mh .meta,.overlay.theme-mh .bowler-meta,.overlay.theme-mh .prematch-side {color:#fff !important;}
+.overlay.theme-mh .scorebox,.overlay.theme-mh .team.left .scorebox {background:rgba(60,0,4,.24) !important;border-color:#ffffff99 !important;}
+.overlay.theme-mh .identity,.overlay.theme-mh #details1,.overlay.theme-mh #details2,.overlay.theme-mh .team.right .identity {border-color:#ffffff99 !important;}
+.overlay.theme-mh .ball {border-color:#ffffffcc !important;font-weight:900 !important;}
+.overlay.theme-mh .ball.wicket {background:#161616 !important;color:#fff !important;border-color:#fff !important;}
+.overlay.theme-mh .ball.boundary {background:#ffe66b !important;color:#171717 !important;border-color:#ffe66b !important;}
+.overlay.theme-mh .ball.six {background:#00c853 !important;color:#fff !important;border-color:#00c853 !important;}
+body.theme-mh-active #overSummary,body.theme-mh-active #finalMatchResult {background:rgba(133,8,17,.97) !important;border:1px solid #ffb5b8 !important;color:#fff !important;}
+body.theme-mh-active #overSummary .os-head,body.theme-mh-active #overSummary .os-foot,body.theme-mh-active #fullInningsBreak .ib-header,body.theme-mh-active #fullInningsBreak .ib-foot {background:#b70d19 !important;color:#fff !important;}
+body.theme-mh-active #overSummary .os-panel,body.theme-mh-active #fullInningsBreak .ib-panel {background:#850811 !important;color:#fff !important;}
+body.theme-mh-active #overSummary .os-panel h3,body.theme-mh-active #finalMatchResult .mr-result {color:#ffe66b !important;}
+body.theme-mh-active #fullInningsBreak {border-color:#ffb5b8 !important;}
 </style>
 <script>
 const params = new URLSearchParams(location.search);
@@ -1597,14 +1610,14 @@ document.documentElement.style.setProperty(
 const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
 const overlayLayout = requestedLayout === "2" ? "2" : "1";
 const requestedTheme = (params.get("theme") || "blue").trim().toLowerCase();
-const overlayTheme = ["blue", "graphite", "red", "marvel"].includes(requestedTheme) ? requestedTheme : "graphite";
+const overlayTheme = ["blue", "graphite", "red", "mh"].includes(requestedTheme) ? requestedTheme : "graphite";
 document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
 document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
 document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
-document.querySelector(".overlay").classList.toggle("theme-marvel", overlayTheme === "marvel");
+document.querySelector(".overlay").classList.toggle("theme-mh", overlayTheme === "mh");
 document.body.classList.toggle("theme-red-active", overlayTheme === "red");
-document.body.classList.toggle("theme-marvel-active", overlayTheme === "marvel");
+document.body.classList.toggle("theme-mh-active", overlayTheme === "mh");
 document.body.classList.toggle("theme-blue-active", overlayTheme === "blue");
 document.body.classList.toggle("theme-graphite-active", overlayTheme === "graphite");
 
