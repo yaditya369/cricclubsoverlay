@@ -1394,7 +1394,53 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 /* Preserve prematch header and footer behavior without allowing old min-heights. */
 .overlay.layout2.is-prematch > #prematchTemplate:not([hidden]) {height:40px!important;min-height:40px!important;max-height:40px!important;box-sizing:border-box!important;overflow:hidden!important;}
 </style>
-</head>
+<style id="marvel-hard-55px-height-fix">
+/* Final cascade override: actual combined overlay box is 55px, including footer. */
+html body .overlay.layout2 {
+  position:fixed!important;top:auto!important;bottom:0!important;
+  height:55px!important;min-height:55px!important;max-height:55px!important;
+  display:flex!important;flex-direction:column!important;
+  padding:0!important;margin:0!important;border:0!important;overflow:hidden!important;
+}
+html body .overlay.layout2 > .top,
+html body .overlay.layout2 > .prematch-template:not([hidden]) {
+  flex:0 0 40px!important;height:40px!important;min-height:40px!important;max-height:40px!important;
+  padding:0!important;margin:0!important;overflow:hidden!important;
+}
+html body .overlay.layout2 > .bottom.visible {
+  flex:0 0 15px!important;height:15px!important;min-height:15px!important;max-height:15px!important;
+  padding:0 8px!important;margin:0!important;overflow:hidden!important;
+  line-height:14px!important;font-size:10px!important;
+}
+html body .overlay.layout2 > .bottom:not(.visible){display:none!important;height:0!important;min-height:0!important;}
+html body .overlay.layout2 .logo {width:25px!important;height:25px!important;max-height:25px!important;border-radius:50%!important;}
+html body .overlay.layout2 .identity {padding:0 3px!important;gap:1px!important;}
+html body .overlay.layout2 .team-name {font-size:8px!important;line-height:9px!important;}
+html body .overlay.layout2 .prematch-emblem {width:29px!important;height:29px!important;}
+html body .overlay.layout2 .prematch-logo {width:27px!important;height:27px!important;border-radius:50%!important;}
+</style>
+<style id="marvel-gradient-actual">
+/* True Marvel gradient: override flat red background in both overlay rows. */
+html body .overlay.theme-marvel .top,
+html body .overlay.layout2.theme-marvel .top,
+html body .overlay.theme-marvel .prematch-template {
+ background:linear-gradient(110deg,
+ rgba(112,0,12,var(--overlay-opacity,.8)) 0%,
+ rgba(224,14,30,var(--overlay-opacity,.8)) 27%,
+ rgba(245,29,39,var(--overlay-opacity,.8)) 52%,
+ rgba(187,8,22,var(--overlay-opacity,.8)) 76%,
+ rgba(103,0,12,var(--overlay-opacity,.8)) 100%) !important;
+ background-color:transparent!important;
+}
+html body .overlay.theme-marvel .bottom,
+html body .overlay.theme-marvel .bottom.visible {
+ background:linear-gradient(90deg,
+ rgba(79,0,8,var(--overlay-opacity,.8)),
+ rgba(171,8,22,var(--overlay-opacity,.8)) 50%,
+ rgba(75,0,8,var(--overlay-opacity,.8))) !important;
+ background-color:transparent!important;
+}
+</style></head>
 <body>
 <div class="overlay">
   <div class="prematch-template" id="prematchTemplate" hidden>
@@ -1755,7 +1801,7 @@ function showBowler(v,balls,inningsOvers){
     else if(/^W$/i.test(x)) cls+=' wicket';
     else if(x==='6') cls+=' boundary six';
     else if(x==='4') cls+=' boundary';
-    return `<span class="${cls}" title="${escapeHTML(x)}">${escapeHTML(extra?extra.label:x)}</span>`;
+    return `<span class="${cls}" title="${escapeHTML(x)}">${cls.includes("dot-ball") ? "" : escapeHTML(extra?extra.label:x)}</span>`;
   }).join('');
   if (!bowler) return "";
   return `
