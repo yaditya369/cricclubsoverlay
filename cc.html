@@ -1460,6 +1460,14 @@ html body .overlay.layout2:not(.is-prematch) > .top .player-score {
   font-weight:700!important;
 }
 </style>
+
+<style id="layout2-45px-top-override">
+/* 45px top + unchanged 15px footer = 60px total; applies only to layout 2. */
+html body .overlay.layout2 {height:60px!important;min-height:60px!important;max-height:60px!important;}
+html body .overlay.layout2 > .top,
+html body .overlay.layout2 > .prematch-template:not([hidden]) {flex:0 0 45px!important;height:45px!important;min-height:45px!important;max-height:45px!important;}
+html body .overlay.layout2.is-prematch > #prematchTemplate:not([hidden]) {height:45px!important;min-height:45px!important;max-height:45px!important;}
+</style>
 </head>
 <body>
 <div class="overlay">
