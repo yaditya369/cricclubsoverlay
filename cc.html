@@ -1182,13 +1182,14 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 .overlay .ball.dot-ball::after {
   content: "";
   display: block;
-  width: 7px;
-  height: 7px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: currentColor;
-  flex: 0 0 7px;
+  flex: 0 0 11px;
 }
 
+.overlay .ball.dot-ball::before {content:none!important;display:none!important;}
 /* Landscape repair: the two-line THIS OVER label must not be clipped by
    the older fixed 19px delivery-row height. Keep the scoreboard size. */
 .overlay.layout2 .top .balls {
@@ -1554,8 +1555,9 @@ body.theme-red-active #finalMatchResult .mr-result {color:#ffe09a}
 .overlay.layout2.theme-marvel .logo {width:28px !important;height:28px !important;}
 .overlay.theme-marvel .prematch-logo {border-radius:50% !important;object-fit:contain !important;background:#fff !important;}
 .overlay.theme-marvel {color:#fff !important;}
-.overlay.theme-marvel .top,.overlay.theme-marvel .prematch-template {background:rgba(237,29,36,var(--overlay-opacity,.70)) !important;color:#fff !important;}
-.overlay.theme-marvel .bottom,.overlay.theme-marvel .bottom.visible {background:rgba(170,9,17,var(--overlay-opacity,.70)) !important;color:#fff !important;border-top-color:#ffffff99 !important;}
+.overlay.theme-marvel .top,.overlay.theme-marvel .prematch-template {
+background:linear-gradient(105deg,rgba(110,0,10,var(--overlay-opacity,.70)) 0%,rgba(230,12,28,var(--overlay-opacity,.70)) 26%,rgba(245,30,42,var(--overlay-opacity,.70)) 50%,rgba(195,8,22,var(--overlay-opacity,.70)) 75%,rgba(103,0,10,var(--overlay-opacity,.70)) 100%) !important;color:#fff !important;}
+.overlay.theme-marvel .bottom,.overlay.theme-marvel .bottom.visible {background:linear-gradient(90deg,rgba(65,0,7,var(--overlay-opacity,.70)),rgba(169,7,21,var(--overlay-opacity,.70)) 50%,rgba(65,0,7,var(--overlay-opacity,.70))) !important;color:#fff !important;border-top-color:#ffffff99 !important;}
 .overlay.theme-marvel .team-name,.overlay.theme-marvel .prematch-team-name,.overlay.theme-marvel .score,.overlay.theme-marvel .meta,.overlay.theme-marvel .bowler-meta,.overlay.theme-marvel .prematch-side {color:#fff !important;}
 .overlay.theme-marvel .scorebox,.overlay.theme-marvel .team.left .scorebox {background:rgba(60,0,4,.24) !important;border-color:#ffffff99 !important;}
 .overlay.theme-marvel .identity,.overlay.theme-marvel #details1,.overlay.theme-marvel #details2,.overlay.theme-marvel .team.right .identity {border-color:#ffffff99 !important;}
