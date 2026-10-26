@@ -1442,6 +1442,15 @@ html body .overlay.theme-mh .bottom.visible {
  background-color:transparent!important;
 }
 </style>
+
+<style id="player-name-bold-plus-one-px">
+/* Only batsmen and bowler names: 11px -> 12px, regular -> bold. */
+html body .overlay.layout2:not(.is-prematch) > .top .player-name,
+html body .overlay.layout2:not(.is-prematch) > .top .bowler-name {
+  font-size:12px!important;
+  font-weight:700!important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
