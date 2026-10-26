@@ -1508,6 +1508,9 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
   display:flex;flex-direction:column;justify-content:center;
   min-width:0;flex:1;gap:2px;
 }
+.overlay.layout3 #details1 .l3-batter-heading {display:flex;align-items:center;min-width:0;width:100%;gap:2px;}
+.overlay.layout3 #details1 .l3-batter-heading .l3-batter-name {display:block;flex:0 1 auto;min-width:0;}
+.overlay.layout3 #details1 .l3-batter-heading .l3-strike {display:inline-block;flex:0 0 auto;margin-left:0;position:static;top:auto;font-size:12px;color:#ffd45c;line-height:1;}
 .overlay.layout3 #details1 .l3-batter-name {
   font-size:clamp(9px,.83vw,12px);font-weight:800;line-height:1.1;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -1561,6 +1564,45 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
 .overlay.layout3 #details2 .l3-bowler-block .this-over-label {height:18px!important;min-height:18px!important;margin-right:2px!important;}
 .overlay.layout3 #details2 .l3-bowler-block .ball {height:16px!important;min-width:16px!important;font-size:9px!important;padding:0 2px!important;}
 @media(max-width:650px){.overlay.layout3 #details2 .l3-bowler-block {grid-template-columns:24px minmax(0,1fr);column-gap:3px;}.overlay.layout3 #details2 .l3-bowler-block .l3-bowler-portrait {width:24px;height:35px;}}
+</style>
+
+<style id="layout3-golden-svg-section-frames">
+/* Layout 3 only: gold SVG-shaped borders around the complete batting and bowling
+   details areas. The fill is clipped to the interior; outside corners remain clear. */
+.overlay.layout3 { --l3-panel-fill: rgba(115, 9, 25, .94); }
+.overlay.layout3.theme-blue { --l3-panel-fill: rgba(21, 55, 106, .94); }
+.overlay.layout3.theme-red { --l3-panel-fill: rgba(132, 17, 31, .94); }
+.overlay.layout3.theme-graphite { --l3-panel-fill: rgba(33, 38, 47, .94); }
+.overlay.layout3.theme-mh { --l3-panel-fill: rgba(116, 10, 24, .94); }
+.overlay.layout3:not(.is-prematch) #details1,
+.overlay.layout3:not(.is-prematch) #details2 {
+  position:relative!important;
+  isolation:isolate;
+  background:transparent!important;
+  border:0!important;
+  box-sizing:border-box!important;
+}
+/* Color is applied only to the polygon's interior. */
+.overlay.layout3:not(.is-prematch) #details1::before,
+.overlay.layout3:not(.is-prematch) #details2::before {
+  content:"";position:absolute;inset:1px;z-index:-1;pointer-events:none;
+  background:var(--l3-panel-fill);
+  clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);
+}
+/* SVG stroke has no fill, so it cannot tint anything outside the outline. */
+.overlay.layout3:not(.is-prematch) #details1::after,
+.overlay.layout3:not(.is-prematch) #details2::after {
+  content:"";position:absolute;inset:1px;z-index:2;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 50' preserveAspectRatio='none'%3E%3Cpath d='M11 1.5 H189 L198.5 25 L189 48.5 H11 L1.5 25 Z' fill='none' stroke='%23FFD700' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  background-size:100% 100%;background-repeat:no-repeat;
+}
+/* Reserve a small safe area inside the angular ends without changing the grid. */
+.overlay.layout3:not(.is-prematch) #details1 {padding-left:12px!important;padding-right:12px!important;}
+.overlay.layout3:not(.is-prematch) #details2 {padding-left:12px!important;padding-right:12px!important;}
+@media(max-width:650px){
+ .overlay.layout3:not(.is-prematch) #details1,
+ .overlay.layout3:not(.is-prematch) #details2 {padding-left:9px!important;padding-right:9px!important;}
+}
 </style>
 </head>
 <body>
@@ -1897,7 +1939,7 @@ function showBattersLayout3(v) {
     const fallback = escapeHTML(name.slice(0,1).toUpperCase());
     return `<div class="l3-batter">
       <div class="l3-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none'">` : ''}<span class="l3-initial">${fallback}</span></div>
-      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${n===1?' ★':''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
+      <div class="l3-batter-info"><div class="l3-batter-heading"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}</span>${n===1?'<span class="strike-indicator l3-strike" title="On strike" aria-label="On strike">★</span>':''}</div><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
     </div>`;
   }).join("");
 }
