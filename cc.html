@@ -1725,6 +1725,54 @@ html body .overlay.layout4 #details1 .l3-batter-name .l4-strike-star {
   display:inline!important; margin-right:3px; text-shadow:0 0 2px #3b2200;
 }
 </style>
+<style id="layout4-svg-gradient-theme-colors">
+/* Layout 4 only: match Layout 2's rich MH gradient inside each SVG panel. */
+.overlay.layout4.theme-mh {--l4-grad-edge:#6e000a;--l4-grad-mid:#e60c1c;--l4-grad-bright:#f51e2a;}
+.overlay.layout4.theme-red {--l4-grad-edge:#580513;--l4-grad-mid:#b71931;--l4-grad-bright:#e53d50;}
+.overlay.layout4.theme-blue {--l4-grad-edge:#092344;--l4-grad-mid:#175aa0;--l4-grad-bright:#2d80cc;}
+.overlay.layout4.theme-graphite {--l4-grad-edge:#15191f;--l4-grad-mid:#39424e;--l4-grad-bright:#566273;}
+</style>
+
+<style id="layout4-footer-strike-final-fix">
+/* Layout 4 only: position the 15px footer between the outer SVG shoulders,
+   not at the screen edges. Explicit absolute positioning avoids inherited
+   Layout 2 width/margin/flex rules in Android WebView. */
+html body .overlay.layout2.layout4:not(.is-prematch) {
+  position:fixed!important; bottom:0!important; height:65px!important;
+  min-height:65px!important;max-height:65px!important;
+  overflow:visible!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  position:absolute!important;
+  top:50px!important;bottom:auto!important;
+  left:1.6%!important;right:1.6%!important;
+  width:auto!important;max-width:none!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
+  margin:0!important;padding:0 8px!important;
+  box-sizing:border-box!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+}
+/* Equal typography regardless of the inherited Layout 2 selectors. */
+html body .overlay.layout2.layout4 #details1 .l3-batter-name,
+html body .overlay.layout2.layout4 #details2 .bowler-name {
+  font-size:12px!important;font-weight:800!important;line-height:1.1!important;
+}
+html body .overlay.layout2.layout4 #details1 .l3-batter-score,
+html body .overlay.layout2.layout4 #details2 .bowler-meta {font-weight:800!important;}
+/* Star next to the striker's runs, not squeezed into the truncated name. */
+html body .overlay.layout2.layout4 #details1 .l4-score-strike-star {
+  display:inline-block!important;
+  margin-left:4px!important;
+  color:#ffd54a!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  vertical-align:baseline!important;
+  text-shadow:0 0 2px #492000;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1735,7 +1783,17 @@ html body .overlay.layout4 #details1 .l3-batter-name .l4-strike-star {
 </div>
 <div class="top">
 <svg class="l4-svg-panels" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
-  <g fill="var(--l4-fill,rgba(138,12,24,.80))" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
+  <defs>
+    <!-- Gradient confined to the three SVG polygons: no rectangular background. -->
+    <linearGradient id="l4-panel-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="26%"  stop-color="var(--l4-grad-mid,#e60c1c)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="50%"  stop-color="var(--l4-grad-bright,#f51e2a)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="75%"  stop-color="var(--l4-grad-mid,#e60c1c)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="100%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
     <polygon points="16,2 409,2 425,50 409,98 16,98 1,50"/>
     <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"/>
     <polygon points="591,2 984,2 999,50 984,98 591,98 575,50"/>
@@ -2098,7 +2156,7 @@ function showBattersLayout3(v) {
     const fallback = escapeHTML(name.slice(0,1).toUpperCase());
     return `<div class="l3-batter">
       <div class="l3-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none'">` : ''}<span class="l3-initial">${fallback}</span></div>
-      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${overlayLayout === "4" && n===1 ? '<span class="l4-strike-star" title="On strike" aria-label="On strike">★</span>' : ''}${escapeHTML(name)}${overlayLayout !== "4" && n===1 ? ' ★' : ''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
+      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${overlayLayout !== "4" && n===1 ? ' ★' : ''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small>${overlayLayout === "4" && n===1 ? '<span class="l4-score-strike-star" title="On strike" aria-label="On strike">★</span>' : ''}</span></div>
     </div>`;
   }).join("");
 }
