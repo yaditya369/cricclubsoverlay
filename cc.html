@@ -1478,6 +1478,30 @@ html body .overlay .top .this-over-label .ball-label { color:#ffffff !important;
 /* Bold delivery values in THIS OVER, across themes and layouts. */
 html body .overlay .top .balls > .ball {font-weight:900!important;}
 </style>
+<style id="layout3-batting">
+/* Layout 3: broadcast-style horizontal batter portraits; layout 1/2 untouched. */
+html body .overlay.layout3:not(.is-prematch) > .top {
+  grid-template-columns: clamp(75px,8vw,115px) minmax(220px,2fr) clamp(125px,15vw,195px) minmax(110px,1fr) clamp(75px,8vw,115px);
+}
+html body .overlay.layout3:not(.is-prematch) #details1 {
+  display:flex;flex-direction:row;align-items:stretch;gap:4px;padding:1px 5px!important;min-width:0;
+}
+.layout3 .l3-batter {display:flex;align-items:center;flex:1 1 0;min-width:0;gap:5px;overflow:hidden;background:rgba(255,255,255,.12);border-radius:3px;}
+.layout3 .l3-portrait {position:relative;flex:0 0 34px;width:34px;height:40px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(255,255,255,.15);}
+.layout3 .l3-portrait img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;z-index:1;}
+.layout3 .l3-initial {font-size:16px;font-weight:800;color:#fff;}
+.layout3 .l3-batter-info {display:flex;flex-direction:column;justify-content:center;min-width:0;gap:2px;}
+.layout3 .l3-batter-name {font-size:11px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.layout3 .l3-batter-score {font-size:12px;line-height:1.1;white-space:nowrap;font-weight:800;}
+.layout3 .l3-batter-score small {font-size:10px;font-weight:600;}
+@media(max-width:650px){
+ html body .overlay.layout3:not(.is-prematch) > .top {grid-template-columns:48px minmax(130px,2fr) 88px minmax(65px,1fr) 48px;}
+ .layout3 .l3-portrait {flex-basis:24px;width:24px;height:38px;}
+ .layout3 .l3-batter {gap:2px;}
+ .layout3 .l3-batter-name {font-size:9px;}
+ .layout3 .l3-batter-score {font-size:10px;}
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1663,10 +1687,11 @@ document.documentElement.style.setProperty(
 // Layout and theme are independent query parameters.
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
 const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
-const overlayLayout = requestedLayout === "2" ? "2" : "1";
+const overlayLayout = ["2", "3"].includes(requestedLayout) ? requestedLayout : "1";
 const requestedTheme = (params.get("theme") || "mh").trim().toLowerCase();
 const overlayTheme = ["blue", "graphite", "red", "mh"].includes(requestedTheme) ? requestedTheme : "mh";
-document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2");
+document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2" || overlayLayout === "3");
+document.querySelector(".overlay").classList.toggle("layout3", overlayLayout === "3");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
 document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
 document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
@@ -1762,7 +1787,30 @@ function showScore(n,t){
   $("rr"+n).textContent=`RR ${t.rr}`;
 }
 */
+function cricclubsProfileUrl(path) {
+  const raw = String(path || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw, "https://cricclubs.com/");
+    return url.protocol === "https:" && url.hostname === "cricclubs.com" ? url.href : "";
+  } catch (_) { return ""; }
+}
+function showBattersLayout3(v) {
+  return [1,2].map(n => {
+    const name = validDisplayName(get(v, "batsman"+n+"Name", ""));
+    if (!name) return "";
+    const image = cricclubsProfileUrl(get(v, "batsman"+n+"ProfileImange", ""));
+    const runs = escapeHTML(get(v, "batsman"+n+"Runs", "0"));
+    const balls = escapeHTML(get(v, "batsman"+n+"Balls", "0"));
+    const fallback = escapeHTML(name.slice(0,1).toUpperCase());
+    return `<div class="l3-batter">
+      <div class="l3-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none'">` : ''}<span class="l3-initial">${fallback}</span></div>
+      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${n===1?' ★':''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
+    </div>`;
+  }).join("");
+}
 function showBatters(v){
+  if (overlayLayout === "3") return showBattersLayout3(v);
   const first=validDisplayName(get(v,"batsman1Name",""));
   const second=validDisplayName(get(v,"batsman2Name",""));
   const row=(name,n,strike)=>name ? `<div class="player">
