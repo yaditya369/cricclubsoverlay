@@ -1957,11 +1957,16 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
       <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
     </linearGradient>
   </defs>
-  <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="16,2 409,2 425,50 409,98 16,98 1,50" stroke="none"/>
-    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50" fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2px" vector-effect="non-scaling-stroke"/>
-    <polygon points="591,2 984,2 999,50 984,98 591,98 575,50" stroke="none"/>
+  <!-- One continuous silhouette: the side panels extend under the center panel,
+       removing the two exposed triangular notches at the footer junction. -->
+  <g fill="url(#l4-panel-gradient)" stroke="none">
+    <polygon points="16,2 409,2 425,50 441,100 16,100 1,50"/>
+    <polygon points="591,2 984,2 999,50 984,100 559,100 575,50"/>
   </g>
+  <!-- Draw the center last so its gold outline remains fully visible. -->
+  <polygon points="441,2 559,2 575,50 559,100 441,100 425,50"
+    fill="url(#l4-center-dark-gradient)" stroke="#FFD54A"
+    stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
 </svg>
     <section class="team left">
       <div class="identity">
@@ -2143,6 +2148,33 @@ html body .overlay.layout4:not(.is-prematch) > .bottom.visible {
   margin-right:1.6%!important;
   box-sizing:border-box!important;
   border-radius:0!important;
+}
+</style>
+<style id="layout4-joined-junctions-final">
+/* Single full-width footer underneath the joined panels, with no black seam.
+   This overrides earlier inset/clip experiments only for Layout 4. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  position:absolute!important;
+  top:49px!important;bottom:auto!important;
+  left:1.6%!important;right:1.6%!important;
+  width:96.8%!important;max-width:96.8%!important;
+  margin:0!important;
+  height:16px!important;min-height:16px!important;max-height:16px!important;
+  padding:0 118px 0 8px!important;
+  clip-path:none!important;-webkit-clip-path:none!important;
+  border:0!important;border-radius:0!important;
+  box-shadow:none!important;overflow:hidden!important;
+  background:linear-gradient(90deg,#850713,#ba0a1a 22%,#65000e 50%,#ba0a1a 78%,#850713)!important;
+  z-index:2!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible #bottomText {
+  position:absolute!important;left:12%!important;right:12%!important;
+  width:76%!important;max-width:76%!important;
+  text-align:center!important;white-space:nowrap!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
+  right:8px!important;left:auto!important;
 }
 </style>
 <script>
