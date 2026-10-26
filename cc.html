@@ -1508,9 +1508,6 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
   display:flex;flex-direction:column;justify-content:center;
   min-width:0;flex:1;gap:2px;
 }
-.overlay.layout3 #details1 .l3-batter-heading {display:flex;align-items:center;min-width:0;width:100%;gap:2px;}
-.overlay.layout3 #details1 .l3-batter-heading .l3-batter-name {display:block;flex:0 1 auto;min-width:0;}
-.overlay.layout3 #details1 .l3-batter-heading .l3-strike {display:inline-block;flex:0 0 auto;margin-left:0;position:static;top:auto;font-size:12px;color:#ffd45c;line-height:1;}
 .overlay.layout3 #details1 .l3-batter-name {
   font-size:clamp(9px,.83vw,12px);font-weight:800;line-height:1.1;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -1566,78 +1563,86 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
 @media(max-width:650px){.overlay.layout3 #details2 .l3-bowler-block {grid-template-columns:24px minmax(0,1fr);column-gap:3px;}.overlay.layout3 #details2 .l3-bowler-block .l3-bowler-portrait {width:24px;height:35px;}}
 </style>
 
-<style id="layout3-golden-svg-section-frames">
-/* Layout 3 only: three touching, self-contained gold panels. */
-.overlay.layout3 {--l3-panel-fill:rgba(115,9,25,.94)}
-.overlay.layout3.theme-blue {--l3-panel-fill:rgba(21,55,106,.94)}
-.overlay.layout3.theme-red {--l3-panel-fill:rgba(132,17,31,.94)}
-.overlay.layout3.theme-graphite {--l3-panel-fill:rgba(33,38,47,.94)}
-.overlay.layout3.theme-mh {--l3-panel-fill:rgba(116,10,24,.94)}
-html body .overlay.layout3:not(.is-prematch) > .top {
-  /* Team identity and players have dedicated grid tracks; no gaps. */
-  grid-template-columns:minmax(70px,8%) minmax(0,34%) minmax(0,16%) minmax(0,34%) minmax(70px,8%)!important;
-  position:relative!important;isolation:isolate!important;background:none!important;
-  border:0!important;box-shadow:none!important;overflow:hidden!important;
-}
-/* The SVG is the ONLY painted surface. Fill is inside its outline, not on the rectangular pseudo-element. */
-html body .overlay.layout3:not(.is-prematch) > .top::before,
-html body .overlay.layout3:not(.is-prematch) > .top::after {
-  content:"";position:absolute;top:0;bottom:0;width:42%;z-index:0;pointer-events:none;
-  background-color:transparent!important;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 45' preserveAspectRatio='none'%3E%3Cpath d='M16 1.5 H404 L418.5 22.5 L404 43.5 H16 L1.5 22.5 Z' fill='%23740A18' stroke='%23FFD700' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")!important;
-  background-size:100% 100%!important;background-repeat:no-repeat!important;
-  clip-path:none!important;
-}
-html body .overlay.layout3:not(.is-prematch) > .top::before {left:0!important;right:auto!important;}
-html body .overlay.layout3:not(.is-prematch) > .top::after {right:0!important;left:auto!important;transform:scaleX(-1);}
-/* The center score touches the pointed ends of both side panels. */
-html body .overlay.layout3:not(.is-prematch) .team.left .scorebox {
-  width:100%!important;height:100%!important;align-self:stretch!important;justify-self:stretch!important;
-  margin:0!important;border:0!important;border-radius:0!important;background:transparent!important;
-  padding:2px 15px!important;box-sizing:border-box!important;overflow:hidden!important;
-}
-html body .overlay.layout3:not(.is-prematch) .team.left .scorebox .mh-hex-outline {inset:0!important;width:100%!important;height:100%!important;}
-/* Mask only the center SVG's inner fill; outer surroundings remain transparent. */
-html body .overlay.layout3:not(.is-prematch) .top .identity,
-html body .overlay.layout3:not(.is-prematch) .top #details1,
-html body .overlay.layout3:not(.is-prematch) .top #details2 {
-  position:relative!important;z-index:1!important;background:none!important;border:0!important;
-  box-shadow:none!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;
-}
-html body .overlay.layout3:not(.is-prematch) .top #details1 {padding:1px 13px 1px 2px!important;}
-html body .overlay.layout3:not(.is-prematch) .top #details2 {padding:1px 2px 1px 13px!important;}
-html body .overlay.layout3:not(.is-prematch) .top .identity {padding:1px 5px!important;box-sizing:border-box!important;}
-html body .overlay.layout3:not(.is-prematch) .top .scorebox {position:relative!important;z-index:1!important;}
-html body .overlay.layout3:not(.is-prematch) #details1 .l3-batter {max-width:100%!important;min-width:0!important;}
-html body .overlay.layout3:not(.is-prematch) #details2 .l3-bowler-block {min-width:0!important;max-width:100%!important;overflow:hidden!important;}
-</style>
-
-<style id="layout3-outer-tips-transparent-final">
-/* L3 only: remove all inherited rectangular MH/other theme background paint.
-   The two SVG background images and the center hex are the only colored areas. */
-html body .overlay.layout3:not(.is-prematch) > .top,
-html body .overlay.layout2.layout3.theme-mh:not(.is-prematch) > .top,
-html body .overlay.layout3.theme-blue:not(.is-prematch) > .top,
-html body .overlay.layout3.theme-red:not(.is-prematch) > .top,
-html body .overlay.layout3.theme-graphite:not(.is-prematch) > .top {
+<style id="layout4-gold-panels">
+/* Layout 4 only. No changes to the original layouts 1, 2, or 3. */
+html body .overlay.layout4,
+html body .overlay.layout4.theme-mh,
+html body .overlay.layout4.theme-red,
+html body .overlay.layout4.theme-blue,
+html body .overlay.layout4.theme-graphite {
   background:transparent!important;
-  background-color:transparent!important;
+  background-image:none!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+html body .overlay.layout4 > .top,
+html body .overlay.layout4.theme-mh > .top,
+html body .overlay.layout4.theme-red > .top,
+html body .overlay.layout4.theme-blue > .top,
+html body .overlay.layout4.theme-graphite > .top {
+  position:relative!important;
+  isolation:isolate;
+  background:transparent!important;
+  background-image:none!important;
+  overflow:hidden!important;
+  border:0!important;
+}
+.overlay.layout4.theme-blue {--l4-fill:rgba(20,57,105,var(--overlay-opacity,.8));}
+.overlay.layout4.theme-graphite {--l4-fill:rgba(35,40,47,var(--overlay-opacity,.8));}
+.overlay.layout4.theme-red {--l4-fill:rgba(138,12,24,var(--overlay-opacity,.8));}
+.overlay.layout4.theme-mh {--l4-fill:rgba(138,12,24,var(--overlay-opacity,.8));}
+.l4-svg-panels {display:none;}
+.overlay.layout4 .l4-svg-panels {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  display:block;
+  pointer-events:none;
+}
+.overlay.layout4 > .top .identity,
+.overlay.layout4 > .top #details1,
+.overlay.layout4 > .top #details2,
+.overlay.layout4 > .top .scorebox {
+  position:relative;
+  z-index:1;
+  min-width:0;
+  background:transparent!important;
   background-image:none!important;
   box-shadow:none!important;
   border:0!important;
+  overflow:hidden!important;
 }
-/* Keep the identities clear of the new outer pointed ends. */
-html body .overlay.layout3:not(.is-prematch) > .top .team.left .identity {
-  padding-left:15px!important;padding-right:2px!important;
+.overlay.layout4 > .top .team.left .identity {padding-left:clamp(16px,1.7vw,28px)!important;padding-right:1px!important;}
+.overlay.layout4 > .top .team.right .identity {padding-right:clamp(16px,1.7vw,28px)!important;padding-left:1px!important;}
+.overlay.layout4 > .top #details1 {padding-left:2px!important;padding-right:4px!important;}
+.overlay.layout4 > .top #details2 {padding-left:5px!important;padding-right:2px!important;}
+.overlay.layout4 > .top .l3-batter,
+.overlay.layout4 > .top .l3-batter-info,
+.overlay.layout4 > .top .l3-bowler-block,
+.overlay.layout4 > .top .l3-bowler-content {
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
 }
-html body .overlay.layout3:not(.is-prematch) > .top .team.right .identity {
-  padding-right:15px!important;padding-left:2px!important;
-}
-/* Prevent the center panel's pseudo-fill from escaping its hexagon. */
-html body .overlay.layout3.theme-mh:not(.is-prematch) .team.left .scorebox::before {
-  clip-path:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%)!important;
+.overlay.layout4 > .top .l3-portrait,
+.overlay.layout4 > .top .l3-bowler-portrait {overflow:hidden!important;max-height:100%!important;}
+.overlay.layout4 > .top .l3-portrait img,
+.overlay.layout4 > .top .l3-bowler-portrait img {max-width:100%!important;max-height:100%!important;}
+.overlay.layout4 > .top .l3-batter-name,
+.overlay.layout4 > .top .bowler-name {overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+/* The existing score text is retained but the scorebox's rectangular fill is removed. */
+.overlay.layout4 > .top .team.left .scorebox {width:100%!important;height:100%!important;margin:0!important;}
+/* The secondary information footer is intentionally preserved. */
+@media(max-width:650px) {
+  .overlay.layout4 > .top .team.left .identity {padding-left:12px!important;}
+  .overlay.layout4 > .top .team.right .identity {padding-right:12px!important;}
 }
 </style>
+
 </head>
 <body>
 <div class="overlay">
@@ -1647,6 +1652,13 @@ html body .overlay.layout3.theme-mh:not(.is-prematch) .team.left .scorebox::befo
   <div class="prematch-side"><span class="prematch-emblem"><img class="prematch-logo" id="preLogo2" alt=""><span class="prematch-initials" id="preInitials2"></span></span><span id="preTeam2"></span></div>
 </div>
 <div class="top">
+<svg class="l4-svg-panels" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+  <g fill="var(--l4-fill,rgba(138,12,24,.80))" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
+    <polygon points="16,2 425,2 441,50 425,98 16,98 1,50"/>
+    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"/>
+    <polygon points="575,2 984,2 999,50 984,98 575,98 559,50"/>
+  </g>
+</svg>
     <section class="team left">
       <div class="identity">
         <img class="logo" id="logo1" alt="">
@@ -1823,11 +1835,12 @@ document.documentElement.style.setProperty(
 // Layout and theme are independent query parameters.
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
 const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
-const overlayLayout = ["2", "3"].includes(requestedLayout) ? requestedLayout : "1";
+const overlayLayout = ["2", "3", "4"].includes(requestedLayout) ? requestedLayout : "1";
 const requestedTheme = (params.get("theme") || "mh").trim().toLowerCase();
 const overlayTheme = ["blue", "graphite", "red", "mh"].includes(requestedTheme) ? requestedTheme : "mh";
-document.querySelector(".overlay").classList.toggle("layout2", overlayLayout === "2" || overlayLayout === "3");
-document.querySelector(".overlay").classList.toggle("layout3", overlayLayout === "3");
+document.querySelector(".overlay").classList.toggle("layout2", ["2", "3", "4"].includes(overlayLayout));
+document.querySelector(".overlay").classList.toggle("layout3", overlayLayout === "3" || overlayLayout === "4");
+document.querySelector(".overlay").classList.toggle("layout4", overlayLayout === "4");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
 document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
 document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
@@ -1937,7 +1950,7 @@ function cricclubsProfileUrl(path) {
 const layout3PortraitCache = new Map();
 const LAYOUT3_PORTRAIT_LIMIT = 24;
 function setPlayerDetails(el, html) {
-  if (overlayLayout !== "3") { el.innerHTML = html; return; }
+  if (overlayLayout !== "3" && overlayLayout !== "4") { el.innerHTML = html; return; }
   // Save the live image nodes before replacing score/name text.
   for (const img of el.querySelectorAll('.l3-portrait img, .l3-bowler-portrait img')) {
     const key = img.dataset.portraitKey || img.getAttribute('src');
@@ -1973,12 +1986,12 @@ function showBattersLayout3(v) {
     const fallback = escapeHTML(name.slice(0,1).toUpperCase());
     return `<div class="l3-batter">
       <div class="l3-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none'">` : ''}<span class="l3-initial">${fallback}</span></div>
-      <div class="l3-batter-info"><div class="l3-batter-heading"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}</span>${n===1?'<span class="strike-indicator l3-strike" title="On strike" aria-label="On strike">★</span>':''}</div><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
+      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${n===1?' ★':''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small></span></div>
     </div>`;
   }).join("");
 }
 function showBatters(v){
-  if (overlayLayout === "3") return showBattersLayout3(v);
+  if ((overlayLayout === "3" || overlayLayout === "4")) return showBattersLayout3(v);
   const first=validDisplayName(get(v,"batsman1Name",""));
   const second=validDisplayName(get(v,"batsman2Name",""));
   const row=(name,n,strike)=>name ? `<div class="player">
@@ -2096,7 +2109,7 @@ function showBowler(v,balls,inningsOvers){
   }).join('');
   if (!bowler) return "";
   const overLine = `<div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
-  if (overlayLayout === "3") {
+  if ((overlayLayout === "3" || overlayLayout === "4")) {
     const image = cricclubsProfileUrl(get(v, 'bowlerProfileImange', ''));
     const initial = escapeHTML(bowlerPortraitInitials(bowler));
     return `<div class="l3-bowler-block">
