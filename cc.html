@@ -1897,7 +1897,7 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible,
 html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
   top:49px!important;
-  height:16px!important;min-height:16px!important;max-height:16px!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
   flex-basis:16px!important;
   border-top:0!important;
   background:linear-gradient(90deg,#6e000a 0%,#a30a18 25%,#72000e 50%,#a30a18 75%,#6e000a 100%)!important;
@@ -1955,13 +1955,15 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
       <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
     </linearGradient>
   </defs>
-  <!-- The wings extend underneath the center, without changing the original center silhouette. -->
+  <!-- Layout 4: 44% side hexagons, 15% center hexagon; center drawn last. -->
   <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="16,2 500,2 500,98 16,98 1,50"/>
-    <polygon points="500,2 984,2 999,50 984,98 500,98"/>
+    <polygon points="16,1 432,1 447,25 432,49 16,49 1,25"/>
+    <polygon points="568,1 984,1 999,25 984,49 568,49 553,25"/>
   </g>
-  <!-- The dark score panel is in front; its gold diagonals become the visible seams. -->
-  <polygon points="441,2 559,2 575,50 559,98 441,98 425,50" fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round"/>
+  <!-- 65px center, protruding 7.5px above and below the 50px wings.
+       Its edges cover 22px of each side hexagon at the midpoint. -->
+  <polygon points="441,-7.5 559,-7.5 575,25 559,57.5 441,57.5 425,25"
+           fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round"/>
 </svg>
     <section class="team left">
       <div class="identity">
@@ -2151,11 +2153,11 @@ html body .overlay.layout4:not(.is-prematch) > .bottom.visible {
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
   position:absolute!important;
-  top:49px!important;bottom:auto!important;
+  top:50px!important;bottom:auto!important;
   left:1.6%!important;right:1.6%!important;
   width:96.8%!important;max-width:96.8%!important;
   margin:0!important;
-  height:16px!important;min-height:16px!important;max-height:16px!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
   padding:0 118px 0 8px!important;
   clip-path:none!important;-webkit-clip-path:none!important;
   border:0!important;border-radius:0!important;
@@ -2197,9 +2199,9 @@ html body .overlay.layout4:not(.is-prematch) > .top .l4-svg-panels {
 }
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
-  position:absolute!important;top:49px!important;bottom:auto!important;
+  position:absolute!important;top:50px!important;bottom:auto!important;
   left:1.6%!important;right:1.6%!important;width:96.8%!important;max-width:96.8%!important;
-  height:16px!important;min-height:16px!important;max-height:16px!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
   margin:0!important;box-sizing:border-box!important;
   border:0!important;box-shadow:none!important;clip-path:none!important;
   background:linear-gradient(90deg,#78040e,#b50a19 25%,#65000e 50%,#b50a19 75%,#78040e)!important;
