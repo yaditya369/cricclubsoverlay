@@ -2080,6 +2080,22 @@ html body .overlay.layout2.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-
   font-weight:800!important;
 }
 </style>
+
+<style id="layout4-this-over-group-centering-final">
+/* Center the full THIS OVER label + delivery sequence in the bowler's second row.
+   Previous fixes centered glyphs only, leaving the sequence left-justified. */
+html body .overlay.layout4 #details2 .l3-bowler-block .balls {
+  width:100%!important;
+  min-width:0!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:3px!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball {
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  text-align:center!important;line-height:1!important;flex:0 0 auto!important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -2274,10 +2290,16 @@ html body .overlay.layout4 .top .balls > .ball {
  padding:0 2px!important;font-weight:900!important;
 }
 html body .overlay.layout4 .top .balls > .ball.wicket {
- background:linear-gradient(145deg,#ff4545 0%,#bf071b 65%,#7e0011 100%)!important;
+ background:linear-gradient(145deg,#8b1826 0%,#5c0c19 65%,#350611 100%)!important;
  border:2px solid #ffe078!important;color:#fff!important;
  box-shadow:0 0 0 1px rgba(255,223,113,.35),0 0 7px rgba(255,190,50,.85)!important;
- text-shadow:0 1px 1px #5a0010!important;
+ text-shadow:0 1px 1px #000!important;
+}
+/* Wicket deliveries including 1W: vivid red while keeping centered labels. */
+html body .overlay.layout4 .top .balls > .ball.wicket {
+ background:linear-gradient(145deg,#ff424f 0%,#e50922 55%,#a40018 100%)!important;
+ border:2px solid #ffe078!important;color:#fff!important;
+ box-shadow:0 0 0 1px rgba(255,223,113,.45),0 0 9px rgba(255,48,70,.8)!important;
 }
 </style>
 
@@ -2727,7 +2749,7 @@ function showBowler(v,balls,inningsOvers){
     let cls='ball';
     if(extra) cls+=' extra';
     else if(x.trim()==='.' || x.trim()==='0') cls+=' dot-ball';
-    else if(/^(?:W|WICKET|OUT)(?:\s*\+.*)?$/i.test(x.trim())) cls+=' wicket';
+    else if(/^(?:(?:\d+\s*)?W|WICKET|OUT)(?:\s*\+.*)?$/i.test(x.trim())) cls+=' wicket';
     else if(x==='6') cls+=' boundary six';
     else if(x==='4') cls+=' boundary';
     return `<span class="${cls}" title="${escapeHTML(x)}">${cls.includes("dot-ball") ? "" : escapeHTML(extra?extra.label:x)}</span>`;
