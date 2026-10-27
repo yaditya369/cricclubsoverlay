@@ -1942,27 +1942,26 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
 <div class="top">
 <svg class="l4-svg-panels" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
   <defs>
-    <!-- Gradient confined to the three SVG polygons: no rectangular background. -->
     <linearGradient id="l4-panel-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
-      <stop offset="26%"  stop-color="var(--l4-grad-mid,#e60c1c)" stop-opacity="var(--overlay-opacity,.8)"/>
-      <stop offset="50%"  stop-color="var(--l4-grad-bright,#f51e2a)" stop-opacity="var(--overlay-opacity,.8)"/>
-      <stop offset="75%"  stop-color="var(--l4-grad-late,#c30816)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="0%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="26%" stop-color="var(--l4-grad-mid,#e60c1c)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="50%" stop-color="var(--l4-grad-bright,#f51e2a)" stop-opacity="var(--overlay-opacity,.8)"/>
+      <stop offset="75%" stop-color="var(--l4-grad-late,#c30816)" stop-opacity="var(--overlay-opacity,.8)"/>
       <stop offset="100%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
     </linearGradient>
-    <!-- Layout 4 center only: darker vertical MH-style gradient, like Layout 3. -->
     <linearGradient id="l4-center-dark-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#8b0b1b" stop-opacity=".97"/>
       <stop offset="48%" stop-color="#66000e" stop-opacity=".97"/>
       <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
     </linearGradient>
   </defs>
-  <!-- Three original panels: coordinates taken directly from cclayout4v1.html. -->
+  <!-- The wings extend underneath the center, without changing the original center silhouette. -->
   <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="16,2 409,2 425,50 409,98 16,98 1,50"/>
-    <polygon points="441,2 559,2 575,50 559,98 441,98 425,50" fill="url(#l4-center-dark-gradient)"/>
-    <polygon points="591,2 984,2 999,50 984,98 591,98 575,50"/>
+    <polygon points="16,2 500,2 500,98 16,98 1,50"/>
+    <polygon points="500,2 984,2 999,50 984,98 500,98"/>
   </g>
+  <!-- The dark score panel is in front; its gold diagonals become the visible seams. -->
+  <polygon points="441,2 559,2 575,50 559,98 441,98 425,50" fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round"/>
 </svg>
     <section class="team left">
       <div class="identity">
@@ -2916,6 +2915,8 @@ async function fetchFullScorecard(force=false){
 const summaryParams = new URLSearchParams(location.search);
 const enabledFlag = value => /^(1|true|on|yes)$/i.test(String(value ?? '0'));
 const overSummaryEnabled = enabledFlag(summaryParams.get('overSummary') ?? summaryParams.get('summary'));
+// Explicit summary=0 disables the final match-result popup as well.
+const finalMatchSummaryEnabled = summaryParams.get('summary') !== '0';
 // Innings-break summary is disabled by default; opt in with ?inningsBreakSummary=1.
 const inningsBreakSummaryEnabled = enabledFlag(summaryParams.get('inningsBreakSummary') ?? '0');
 // summaryDuration is seconds (default 5) or "nextBall" to wait for the first legal ball.
@@ -3008,7 +3009,7 @@ function render(data){
   const powered=$("powered");
   const onBreak=inningsBreak(data,v,t1,t2,second);
   const isFinished=completed(data,v) && Boolean(textField(data,v,["result","matchResult"]));
-  if(isFinished) showFinalMatchResult(data,v,t1,t2);
+  if(isFinished && finalMatchSummaryEnabled) showFinalMatchResult(data,v,t1,t2);
   else {$("finalMatchResult").hidden=true;document.body.classList.remove("show-final-result");}
   if(isFinished||onBreak) dismissOverSummary();
   observeCompletedOver(data,v,t1,t2,second,onBreak);
