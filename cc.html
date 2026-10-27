@@ -1774,6 +1774,38 @@ html body .overlay.layout2.layout4 #details1 .l4-score-strike-star {
 }
 </style>
 
+
+<style id="layout4-striker-highlight-transition">
+/* Layout 4 only: highlight the active batter without changing panel dimensions. */
+html body .overlay.layout4 #details1 .l3-batter.l4-on-strike {
+  background:linear-gradient(90deg,rgba(255,213,74,.24),rgba(255,213,74,.07))!important;
+  box-shadow:inset 0 0 0 1px rgba(255,213,74,.82),0 0 7px rgba(255,213,74,.15)!important;
+  border-radius:5px!important;
+}
+html body .overlay.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-name {
+  color:#fff1ad!important;
+}
+html body .overlay.layout4 #details1 .l3-batter.l4-strike-arrival {
+  animation:l4-strike-arrival 2.2s ease-out 1 both;
+}
+html body .overlay.layout4 #details1 .l3-batter.l4-strike-departure {
+  animation:l4-strike-departure 1.1s ease-out 1 both;
+}
+@keyframes l4-strike-arrival {
+  0% {background-color:rgba(255,213,74,.55);box-shadow:inset 0 0 0 2px #ffe77d,0 0 16px rgba(255,213,74,.85);}
+  35% {background-color:rgba(255,213,74,.13);box-shadow:inset 0 0 0 1px #ffd54a,0 0 4px rgba(255,213,74,.25);}
+  65% {background-color:rgba(255,213,74,.45);box-shadow:inset 0 0 0 2px #ffe77d,0 0 12px rgba(255,213,74,.65);}
+  100% {background-color:transparent;box-shadow:none;}
+}
+@keyframes l4-strike-departure {
+  from {box-shadow:inset 0 0 0 1px #ffd54a;background-color:rgba(255,213,74,.25);}
+  to {box-shadow:none;background-color:transparent;}
+}
+@media(prefers-reduced-motion:reduce) {
+  html body .overlay.layout4 #details1 .l3-batter.l4-strike-arrival,
+  html body .overlay.layout4 #details1 .l3-batter.l4-strike-departure {animation:none!important;}
+}
+</style>
 <style id="layout4-footer-shoulder-clip-final">
 /* Only Layout 4. The outer SVG polygon tips are at 0.1%/99.9%,
    and their straight shoulders are at 1.6%/98.4%. Keep the footer
@@ -1931,6 +1963,62 @@ html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
 /* Avoid any top/footer separating stroke. */
 html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:none!important;}
 </style>
+<style id="layout4-team-identity-batter-spacing-20261026">
+/* Layout 4 only: protect the team badges from the hexagon points and
+   create a deliberate gutter between team identities and player details. */
+html body .overlay.layout4:not(.is-prematch) > .top .team.left .identity {
+  padding-left:clamp(20px,2.1vw,34px)!important;
+  padding-right:9px!important;
+  box-sizing:border-box!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top .team.right .identity {
+  padding-left:9px!important;
+  padding-right:clamp(20px,2.1vw,34px)!important;
+  box-sizing:border-box!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top #details1 {
+  padding-left:10px!important;
+  padding-right:4px!important;
+  box-sizing:border-box!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top #details2 {
+  padding-left:5px!important;
+  padding-right:10px!important;
+  box-sizing:border-box!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top .team .identity {gap:3px!important;}
+@media(max-width:650px) {
+ html body .overlay.layout4:not(.is-prematch) > .top .team.left .identity {padding-left:15px!important;padding-right:5px!important;}
+ html body .overlay.layout4:not(.is-prematch) > .top .team.right .identity {padding-left:5px!important;padding-right:15px!important;}
+ html body .overlay.layout4:not(.is-prematch) > .top #details1 {padding-left:5px!important;}
+ html body .overlay.layout4:not(.is-prematch) > .top #details2 {padding-right:5px!important;}
+}
+</style>
+
+<style id="milestone-celebrations-v1">
+/* Additive milestone layer: existing FOUR/SIX/WICKET styles remain untouched. */
+#milestoneEvent{position:fixed;left:50%;top:49%;transform:translate(-50%,-50%);z-index:1100;pointer-events:none;width:min(900px,94vw);text-align:center;opacity:0;display:none;filter:drop-shadow(0 7px 16px #000)}
+#milestoneEvent.active{display:block;animation:milestoneVisible 3.4s ease both}
+#milestoneEvent .ms-head{font:italic 900 clamp(30px,6vw,78px)/1.05 Arial,sans-serif;color:var(--ms-color,#ffd456);text-shadow:0 0 22px var(--ms-color,#ffd456),0 5px 2px #32101c;-webkit-text-stroke:1px #fff7}
+#milestoneEvent .ms-name{font:900 clamp(15px,2.5vw,26px)/1.2 Arial,sans-serif;color:white;letter-spacing:2px;margin-top:9px}
+#milestoneEvent .ms-detail{font:800 clamp(12px,1.8vw,18px)/1.2 Arial,sans-serif;color:#fff3c7;margin-top:7px}
+#milestoneEvent .ms-particles{position:absolute;inset:0;z-index:-1}
+#milestoneEvent .ms-particles i{position:absolute;left:50%;top:50%;height:13px;width:8px;background:var(--ms-color,#ffd456);opacity:0}
+#milestoneEvent.active .ms-particles i{animation:msBurst 1.4s ease-out both;animation-delay:var(--delay)}
+#milestoneEvent.active.team50 .ms-content{animation:msSweep .9s ease-out both}
+#milestoneEvent.active.team100 .ms-content{animation:msZoom 1.1s ease-out both}
+#milestoneEvent.active.team150 .ms-content{animation:msRise 1.1s ease-out both}
+#milestoneEvent.active.team200 .ms-content{animation:msFlip 1.1s ease-out both}
+#milestoneEvent.active.team250 .ms-content{animation:msImpact 1.1s ease-out both}
+#milestoneEvent.active:not(.team50):not(.team100):not(.team150):not(.team200):not(.team250) .ms-content{animation:msZoom .9s ease-out both}
+@keyframes milestoneVisible{0%{opacity:0}12%,82%{opacity:1}100%{opacity:0}}
+@keyframes msBurst{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(300deg)}}
+@keyframes msSweep{from{transform:translateX(-80%) skewX(-15deg);opacity:0}70%{transform:translateX(6%);opacity:1}to{transform:none}}
+@keyframes msZoom{from{transform:scale(.25);opacity:0}65%{transform:scale(1.2);opacity:1}to{transform:scale(1)}}
+@keyframes msRise{from{transform:translateY(100px);opacity:0}70%{transform:translateY(-12px);opacity:1}to{transform:none}}
+@keyframes msFlip{from{transform:perspective(500px) rotateY(-85deg);opacity:0}75%{transform:perspective(500px) rotateY(10deg);opacity:1}to{transform:none}}
+@keyframes msImpact{0%{transform:scale(2.4);filter:blur(12px);opacity:0}50%{transform:scale(.85);filter:none;opacity:1}100%{transform:scale(1)}}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -1960,8 +2048,8 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
     <polygon points="16,2 432.5,2 447.5,50 432.5,98 16,98 1,50"/>
     <polygon points="567.5,2 984,2 999,50 984,98 567.5,98 552.5,50"/>
   </g>
-  <!-- Center panel is 60px high (120 SVG units), extending 5px above and below the 50px side panels. Painted last for visible overlap. -->
-  <polygon points="441,-10 559,-10 575,50 559,110 441,110 425,50"
+  <!-- Center polygon is 55px tall, extending approximately 2.5px above and below the 50px side panels. Painted last for visible overlap. -->
+  <polygon points="441,-3 559,-3 575,50 559,103 441,103 425,50"
            fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round"/>
 </svg>
     <section class="team left">
@@ -2419,6 +2507,23 @@ function setPlayerDetails(el, html) {
     layout3PortraitCache.delete(layout3PortraitCache.keys().next().value);
   }
 }
+// Track striker by feed order: batsman1 is the striker (existing gold-star convention).
+// Do not replay the animation on routine 5-second score refreshes.
+let l4LastStriker = "";
+let l4LastBatters = "";
+let l4StrikeChangedAt = 0;
+function l4StrikeState(v) {
+  if (overlayLayout !== "4") return {arrival:false,departure:false};
+  const striker=validDisplayName(get(v,"batsman1Name",""));
+  const other=validDisplayName(get(v,"batsman2Name",""));
+  const pair=[striker,other].filter(Boolean).sort().join("|");
+  if (!striker) {l4LastStriker="";l4LastBatters="";return {arrival:false,departure:false};}
+  if (l4LastStriker && striker !== l4LastStriker) l4StrikeChangedAt=Date.now();
+  l4LastStriker=striker;
+  l4LastBatters=pair;
+  const changing=Date.now()-l4StrikeChangedAt<2200;
+  return {arrival:changing,departure:changing};
+}
 function showBattersLayout3(v) {
   return [1,2].map(n => {
     const name = validDisplayName(get(v, "batsman"+n+"Name", ""));
@@ -2427,7 +2532,7 @@ function showBattersLayout3(v) {
     const runs = escapeHTML(get(v, "batsman"+n+"Runs", "0"));
     const balls = escapeHTML(get(v, "batsman"+n+"Balls", "0"));
     const fallback = escapeHTML(name.slice(0,1).toUpperCase());
-    return `<div class="l3-batter">
+    return `<div class="l3-batter${overlayLayout === "4" && n===1 ? " l4-on-strike" : ""}${overlayLayout === "4" && strikeState.arrival ? (n===1 ? " l4-strike-arrival" : " l4-strike-departure") : ""}">
       <div class="l3-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none'">` : ''}<span class="l3-initial">${fallback}</span></div>
       <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${overlayLayout !== "4" && n===1 ? ' ★' : ''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small>${overlayLayout === "4" && n===1 ? '<span class="l4-score-strike-star" title="On strike" aria-label="On strike">★</span>' : ''}</span></div>
     </div>`;
@@ -3046,6 +3151,115 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
   });}
 }
 
+
+// Milestone celebrations (Layout 4 only). No fabricated stats or historical replay.
+const milestoneEnabled = !/^(0|false|off)$/i.test(params.get('milestones')||'1');
+const milestoneDefs = {
+  bat50:['HALF CENTURY!','#ffd456'],bat100:['CENTURY!','#70f8c7'],
+  five:['FIVE WICKETS!','#ff647e'],maiden:['MAIDEN OVER!','#ffd456'],
+  team50:['50 RUNS!','#f7df90'],team100:['100 UP!','#ffe184'],
+  team150:['150 RUNS!','#6ee7e0'],team200:['200 UP!','#e6c6ff'],team250:['250 RUNS!','#ffce8c'],
+  hat:['HAT-TRICK!','#ff647e'],part50:['50-RUN PARTNERSHIP!','#70f8c7'],
+  part100:['100-RUN PARTNERSHIP!','#70f8c7']
+};
+let milestoneBaseline = null;
+const milestoneShown = new Set(), milestoneQueue = [];
+let milestoneBusy = false;
+function milestoneNumeric(x){if(x===null||x===undefined||String(x).trim()==='')return null;const n=Number(x);return Number.isFinite(n)?n:null;}
+function milestoneAdd(type,key,name='',detail=''){
+  if(!milestoneDefs[type]||milestoneShown.has(key))return;
+  milestoneShown.add(key);milestoneQueue.push({type,key,name,detail});
+  milestonePlayNext();
+}
+function milestonePlayNext(){
+  if(milestoneBusy||!milestoneQueue.length)return;
+  if(document.body.classList.contains('show-final-result')){milestoneQueue.length=0;return;}
+  // Give a boundary/wicket animation time to finish before the milestone.
+  if(document.getElementById('scoreEvent')?.classList.contains('active')){
+    setTimeout(milestonePlayNext,350);return;
+  }
+  const item=milestoneQueue.shift(), el=document.getElementById('milestoneEvent');
+  if(!el)return;
+  milestoneBusy=true;
+  const [title,color]=milestoneDefs[item.type];
+  el.style.setProperty('--ms-color',color);
+  el.querySelector('.ms-head').textContent=title;
+  el.querySelector('.ms-name').textContent=item.name;
+  el.querySelector('.ms-detail').textContent=item.detail;
+  const particles=el.querySelector('.ms-particles');
+  particles.replaceChildren();
+  for(let i=0;i<28;i++){
+    const a=i*Math.PI/14,r=85+(i%5)*25,span=document.createElement('i');
+    span.style.setProperty('--dx',Math.cos(a)*r+'px');
+    span.style.setProperty('--dy',Math.sin(a)*r+'px');
+    span.style.setProperty('--delay',(i%5)*.035+'s');
+    particles.appendChild(span);
+  }
+  el.className='';void el.offsetWidth;el.className='active '+item.type;
+  emitNativeEvent('MILESTONE',{milestone:item.type,player:item.name,detail:item.detail},'MILESTONE|'+item.key);
+  setTimeout(()=>{el.className='';milestoneBusy=false;milestonePlayNext();},3400);
+}
+function milestoneRead(data,v,second,t1,t2){
+  const inning=second?2:1,t=second?t2:t1;
+  const snap={inning,total:milestoneNumeric(t.total),bat:{},bowl:{},part:null};
+  for(let n=1;n<=2;n++){
+    const name=validDisplayName(get(v,'batsman'+n+'Name',''));
+    const runs=milestoneNumeric(get(v,'batsman'+n+'Runs',''));
+    if(name&&runs!==null)snap.bat[name]={runs,balls:get(v,'batsman'+n+'Balls','')};
+  }
+  const bowler=validDisplayName(get(v,'bowlerName',''));
+  const wickets=milestoneNumeric(get(v,'bowlerWickets',''));
+  // Prefer explicit current bowler maiden count; otherwise use the optional full scorecard.
+  let maidens=milestoneNumeric(get(v,'bowlerMaidens',''));
+  if(maidens===null && loadedFullCard && Array.isArray(loadedFullCard.bowling)){
+    const row=loadedFullCard.bowling.find(p=>p.name===bowler);
+    if(row)maidens=milestoneNumeric(row.maidens);
+  }
+  if(bowler)snap.bowl[bowler]={wickets,maidens};
+  // Partnership milestones require a genuine partnership-runs field, not team score.
+  const part=milestoneNumeric(v.partnershipRuns ?? v.currentPartnershipRuns);
+  if(part!==null){
+    const pair=Object.keys(snap.bat).sort();
+    if(pair.length===2)snap.part={key:pair.join('|'),name:pair.join(' + '),runs:part};
+  }
+  return snap;
+}
+function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
+  if(!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
+  const now=milestoneRead(data,v,second,t1,t2);
+  const prev=milestoneBaseline;milestoneBaseline=now;
+  if(!prev||prev.inning!==now.inning||onBreak||isFinished)return;
+  const prefix=String(now.inning)+'|';
+  for(const n of [50,100,150,200,250]){
+    if(prev.total!==null&&now.total!==null&&prev.total<n&&now.total>=n)
+      milestoneAdd('team'+n,prefix+'team'+n);
+  }
+  for(const [name,bat] of Object.entries(now.bat)){
+    const old=prev.bat[name];
+    if(!old)continue;
+    for(const n of [50,100]){
+      if(old.runs<n&&bat.runs>=n)
+        milestoneAdd('bat'+n,prefix+'bat'+n+'|'+name,name,bat.runs+' RUNS'+(bat.balls?' · '+bat.balls+' BALLS':''));
+    }
+  }
+  for(const [name,bowl] of Object.entries(now.bowl)){
+    const old=prev.bowl[name];
+    if(!old)continue;
+    if(old.wickets!==null&&bowl.wickets!==null&&old.wickets<5&&bowl.wickets>=5)
+      milestoneAdd('five',prefix+'five|'+name,name,bowl.wickets+' WICKETS');
+    if(old.maidens!==null&&bowl.maidens!==null&&bowl.maidens>old.maidens)
+      milestoneAdd('maiden',prefix+'maiden|'+name+'|'+bowl.maidens,name);
+  }
+  if(now.part&&prev.part&&now.part.key===prev.part.key){
+    for(const n of [50,100]){
+      if(prev.part.runs<n&&now.part.runs>=n)
+        milestoneAdd('part'+n,prefix+'part'+n+'|'+now.part.key,now.part.name);
+    }
+  }
+  // Hat-trick requires wicket attribution for three consecutive bowler deliveries.
+  // The flat THIS OVER token list cannot prove this, so no speculative trigger.
+}
+
 function render(data){
   const v=data.values||{};
   const second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
@@ -3073,6 +3287,7 @@ function render(data){
   } else if((!overSummaryTimer && !awaitingNextBall) || !(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
   const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
   observeNativeMatchState(data,v,second,t1,t2,preMatch,onBreak,isFinished);
+  observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished);
   const overlayEl=document.querySelector(".overlay");
   overlayEl.classList.toggle("is-prematch",preMatch);
   $("prematchTemplate").hidden=!preMatch;
@@ -3301,5 +3516,6 @@ if (urlParam("demo") === "matchResult") {
   refresh();
 }
 </script>
+<div id="milestoneEvent" aria-live="polite"><div class="ms-particles"></div><div class="ms-content"><div class="ms-head"></div><div class="ms-name"></div><div class="ms-detail"></div></div></div>
 </body>
 </html>
