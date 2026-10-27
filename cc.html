@@ -1955,10 +1955,10 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
       <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
     </linearGradient>
   </defs>
-  <!-- Layout 4: equal-height hexagons; center overlays each wing by 5% of center width. -->
+  <!-- Layout 4: equal-height hexagons; center overlaps each wing by 15% of center width. -->
   <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="16,2 417,2 432,50 417,98 16,98 1,50"/>
-    <polygon points="583,2 984,2 999,50 984,98 583,98 568,50"/>
+    <polygon points="16,2 432.5,2 447.5,50 432.5,98 16,98 1,50"/>
+    <polygon points="567.5,2 984,2 999,50 984,98 567.5,98 552.5,50"/>
   </g>
   <!-- Center is 50px tall, same as wings. Painted last for visible overlap. -->
   <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"
@@ -2205,6 +2205,53 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
   border:0!important;box-shadow:none!important;clip-path:none!important;
   background:linear-gradient(90deg,#78040e,#b50a19 25%,#65000e 50%,#b50a19 75%,#78040e)!important;
   z-index:1!important;
+}
+</style>
+<style id="layout4-footer-text-alignment-final-20261026">
+/* Layout 4 only: eliminate inherited projection translateX(-50%) and
+   conflicting width/left/right rules that clipped the result text. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText,
+html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText {
+  position:absolute!important;
+  top:50%!important;
+  left:120px!important;
+  right:120px!important;
+  width:auto!important;
+  max-width:none!important;
+  min-width:0!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+  padding:0!important;
+  display:block!important;
+  text-align:center!important;
+  line-height:13px!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
+  position:absolute!important;
+  top:50%!important;
+  right:8px!important;
+  left:auto!important;
+  transform:translateY(-50%)!important;
+  width:auto!important;
+  max-width:110px!important;
+  line-height:12px!important;
+  font-size:8px!important;
+  white-space:nowrap!important;
+  text-align:right!important;
+}
+@media(max-width:650px) {
+  html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText {
+    left:85px!important;right:85px!important;font-size:9px!important;
+  }
+  html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
+    right:5px!important;font-size:7px!important;max-width:80px!important;
+  }
 }
 </style>
 <script>
