@@ -2525,6 +2525,7 @@ function l4StrikeState(v) {
   return {arrival:changing,departure:changing};
 }
 function showBattersLayout3(v) {
+  const strikeState = l4StrikeState(v);
   return [1,2].map(n => {
     const name = validDisplayName(get(v, "batsman"+n+"Name", ""));
     if (!name) return "";
@@ -3224,6 +3225,116 @@ function milestoneRead(data,v,second,t1,t2){
   }
   return snap;
 }
+
+// Verified hat-trick tracking. Accepts structured delivery records supplied by the
+// score API or by a separately configured feed, never un-attributed display tokens.
+// Consecutive bowler deliveries include wides/no-balls (they break a hat-trick).
+// Runs-outs, retired-outs, obstructing field and other non-bowler wickets do not count.
+// Three consecutive wickets credited to one bowler can span overs.
+const hatTrickStates = new Map();
+const hatTrickProcessed = new Map();
+let hatTrickFeed = null;
+const hatTrickFeedUrl = params.get('hatTrickFeedUrl') || '';
+const hatTrickMaxIds = 1000;
+function hatValue(obj,...names){
+  for(const n of names)if(obj?.[n]!==undefined && obj[n]!==null && obj[n]!=='')return obj[n];
+  return null;
+}
+function hatTruthy(x){
+  if(typeof x==='boolean')return x;
+  if(typeof x==='number')return x!==0;
+  return /^(1|true|yes|y)$/i.test(String(x??''));
+}
+function hatNormalize(record,inning){
+  if(!record || typeof record!=='object' || Array.isArray(record))return null;
+  const innings=Number(hatValue(record,'innings','inning','inningsNumber','inningNumber','inningsNo')??inning);
+  if(innings!==inning)return null;
+  const bowler=validDisplayName(hatValue(record,'bowlerName','bowler_name','bowler','bowlerFullName') ?? '');
+  const bowlerId=hatValue(record,'bowlerId','bowler_id','bowlerPlayerId');
+  const bowlerKey=bowlerId!=null?'id:'+String(bowlerId):bowler?'name:'+bowler.toLowerCase():'';
+  if(!bowlerKey)return null;
+  const over=hatValue(record,'overNumber','over','overNo','over_number');
+  const ball=hatValue(record,'ballNumber','ball','ballNo','deliveryNumber','ball_number');
+  const sequence=hatValue(record,'sequence','sequenceNumber','eventSequence','deliverySequence','index');
+  const id=hatValue(record,'deliveryId','ballId','eventId','id');
+  // A stable delivery ID or an explicit sequence is required for deduplication.
+  const key=id!=null?'id:'+id:sequence!=null?'seq:'+sequence:
+    over!=null&&ball!=null?'pos:'+over+'.'+ball:'';
+  if(!key)return null;
+  const out=hatValue(record,'dismissalType','wicketType','howOut','dismissal','outType');
+  const outText=String(typeof out==='object'?hatValue(out,'type','name','kind')??'':out??'').trim().toLowerCase().replace(/[_-]/g,' ');
+  const wicket=hatTruthy(hatValue(record,'isWicket','wicket','isOut','wicketFallen')) ||
+    Boolean(outText && outText!=='not out');
+  const nonBowler=/(run\s*out|retired|obstruct|timed\s*out)/i.test(outText);
+  const credited=hatValue(record,'creditedToBowler','bowlerCredited','isBowlerWicket','countsForBowler');
+  // Never infer a credited wicket from a bare "W" marker.
+  const bowlerWicket=wicket && (credited!=null ? hatTruthy(credited) :
+    Boolean(outText && !nonBowler && /^(bowled|caught|caught and bowled|lbw|l b w|stumped|hit wicket)$/.test(outText)));
+  return {innings,bowler,bowlerKey,key,bowlerWicket,sequence:sequence==null?null:Number(sequence),
+    over:over==null?null:Number(over),ball:ball==null?null:Number(ball)};
+}
+function hatDeliveryList(payload,inning){
+  if(Array.isArray(payload))return payload;
+  if(!payload || typeof payload!=='object')return [];
+  const nested=payload.innings?.[inning-1];
+  for(const value of [payload.deliveries,payload.ballByBall,payload.ballbyball,
+    payload.deliveryEvents,payload.ballsDetailed,payload.events,
+    nested?.deliveries,nested?.ballByBall,nested?.balls]){
+    if(Array.isArray(value)&&value.some(x=>x&&typeof x==='object'&&!Array.isArray(x)))return value;
+  }
+  return [];
+}
+function hatSort(a,b){
+  if(a.sequence!=null&&b.sequence!=null)return a.sequence-b.sequence;
+  if(a.over!=null&&b.over!=null && a.ball!=null&&b.ball!=null)
+    return a.over-b.over||a.ball-b.ball;
+  return 0;
+}
+function hatProcess(payload,inning,allowCelebration=true){
+  const normalized=hatDeliveryList(payload,inning).map(x=>hatNormalize(x,inning)).filter(Boolean);
+  if(!normalized.length)return 0;
+  normalized.sort(hatSort);
+  const known=hatTrickProcessed.get(inning)||new Set();
+  const state=hatTrickStates.get(inning)||{bowlerKey:'',count:0,primed:false};
+  // On the first complete snapshot, establish a baseline without celebrating
+  // historic hat-tricks; process future newly received deliveries normally.
+  const initial=!state.primed;
+  let detected=0;
+  for(const delivery of normalized){
+    if(known.has(delivery.key))continue;
+    known.add(delivery.key);
+    if(known.size>hatTrickMaxIds){const first=known.values().next().value;known.delete(first);}
+    // Only consecutive deliveries BY THIS BOWLER count. An intervening
+    // delivery by a different bowler does not reset the previous bowler's
+    // streak, allowing a hat-trick across overs.
+    const bowlerState=state[delivery.bowlerKey]||{count:0};
+    bowlerState.count=delivery.bowlerWicket?bowlerState.count+1:0;
+    state[delivery.bowlerKey]=bowlerState;
+    if(bowlerState.count===3){
+      detected++;
+      if(!initial&&allowCelebration)
+        milestoneAdd('hat',String(inning)+'|hat|'+delivery.bowlerKey+'|'+delivery.key,delivery.bowler);
+    }
+  }
+  state.primed=true;
+  hatTrickProcessed.set(inning,known);
+  hatTrickStates.set(inning,state);
+  return detected;
+}
+function observeHatTrick(data,inning,preMatch,onBreak,isFinished){
+  if(!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
+  const payload=hatTrickFeed||data;
+  hatProcess(payload,inning,!onBreak&&!isFinished);
+}
+async function fetchHatTrickFeed(){
+  if(!hatTrickFeedUrl || !milestoneEnabled || overlayLayout!=='4')return;
+  try{
+    const response=await fetch(hatTrickFeedUrl,{cache:'no-store'});
+    if(!response.ok)throw Error('Hat-trick feed HTTP '+response.status);
+    hatTrickFeed=await response.json();
+  }catch(err){console.warn('Hat-trick delivery feed unavailable:',err);}
+}
+
 function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
   if(!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
   const now=milestoneRead(data,v,second,t1,t2);
@@ -3256,8 +3367,11 @@ function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
         milestoneAdd('part'+n,prefix+'part'+n+'|'+now.part.key,now.part.name);
     }
   }
-  // Hat-trick requires wicket attribution for three consecutive bowler deliveries.
-  // The flat THIS OVER token list cannot prove this, so no speculative trigger.
+  // A hat-trick is evaluated separately from verified, delivery-level events.
+  // Do not infer the bowler from a flat THIS OVER display token.
+  try { observeHatTrick(data,now.inning,preMatch,onBreak,isFinished); }
+  catch(err){ console.warn('Hat-trick tracking skipped:',err); }
+
 }
 
 function render(data){
@@ -3287,7 +3401,12 @@ function render(data){
   } else if((!overSummaryTimer && !awaitingNextBall) || !(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
   const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
   observeNativeMatchState(data,v,second,t1,t2,preMatch,onBreak,isFinished);
-  observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished);
+  // Milestones are optional: they must never interrupt core live-score rendering.
+  try {
+    observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished);
+  } catch (milestoneError) {
+    console.warn('Milestone processing skipped; scoreboard continues:', milestoneError);
+  }
   const overlayEl=document.querySelector(".overlay");
   overlayEl.classList.toggle("is-prematch",preMatch);
   $("prematchTemplate").hidden=!preMatch;
@@ -3439,10 +3558,12 @@ async function refresh(){
   try{
     const response=await fetch(API,{cache:"no-store"});
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    render(await response.json());
+    const liveData=await response.json();
+    await fetchHatTrickFeed();
+    render(liveData);
     $("error").style.display="none";
   }catch(e){
-    console.error(e);
+    console.error("CricClubs refresh/render failed:", e);
     $("error").textContent="Live score temporarily unavailable. Retrying…";
     $("error").style.display="block";
   }
