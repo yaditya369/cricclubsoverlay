@@ -1955,15 +1955,13 @@ html body .overlay.layout2.layout4 > .top {border-bottom:0!important;box-shadow:
       <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
     </linearGradient>
   </defs>
-  <!-- Layout 4: 44% side hexagons, 15% center hexagon; center drawn last. -->
+  <!-- Layout 4: equal-height hexagons; center overlays each wing by 5% of center width. -->
   <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="16,2 432,2 447,50 432,98 16,98 1,50"/>
-    <polygon points="568,2 984,2 999,50 984,98 568,98 553,50"/>
+    <polygon points="16,2 417,2 432,50 417,98 16,98 1,50"/>
+    <polygon points="583,2 984,2 999,50 984,98 583,98 568,50"/>
   </g>
-  <!-- SVG viewBox is 100 units high while CSS top is 50px:
-       65px center = 130 SVG units, extending 15 units (7.5px) each side.
-       Center is painted last to overlap the full-height side hexagons. -->
-  <polygon points="441,-15 559,-15 575,50 559,115 441,115 425,50"
+  <!-- Center is 50px tall, same as wings. Painted last for visible overlap. -->
+  <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"
            fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round"/>
 </svg>
     <section class="team left">
