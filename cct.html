@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CricClubs Worker API Tester</title>
+  <title>CricClubs Worker API Tester - NACL</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -157,7 +157,7 @@
 <body>
 
 <div class="container">
-  <h1>CricClubs Worker API Tester</h1>
+  <h1>CricClubs Worker API Tester (NACL)</h1>
   <p class="subtitle">Worker Endpoint: <code>https://cricclubs-api.y-aditya369.workers.dev</code></p>
 
   <div class="card">
@@ -166,13 +166,13 @@
         <input type="text" id="clubId" value="27594">
       </label>
       <label>Match ID
-        <input type="text" id="matchId" value="4635">
+        <input type="text" id="matchId" value="4630">
       </label>
       <label>Player ID
-        <input type="text" id="playerId" value="2888744">
+        <input type="text" id="playerId" value="">
       </label>
       <label>League Subdomain
-        <input type="text" id="league" value="cricclubs" placeholder="e.g. cricbay, nwcl">
+        <input type="text" id="league" value="nacltennisballcricket">
       </label>
     </div>
 
@@ -189,7 +189,7 @@
       <span>Request URL</span>
       <span id="status-badge" class="status-tag">Ready</span>
     </div>
-    <div id="url-display">https://cricclubs-api.y-aditya369.workers.dev/?clubId=27594&matchId=4635</div>
+    <div id="url-display">https://cricclubs-api.y-aditya369.workers.dev/?clubId=27594&matchId=4630&league=nacltennisballcricket</div>
 
     <iframe id="preview-frame" title="CricClubs API Output Preview"></iframe>
     <textarea id="raw-output" readonly placeholder="Raw HTML response will appear here..."></textarea>
@@ -250,7 +250,6 @@
         statusBadge.className = "status-tag error";
       }
 
-      // Render response in iframe and raw textarea
       iframe.srcdoc = htmlText;
       rawText.value = htmlText;
 
