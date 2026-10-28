@@ -2096,6 +2096,56 @@ html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball {
   text-align:center!important;line-height:1!important;flex:0 0 auto!important;
 }
 </style>
+<style id="layout4-this-over-runs-below-label-fix">
+/* Layout 4 only: keep the run count directly below THIS OVER. */
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .this-over-label {
+  display:inline-flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  gap:0!important;
+  height:19px!important;
+  min-height:19px!important;
+  margin:0 3px 0 0!important;
+  white-space:nowrap!important;
+  vertical-align:middle!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .this-over-label > .ball-label,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .this-over-label > .this-over-runs {
+  display:block!important;
+  width:auto!important;
+  height:9px!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:8px!important;
+  line-height:9px!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+}
+</style>
+<style id="layout4-this-over-left-group-bold-centered-deliveries">
+/* Layout 4: keep the two-line label immediately beside the delivery boxes,
+   rather than distributing the sequence to the far right. */
+html body .overlay.layout4 #details2 .l3-bowler-block .balls {
+  display:flex!important;
+  justify-content:flex-start!important;
+  align-items:center!important;
+  gap:3px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-weight:800!important;
+  line-height:1!important;
+  flex:0 0 auto!important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
