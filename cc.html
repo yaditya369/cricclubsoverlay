@@ -2146,6 +2146,23 @@ html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball {
   flex:0 0 auto!important;
 }
 </style>
+<style id="layout4-delivery-values-bold-verified">
+/* The actual JS-generated delivery chips, including boundary/wicket/extra variants. */
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > span.ball,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > span.ball.boundary,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > span.ball.wicket,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > span.ball.extra {
+  font-weight:900!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  line-height:1!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > span.ball.dot-ball::after {
+  font-weight:900!important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -2802,7 +2819,7 @@ function showBowler(v,balls,inningsOvers){
     else if(/^(?:(?:\d+\s*)?W|WICKET|OUT)(?:\s*\+.*)?$/i.test(x.trim())) cls+=' wicket';
     else if(x==='6') cls+=' boundary six';
     else if(x==='4') cls+=' boundary';
-    return `<span class="${cls}" title="${escapeHTML(x)}">${cls.includes("dot-ball") ? "" : escapeHTML(extra?extra.label:x)}</span>`;
+    return `<span class="${cls}" title="${escapeHTML(x)}" style="font-weight:900!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;line-height:1!important;">${cls.includes("dot-ball") ? "" : escapeHTML(extra?extra.label:x)}</span>`;
   }).join('');
   if (!bowler) return "";
   const overLine = `<div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
