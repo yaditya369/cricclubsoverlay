@@ -2218,6 +2218,30 @@ html body .overlay.layout4 #details2 .l3-bowler-block .balls {
   justify-content:flex-start!important;
 }
 </style>
+<style id="layout4-bowler-and-delivery-weight-correction">
+/* Scoped final override: bowling figures must be bold despite older Layout 2 rules. */
+html body .overlay.layout4 #details2 .l3-bowler-block .bowler-row .bowler-meta {
+  font-size:14px !important;
+  font-weight:900 !important;
+  text-align:right !important;
+  margin-left:auto !important;
+  font-synthesis:weight;
+}
+/* Equal, bold numerals for runs, wickets and extras; retain existing chip colors and animation. */
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball.wicket,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball.extra,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball.boundary,
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball.six {
+  font-size:13px !important;
+  font-weight:900 !important;
+  font-synthesis:weight;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball * {
+  font-size:inherit !important;
+  font-weight:900 !important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
