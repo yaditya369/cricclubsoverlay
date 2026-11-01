@@ -2191,6 +2191,33 @@ html body .overlay.layout4 #details2 .balls::-webkit-scrollbar{display:none!impo
 html body .overlay.layout4 #details2 .balls > .ball{flex-shrink:0!important;position:relative!important;transform-origin:center center!important;}
 html body .overlay.layout4 #details2 .balls > .ball.delivery-zoom-in{animation:ccDeliveryZoomV64 1000ms ease-in-out 1!important;z-index:8!important;}
 </style>
+
+<style id="layout4-bowler-left-alignment-v67">
+/* With the portrait removed, the content must occupy grid column 1.
+   The inherited Layout 3 rule pins it to column 2 and leaves unused space. */
+html body .overlay.layout4 #details2 .l3-bowler-block {
+  grid-template-columns:minmax(0,1fr)!important;column-gap:0!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .l3-bowler-content {
+  grid-column:1!important;grid-row:1!important;
+  justify-self:stretch!important;align-items:stretch!important;
+  width:100%!important;min-width:0!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .bowler-row {
+  justify-content:space-between!important;gap:7px!important;
+  margin-left:0!important;padding-left:0!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .bowler-name {
+  font-size:14px!important;font-weight:900!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .bowler-meta {
+  font-size:14px!important;font-weight:400!important;
+  margin-left:auto!important;text-align:right!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .balls {
+  justify-content:flex-start!important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
