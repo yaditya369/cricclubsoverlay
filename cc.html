@@ -2242,6 +2242,18 @@ html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball * {
   font-weight:900 !important;
 }
 </style>
+<style id="layout4-batter-gap-and-extra-white-20261101">
+/* Only Layout 4: give the first batter the same breathing room after the team divider. */
+html body .overlay.layout4:not(.is-prematch) #details1 .l3-batter:first-child {
+  padding-left:14px !important;
+}
+/* Extra chips (wide/no-ball/byes/leg-byes) must use white lettering. */
+html body .overlay.layout4 .top .balls > .ball.extra,
+html body .overlay.layout4 #details2 .balls > .ball.extra,
+html body .overlay.layout4 .top .balls > .ball.extra * {
+  color:#ffffff !important;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
