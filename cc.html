@@ -2053,29 +2053,29 @@ html body .overlay .top .balls > .ball > * {
 </style>
 <style id="layout4-batsmen-score-font-increase">
 /* Layout 4 only: both batsmen use the existing striker typography. */
-html body .overlay.layout2.layout4 #details1 .l3-batter .l3-batter-name {
+html body .overlay.layout4 #details1 .l3-batter .l3-batter-name {
   font-size:14px!important;
 }
-html body .overlay.layout2.layout4 #details1 .l3-batter .l3-batter-score {
+html body .overlay.layout4 #details1 .l3-batter .l3-batter-score {
   font-size:17px!important;
   font-weight:900!important;
   line-height:1.05!important;
 }
-html body .overlay.layout2.layout4 #details1 .l3-batter .l3-batter-score small {
+html body .overlay.layout4 #details1 .l3-batter .l3-batter-score small {
   font-size:13px!important;
   font-weight:900!important;
 }
-html body .overlay.layout2.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-name {
+html body .overlay.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-name {
   font-size:14px!important;
   font-weight:900!important;
   line-height:1.1!important;
 }
-html body .overlay.layout2.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-score {
+html body .overlay.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-score {
   font-size:17px!important;
   font-weight:900!important;
   line-height:1.05!important;
 }
-html body .overlay.layout2.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-score small {
+html body .overlay.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-score small {
   font-size:13px!important;
   font-weight:800!important;
 }
@@ -2144,6 +2144,52 @@ html body .overlay.layout2.layout4:not(.is-prematch) #details1 .l3-batter-info {
   align-items:flex-start!important;
   text-align:left!important;
 }
+</style>
+
+<style id="layout4-bowler-typography-and-position-final">
+/* Layout 4 only: match batsmen's name/score sizes, and anchor the bowler at the left. */
+html body .overlay.layout4 #details2 .l3-bowler-block .l3-bowler-content {
+  width:100%!important; min-width:0!important; align-items:stretch!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .bowler-row {
+  justify-content:flex-start!important; gap:9px!important; width:100%!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .bowler-name {
+  flex:0 1 auto!important; width:auto!important; max-width:58%!important;
+  font-size:14px!important; font-weight:900!important; line-height:1.1!important;
+  text-align:left!important;
+}
+html body .overlay.layout4 #details2 .l3-bowler-block .bowler-meta {
+  flex:0 0 auto!important; margin-left:0!important;
+  font-size:17px!important; font-weight:900!important; line-height:1.05!important;
+  text-align:left!important;
+}
+</style>
+
+<style id="layout4-identity-dividers-v66">
+/* Dividers at the team/player boundary on both sides; do not change center geometry. */
+html body .overlay.layout4:not(.is-prematch) > .top .team.left > .identity {
+ border-right:1px solid rgba(255,213,74,.8)!important;
+ padding-right:10px!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top .team.right > .identity {
+ border-left:1px solid rgba(255,213,74,.8)!important;
+ padding-left:10px!important;
+}
+/* Milestone names are deliberately larger than the description. */
+html body #milestoneEvent .ms-name {font-size:clamp(23px,3.6vw,40px)!important;line-height:1.13!important;font-weight:900!important;}
+/* CricBay v64 final approved 1.5x / 1000ms / 45% bounce / 50% glow. */
+@keyframes ccDeliveryZoomV64 {
+ 0%{transform:scale(1);box-shadow:0 0 0 rgba(255,215,107,0)}
+ 30%{transform:scale(1.5);box-shadow:0 0 14px 4px rgba(255,215,107,.5)}
+ 65%{transform:scale(.88);box-shadow:0 0 0 rgba(255,215,107,0)}
+ 82%{transform:scale(1.45)}
+ 100%{transform:scale(1);box-shadow:0 0 0 rgba(255,215,107,0)}
+}
+html body .overlay.layout4 #details2 .balls {overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;scroll-behavior:auto!important;padding-top:9px!important;padding-bottom:9px!important;margin-top:-7px!important;margin-bottom:-7px!important;min-width:0!important;}
+html body .overlay.layout4 #details2 .balls::-webkit-scrollbar{display:none!important}
+html body .overlay.layout4 #details2 .balls > .ball{flex-shrink:0!important;position:relative!important;transform-origin:center center!important;}
+html body .overlay.layout4 #details2 .balls > .ball.delivery-zoom-in{animation:ccDeliveryZoomV64 1000ms ease-in-out 1!important;z-index:8!important;}
 </style>
 </head>
 <body>
@@ -3820,5 +3866,57 @@ if (urlParam("demo") === "matchResult") {
 }
 </script>
 <div id="milestoneEvent" aria-live="polite"><div class="ms-particles"></div><div class="ms-content"><div class="ms-head"></div><div class="ms-name"></div><div class="ms-detail"></div></div></div>
+
+<script id="layout4-delivery-zoom-v66">
+(function(){
+ let previous=null, initialized=false, scheduled=false;
+ function check(){
+  scheduled=false;
+  const overlay=document.querySelector('.overlay');
+  if(!overlay || !overlay.classList.contains('layout4'))return;
+  const holder=document.querySelector('#details2 .balls');
+  if(!holder)return;
+  const chips=Array.from(holder.querySelectorAll(':scope > .ball'));
+  const labels=chips.map(e=>e.textContent.trim()+'|'+e.className.replace(/\s*delivery-zoom-in/g,''));
+  const key=labels.join('~');
+  if(!initialized){previous=key;initialized=true;return;}
+  if(key===previous)return;
+  const old=previous ? previous.split('~') : [];
+  previous=key;
+  // Re-rendered DOM should not trigger a zoom if nothing new was scored.
+  // Match the largest suffix of the old over to the prefix of the new one.
+  let overlap=0;
+  for(let n=Math.min(old.length,labels.length);n>0;n--){
+   if(old.slice(-n).join('~')===labels.slice(0,n).join('~')){overlap=n;break;}
+  }
+  if(!overlap && old.length && labels.length && labels.length<=old.length){
+   // An over reset / score correction is not a new ball.
+   return;
+  }
+  if(!labels.length)return;
+  const latest=chips[chips.length-1];
+  requestAnimationFrame(()=>{
+   if(!latest.isConnected)return;
+   if(typeof latest.animate==='function'){
+    latest.animate([
+     {transform:'scale(1)',boxShadow:'0 0 0 rgba(255,215,107,0)',offset:0},
+     {transform:'scale(1.5)',boxShadow:'0 0 14px 4px rgba(255,215,107,.5)',offset:.30},
+     {transform:'scale(.88)',boxShadow:'0 0 0 rgba(255,215,107,0)',offset:.65},
+     {transform:'scale(1.45)',offset:.82},
+     {transform:'scale(1)',boxShadow:'0 0 0 rgba(255,215,107,0)',offset:1}
+    ],{duration:1000,easing:'ease-in-out',iterations:1});
+   }else{
+    latest.classList.add('delivery-zoom-in');
+    setTimeout(()=>latest.classList.remove('delivery-zoom-in'),1000);
+   }
+   // CricBay v65 behavior: always reveal the latest delivery.
+   holder.scrollLeft=holder.scrollWidth-holder.clientWidth;
+  });
+ }
+ const observer=new MutationObserver(()=>{if(!scheduled){scheduled=true;requestAnimationFrame(check);}});
+ function start(){const node=document.querySelector('#details2');if(node){observer.observe(node,{childList:true,subtree:true,characterData:true});check();}}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+</script>
 </body>
 </html>
