@@ -2691,6 +2691,11 @@ html body .overlay.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
   line-height:normal!important;
 }
 </style>
+<style id="layout4-team-name-visibility-restore">
+/* Restore the brighter team-name ends of the original MH gradient.
+   Only Layout 4's SVG fill is affected; opacity remains controlled by the URL. */
+.overlay.layout4.theme-mh { --l4-grad-edge:#a80818; }
+</style>
 <style id="layout4-opacity-footer-correction-20261101b">
 /* Keep the 15px footer and center its text by layout, not font baselines. */
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText,
