@@ -2699,6 +2699,25 @@ html body .overlay.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
   line-height:normal!important;
 }
 </style>
+<style id="layout4-opacity-footer-correction-20261101b">
+/* Keep the 15px footer and center its text by layout, not font baselines. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText,
+html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText {
+  position:absolute!important;top:0!important;bottom:0!important;
+  left:120px!important;right:120px!important;
+  width:auto!important;height:100%!important;max-width:none!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  transform:none!important;line-height:1!important;padding:0!important;margin:0!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
+  position:absolute!important;top:0!important;bottom:0!important;right:8px!important;
+  height:100%!important;display:flex!important;align-items:center!important;
+  transform:none!important;line-height:1!important;margin:0!important;
+}
+@media(max-width:650px){
+ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText {left:85px!important;right:85px!important;}
+}
+</style>
 <script>
 const params = new URLSearchParams(location.search);
 const clubId = params.get("clubId") || "22594";
@@ -2719,6 +2738,13 @@ document.documentElement.style.setProperty(
   "--overlay-opacity",
   overlayOpacity
 );
+
+// SVG presentation attributes do not reliably resolve CSS custom properties in
+// Android WebView. Apply the numeric alpha directly to each gradient stop.
+document.querySelectorAll('.l4-svg-panels linearGradient stop').forEach(stop => {
+  stop.setAttribute('stop-opacity', String(overlayOpacity));
+  stop.style.stopOpacity = String(overlayOpacity);
+});
 
 // Layout and theme are independent query parameters.
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
