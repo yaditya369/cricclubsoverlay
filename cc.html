@@ -2273,15 +2273,7 @@ html body .overlay.layout4:not(.is-prematch) > .top .team .team-name {
   white-space:normal!important;
   text-align:center!important;
 }
-/* Darker gradient only beneath team identity, without covering text/logo
-   or changing the gold panel outlines. */
-html body .overlay.layout4:not(.is-prematch) > .top .team .identity::before {
-  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-  background:linear-gradient(90deg,rgba(20,0,5,.83),rgba(57,0,11,.66) 52%,rgba(20,0,5,.83));
-}
-html body .overlay.layout4:not(.is-prematch) > .top .team .identity {
-  isolation:isolate;
-}
+/* Team identity darkening reverted; original SVG gradient is retained. */
 </style>
 </head>
 <body>
