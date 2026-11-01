@@ -2302,9 +2302,9 @@ html body .overlay.layout4:not(.is-prematch) > .top .team .identity {
       <stop offset="100%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
     </linearGradient>
     <linearGradient id="l4-center-dark-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#8b0b1b" stop-opacity=".97"/>
-      <stop offset="48%" stop-color="#66000e" stop-opacity=".97"/>
-      <stop offset="100%" stop-color="#390008" stop-opacity=".97"/>
+      <stop offset="0%" stop-color="#8b0b1b" stop-opacity="var(--overlay-opacity,.80)"/>
+      <stop offset="48%" stop-color="#66000e" stop-opacity="var(--overlay-opacity,.80)"/>
+      <stop offset="100%" stop-color="#390008" stop-opacity="var(--overlay-opacity,.80)"/>
     </linearGradient>
   </defs>
   <!-- Layout 4: equal-height hexagons; center overlaps each wing by 15% of center width. -->
@@ -2665,6 +2665,40 @@ html body .overlay.layout4:not(.is-prematch) #details1 .l3-batter + .l3-batter {
   padding-left:9px!important;
 }
 </style>
+<style id="layout4-opacity-footer-fix-20261101">
+/* Keep Layout 4 SVG as the sole painted header layer. */
+html body .overlay.layout4:not(.is-prematch),
+html body .overlay.layout4:not(.is-prematch) > .top,
+html body .overlay.layout4:not(.is-prematch) > .top .team,
+html body .overlay.layout4:not(.is-prematch) > .top .scorebox {
+  background:transparent!important;
+  background-image:none!important;
+}
+/* Footer gradient must honor the URL opacity rather than opaque hex stops. */
+html body .overlay.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout4:not(.is-prematch) > .bottom.visible {
+  background:linear-gradient(90deg,
+    rgba(120,4,14,var(--overlay-opacity,.80)),
+    rgba(181,10,25,var(--overlay-opacity,.80)) 25%,
+    rgba(101,0,14,var(--overlay-opacity,.80)) 50%,
+    rgba(181,10,25,var(--overlay-opacity,.80)) 75%,
+    rgba(120,4,14,var(--overlay-opacity,.80)))!important;
+  display:flex!important;
+  align-items:center!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .bottom.visible #bottomText {
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  line-height:normal!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  line-height:normal!important;
+}
+</style>
 <script>
 const params = new URLSearchParams(location.search);
 const clubId = params.get("clubId") || "22594";
@@ -2679,7 +2713,7 @@ const opacityValue = Number(params.get("opacity"));
 
 const overlayOpacity = params.has("opacity") && Number.isFinite(opacityValue)
   ? Math.max(0, Math.min(1, opacityValue))
-  : 0.70;
+  : 0.80;
 
 document.documentElement.style.setProperty(
   "--overlay-opacity",
