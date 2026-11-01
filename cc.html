@@ -2248,7 +2248,7 @@ html body .overlay.layout4 #details2 .l3-bowler-block .balls {
     <polygon points="567.5,2 1000,2 1000,98 567.5,98 552.5,50"/>
   </g>
   <!-- Center polygon is 55px tall, extending approximately 2.5px above and below the 50px side panels. Painted last for visible overlap. -->
-  <polygon points="441,-3 559,-3 575,50 559,103 441,103 425,50"
+  <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"
            fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round"/>
 </svg>
     <section class="team left">
@@ -2560,6 +2560,38 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible .powered-
   html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
     right:5px!important;font-size:7px!important;max-width:80px!important;
   }
+}
+</style>
+<style id="layout4-final-height-footer-batter-gaps-20261031">
+/* Layout 4 only. Center polygon now shares the side-panel vertical edges. */
+html body .overlay.layout4:not(.is-prematch) {
+  position:fixed!important; bottom:0!important;
+  height:65px!important; min-height:65px!important; max-height:65px!important;
+  overflow:visible!important;
+}
+html body .overlay.layout4:not(.is-prematch) > .top {
+  height:50px!important; min-height:50px!important; max-height:50px!important;
+  flex:0 0 50px!important;
+}
+/* Footer occupies the final 15px and sits flush with the bottom edge. */
+html body .overlay.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout4:not(.is-prematch) > .bottom.visible,
+html body.show-final-result .overlay.layout4:not(.is-prematch) > .bottom.visible {
+  position:absolute!important;top:auto!important;bottom:0!important;
+  left:0!important;right:0!important;width:100%!important;max-width:100%!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
+  flex-basis:15px!important;margin:0!important;
+}
+/* Consistent inner spacing from the team divider to Batter 1 and
+   from the between-batters divider to Batter 2. */
+html body .overlay.layout4:not(.is-prematch) #details1 {
+  padding-left:0!important;padding-right:3px!important;gap:0!important;
+}
+html body .overlay.layout4:not(.is-prematch) #details1 .l3-batter {
+  padding-left:9px!important;padding-right:5px!important;
+}
+html body .overlay.layout4:not(.is-prematch) #details1 .l3-batter + .l3-batter {
+  padding-left:9px!important;
 }
 </style>
 <script>
