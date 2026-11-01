@@ -2052,18 +2052,18 @@ html body .overlay .top .balls > .ball > * {
 }
 </style>
 <style id="layout4-batsmen-score-font-increase">
-/* Layout 4 only: enlarge the active striker's name and statistics, not both batsmen. */
-html body .overlay.layout2.layout4 #details1 .l3-batter:not(.l4-on-strike) .l3-batter-name {
-  font-size:12px!important;
+/* Layout 4 only: both batsmen use the existing striker typography. */
+html body .overlay.layout2.layout4 #details1 .l3-batter .l3-batter-name {
+  font-size:14px!important;
 }
-html body .overlay.layout2.layout4 #details1 .l3-batter:not(.l4-on-strike) .l3-batter-score {
-  font-size:12px!important;
-  font-weight:800!important;
+html body .overlay.layout2.layout4 #details1 .l3-batter .l3-batter-score {
+  font-size:17px!important;
+  font-weight:900!important;
   line-height:1.05!important;
 }
-html body .overlay.layout2.layout4 #details1 .l3-batter:not(.l4-on-strike) .l3-batter-score small {
-  font-size:10px!important;
-  font-weight:800!important;
+html body .overlay.layout2.layout4 #details1 .l3-batter .l3-batter-score small {
+  font-size:13px!important;
+  font-weight:900!important;
 }
 html body .overlay.layout2.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-name {
   font-size:14px!important;
@@ -2116,6 +2116,34 @@ html body .overlay.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-name {
   color:inherit!important;text-shadow:none!important;
 }
 html body .overlay.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-score {color:inherit!important;}
+</style>
+<style id="layout4-batter-spacing-divider-fix">
+/* Layout 4 only: remove wasted space between the two batters and add
+   a subtle gold divider. The center score hexagon is untouched. */
+html body .overlay.layout2.layout4:not(.is-prematch) #details1 {
+  justify-content:flex-start!important;
+  gap:0!important;
+  padding-left:2px!important;
+  padding-right:3px!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) #details1 .l3-batter {
+  flex:0 1 50%!important;
+  width:50%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  justify-content:flex-start!important;
+  padding:0 5px 0 2px!important;
+  border-radius:0!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) #details1 .l3-batter + .l3-batter {
+  border-left:1px solid rgba(255,213,74,.8)!important;
+  padding-left:9px!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) #details1 .l3-batter-info {
+  flex:1 1 auto!important;
+  align-items:flex-start!important;
+  text-align:left!important;
+}
 </style>
 </head>
 <body>
