@@ -2254,6 +2254,35 @@ html body .overlay.layout4 .top .balls > .ball.extra * {
   color:#ffffff !important;
 }
 </style>
+<style id="layout4-wide-team-names-dark-gradient-20261101">
+/* Layout 4 only: wider identity columns for long team names. The center
+   score column retains its original width and position. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .top {
+  grid-template-columns:clamp(116px,12.5%,200px) minmax(0,1fr) clamp(112px,16%,220px) minmax(0,1fr) clamp(116px,12.5%,200px)!important;
+}
+/* Allow two lines for names such as INVINCIBLES CALIFORNIANS. */
+html body .overlay.layout4:not(.is-prematch) > .top .team .team-name {
+  width:100%!important;
+  max-height:26px!important;
+  font-size:clamp(9px,.82vw,13px)!important;
+  line-height:1.06!important;
+  font-weight:900!important;
+  overflow:hidden!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+  white-space:normal!important;
+  text-align:center!important;
+}
+/* Darker gradient only beneath team identity, without covering text/logo
+   or changing the gold panel outlines. */
+html body .overlay.layout4:not(.is-prematch) > .top .team .identity::before {
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(20,0,5,.83),rgba(57,0,11,.66) 52%,rgba(20,0,5,.83));
+}
+html body .overlay.layout4:not(.is-prematch) > .top .team .identity {
+  isolation:isolate;
+}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -2438,6 +2467,12 @@ html body .overlay.layout2.theme-mh .team.left .scorebox .meta{
 .overlay .ball.boundary, .overlay.theme-red .ball.boundary, .overlay.theme-mh .ball.boundary {background:#2563eb!important;border-color:#93c5fd!important;color:#fff!important;}
 .overlay .ball.six, .overlay.theme-red .ball.six, .overlay.theme-mh .ball.six {background:#16a34a!important;border-color:#86efac!important;color:#fff!important;}
 .overlay .ball.extra, .overlay.theme-red .ball.extra, .overlay.theme-mh .ball.extra {background:#d97706!important;border-color:#fcd34d!important;color:#fff!important;}
+</style>
+<style id="layout4-delivery-font-minus-one">
+/* Layout 4 only: 13px to 12px for all This Over delivery chips. */
+html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball,
+html body .overlay.layout4 #details2 .balls > .ball { font-size:12px!important; }
+html body .overlay.layout4 #details2 .balls > .ball * { font-size:inherit!important; }
 </style>
 <style id="layout4-final-delivery-alignment-and-wicket">
 /* Final Layout 4 override: center each chip and give wickets an unmistakable treatment. */
@@ -2653,7 +2688,7 @@ document.documentElement.style.setProperty(
 
 // Layout and theme are independent query parameters.
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
-const requestedLayout = (params.get("layout") || "2").trim().toLowerCase();
+const requestedLayout = (params.get("layout") || "4").trim().toLowerCase();
 const overlayLayout = ["2", "3", "4"].includes(requestedLayout) ? requestedLayout : "1";
 const requestedTheme = (params.get("theme") || "mh").trim().toLowerCase();
 const overlayTheme = ["blue", "graphite", "red", "mh"].includes(requestedTheme) ? requestedTheme : "mh";
