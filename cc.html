@@ -2691,11 +2691,6 @@ html body .overlay.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
   line-height:normal!important;
 }
 </style>
-<style id="layout4-team-name-visibility-restore">
-/* Restore the brighter team-name ends of the original MH gradient.
-   Only Layout 4's SVG fill is affected; opacity remains controlled by the URL. */
-.overlay.layout4.theme-mh { --l4-grad-edge:#a80818; }
-</style>
 <style id="layout4-opacity-footer-correction-20261101b">
 /* Keep the 15px footer and center its text by layout, not font baselines. */
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText,
@@ -2715,8 +2710,88 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible .powered-
  html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText {left:85px!important;right:85px!important;}
 }
 </style>
+<style id="layout4-footer-centering-final-fix">
+/* Final override: full-width 15px footer, with truly centered content. */
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
+  position:absolute!important;left:0!important;right:0!important;
+  top:50px!important;bottom:auto!important;
+  width:100%!important;max-width:100%!important;
+  margin:0!important;padding:0!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
+  box-sizing:border-box!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  overflow:hidden!important;
+  background:linear-gradient(90deg,
+    rgba(120,4,14,var(--overlay-opacity,.80)),
+    rgba(181,10,25,var(--overlay-opacity,.80)) 25%,
+    rgba(101,0,14,var(--overlay-opacity,.80)) 50%,
+    rgba(181,10,25,var(--overlay-opacity,.80)) 75%,
+    rgba(120,4,14,var(--overlay-opacity,.80)))!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText,
+html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText {
+  position:absolute!important;inset:0 120px!important;
+  width:auto!important;max-width:none!important;height:15px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  line-height:15px!important;text-align:center!important;
+  margin:0!important;padding:0!important;transform:none!important;
+  white-space:nowrap!important;
+}
+html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible .powered-credit {
+  position:absolute!important;top:0!important;bottom:0!important;right:8px!important;left:auto!important;
+  height:15px!important;display:flex!important;align-items:center!important;
+  line-height:15px!important;margin:0!important;padding:0!important;transform:none!important;
+}
+@media(max-width:650px){
+ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText,
+ html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible #bottomText {
+  left:85px!important;right:85px!important;
+ }
+}
+</style>
+<style id="layout4-footer-unified-all-states">
+/* One footer geometry for pre-match, toss, innings, chase and result. */
+html body .overlay.layout2.layout4 > .bottom,
+html body .overlay.layout2.layout4 > .bottom.visible {
+  position:relative!important;inset:auto!important;
+  flex:0 0 15px!important;width:100%!important;max-width:100%!important;
+  height:15px!important;min-height:15px!important;max-height:15px!important;
+  margin:0!important;padding:0!important;box-sizing:border-box!important;
+  align-items:center!important;justify-content:center!important;overflow:hidden!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible #bottomText,
+html body.show-final-result .overlay.layout2.layout4 > .bottom.visible #bottomText {
+  position:absolute!important;top:0!important;bottom:0!important;
+  left:0!important;right:0!important;inset:0!important;
+  width:100%!important;max-width:none!important;height:15px!important;
+  margin:0!important;padding:0 115px!important;box-sizing:border-box!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  text-align:center!important;line-height:15px!important;transform:none!important;
+  white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
+  position:absolute!important;top:0!important;bottom:0!important;left:auto!important;right:8px!important;
+  height:15px!important;margin:0!important;padding:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  line-height:15px!important;transform:none!important;
+}
+@media(max-width:650px){
+  html body .overlay.layout2.layout4 > .bottom.visible #bottomText,
+  html body.show-final-result .overlay.layout2.layout4 > .bottom.visible #bottomText {padding-left:85px!important;padding-right:85px!important;}
+}
+</style>
+<style id="view8-hide-entire-overlay">
+/* view=8: transparent video-only output, including all independent animation layers. */
+html.cc-view8, html.cc-view8 body { background:transparent!important; }
+html.cc-view8 body > * { display:none!important; visibility:hidden!important; }
+</style>
 <script>
 const params = new URLSearchParams(location.search);
+if ((params.get("view") || "").trim() === "8") {
+  document.documentElement.classList.add("cc-view8");
+}
+
 const clubId = params.get("clubId") || "22594";
 const matchId = params.get("matchId") || "1374";
 
@@ -3089,29 +3164,15 @@ const urlParam = k => params.get(k) || "";
 let lastEventSignature = null;
 let eventReady = false;
 let animationTimer;
-// Place boundary-horn.mp3 beside index.html on the same website.
-// Enabled by default; add &sound=0 to mute, or &soundVolume=0.5 to adjust volume.
-const soundEnabled = !/^(0|false|off|no)$/i.test(String(params.get("sound") ?? "1"));
-const soundVolumeRaw = Number(params.get("soundVolume") ?? "0.8");
-const soundVolume = Number.isFinite(soundVolumeRaw) ? Math.max(0,Math.min(1,soundVolumeRaw)) : 0.8;
-const eventAudio = new Audio("boundary-horn.mp3");
-eventAudio.preload = "auto";
-eventAudio.volume = soundVolume;
-function playEventSound(){
-  if(!soundEnabled) return;
-  try {
-    eventAudio.pause();
-    eventAudio.currentTime = 0;
-    const attempt=eventAudio.play();
-    if(attempt && typeof attempt.catch === "function") attempt.catch(e=>console.info("Event audio blocked or unavailable:",e.message));
-  } catch(e) { console.info("Event audio unavailable:",e.message); }
-}
 function showEvent(kind) {
+  if(typeof milestoneBusy!=='undefined' && milestoneBusy){
+    setTimeout(()=>showEvent(kind),350);
+    return;
+  }
   const el=$("scoreEvent");
   const visual={wicket:["🏏","WICKET!"],four:["🏏","FOUR!"],six:["🚀","SIX!"]}[kind];
   if(!visual) return;
   el.style.removeProperty("display");
-  if(kind === "four" || kind === "six") playEventSound();
   clearTimeout(animationTimer);
   el.className="event-animation "+kind;
   const visuals={wicket:["💥","WICKET!",""],four:["🏏","FOUR!","RACING TO THE BOUNDARY"],six:["🚀","SIX!","OUT OF THE PARK"]};
@@ -3135,7 +3196,8 @@ function showEvent(kind) {
   }
   void el.offsetWidth;
   el.classList.add("active");
-  animationTimer=setTimeout(()=>el.classList.remove("active"),2500);
+  if(typeof milestoneEventDeadline!=='undefined')milestoneEventDeadline=Date.now()+2600;
+  animationTimer=setTimeout(()=>{el.classList.remove("active");if(typeof milestonePlayNext==='function')milestonePlayNext();},2500);
 }
 function eventKind(x) {
   const b=String(x).trim().toUpperCase();
@@ -3250,36 +3312,8 @@ function observeNativeMatchState(data,v,second,t1,t2,preMatch,onBreak,isFinished
         ["OVER_COMPLETED",innings,balls].join("|"));
   }
 }
-// Native Android callback: fired once for each newly observed FOUR/SIX delivery.
-// No callback on initial load, refresh of unchanged data, or preview animations.
-function notifyAndroidBoundary(kind, signature, second, overs, deliveryToken = "") {
-  if (kind !== "four" && kind !== "six") return;
-  const payload = {
-    innings: second ? 2 : 1, over: String(overs ?? ""),
-    deliveryId: signature, delivery: deliveryToken,
-    isNoBall: /^(?:N|NB|NOBALL|NO-BALL)\+/.test(deliveryToken)
-  };
-  const type = kind === "four" ? "FOUR" : "SIX";
-  // CricBay calls onBoundary directly even when onEvent is available.
-  const key = "BOUNDARY|" + signature;
-  if (nativeEventKeys.has(key)) return;
-  const event = {type, matchId:String(params.get("matchId") || ""),
-    clubId:String(params.get("clubId") || ""), timestamp:Date.now(), ...payload};
-  const bridge = window.AndroidBridge;
-  let delivered = false;
-  if (bridge && typeof bridge.onBoundary === "function") {
-    try {bridge.onBoundary(JSON.stringify(event)); delivered = true;}
-    catch(err) {console.warn("Android boundary callback failed",err);}
-  }
-  if (bridge && typeof bridge.onEvent === "function") {
-    try {bridge.onEvent(JSON.stringify(event)); delivered = true;}
-    catch(err) {console.warn("Android generic callback failed",err);}
-  }
-  if (delivered) {
-    nativeEventKeys.add(key);
-    if (nativeEventKeys.size > 300) nativeEventKeys.delete(nativeEventKeys.values().next().value);
-  }
-}
+// FOUR/SIX audio and Android boundary callbacks intentionally disabled.
+// Visual boundary animations remain enabled.
 function watchLastBall(data,v,second) {
   const balls=Array.isArray(data.balls)?data.balls:[];
   const t=second?teamScore(v,"t2"):teamScore(v,"t1");
@@ -3296,15 +3330,7 @@ function watchLastBall(data,v,second) {
         deliveryId: signature, delivery: last,
         score: String(t.total), wickets: Number(t.wickets)
       }, "WICKET|" + signature);
-      // FOUR/SIX plus no-ball boundaries (N+4/N+6). Wide boundaries
-      // and byes are not batter boundaries and must not trigger callbacks.
-      const token = last.trim().toUpperCase().replace(/\\s+/g, "");
-      const noBallBoundary = /^(?:N|NB|NOBALL|NO-BALL)\+(4|6)$/.exec(token);
-      const boundaryKind = token === "4" || noBallBoundary?.[1] === "4" ? "four"
-                         : token === "6" || noBallBoundary?.[1] === "6" ? "six" : "";
-      if (boundaryKind) {
-        notifyAndroidBoundary(boundaryKind, signature, second, t.overs, token);
-      }
+
     }
   }
   lastEventSignature=signature;
@@ -3579,6 +3605,15 @@ const milestoneDefs = {
   part100:['100-RUN PARTNERSHIP!','#70f8c7']
 };
 let milestoneBaseline = null;
+// Partnership epochs are anchored at observed wickets or the start of an innings.
+// If the overlay joins mid-partnership without an API total, the absolute score
+// is unknown until a wicket: never guess from the innings score.
+let partnershipEpoch = null;
+let partnershipSerial = 0;
+let milestoneEventDeadline = 0;
+let milestoneWakeTimer = null;
+const milestoneScope = String(clubId)+'|'+String(matchId);
+
 const milestoneShown = new Set(), milestoneQueue = [];
 let milestoneBusy = false;
 function milestoneNumeric(x){if(x===null||x===undefined||String(x).trim()==='')return null;const n=Number(x);return Number.isFinite(n)?n:null;}
@@ -3591,8 +3626,10 @@ function milestonePlayNext(){
   if(milestoneBusy||!milestoneQueue.length)return;
   if(document.body.classList.contains('show-final-result')){milestoneQueue.length=0;return;}
   // Give a boundary/wicket animation time to finish before the milestone.
-  if(document.getElementById('scoreEvent')?.classList.contains('active')){
-    setTimeout(milestonePlayNext,350);return;
+  if(document.getElementById('scoreEvent')?.classList.contains('active') || Date.now()<milestoneEventDeadline){
+    clearTimeout(milestoneWakeTimer);
+    milestoneWakeTimer=setTimeout(milestonePlayNext,Math.max(100,milestoneEventDeadline-Date.now()+60));
+    return;
   }
   const item=milestoneQueue.shift(), el=document.getElementById('milestoneEvent');
   if(!el)return;
@@ -3617,7 +3654,7 @@ function milestonePlayNext(){
 }
 function milestoneRead(data,v,second,t1,t2){
   const inning=second?2:1,t=second?t2:t1;
-  const snap={inning,total:milestoneNumeric(t.total),bat:{},bowl:{},part:null};
+  const snap={inning,total:milestoneNumeric(t.total),wickets:milestoneNumeric(t.wickets),bat:{},bowl:{},part:null};
   for(let n=1;n<=2;n++){
     const name=validDisplayName(get(v,'batsman'+n+'Name',''));
     const runs=milestoneNumeric(get(v,'batsman'+n+'Runs',''));
@@ -3632,12 +3669,27 @@ function milestoneRead(data,v,second,t1,t2){
     if(row)maidens=milestoneNumeric(row.maidens);
   }
   if(bowler)snap.bowl[bowler]={wickets,maidens};
-  // Partnership milestones require a genuine partnership-runs field, not team score.
-  const part=milestoneNumeric(v.partnershipRuns ?? v.currentPartnershipRuns);
-  if(part!==null){
-    const pair=Object.keys(snap.bat).sort();
-    if(pair.length===2)snap.part={key:pair.join('|'),name:pair.join(' + '),runs:part};
+  // Read the partnership total from common live-score payload locations.
+  // A zero is valid; never substitute the innings total for partnership runs.
+  const sources=[v,data,data?.current,data?.scorecard,data?.match,
+    v?.partnership,v?.currentPartnership,data?.partnership,data?.currentPartnership,
+    data?.current?.partnership];
+  let part=null;
+  for(const source of sources){
+    if(!source || typeof source!=='object')continue;
+    for(const field of ['partnershipRuns','currentPartnershipRuns','partnershipScore',
+      'partnershipTotal','runs','totalRuns']){
+      // Generic 'runs' and 'totalRuns' only belong to partnership subobjects.
+      if((field==='runs'||field==='totalRuns') &&
+         ![v?.partnership,v?.currentPartnership,data?.partnership,
+           data?.currentPartnership,data?.current?.partnership].includes(source))continue;
+      const candidate=milestoneNumeric(source[field]);
+      if(candidate!==null){part=candidate;break;}
+    }
+    if(part!==null)break;
   }
+  const pair=Object.keys(snap.bat).sort();
+  if(pair.length===2)snap.part={key:pair.join('|'),name:pair.join(' + '),runs:part};
   return snap;
 }
 
@@ -3728,7 +3780,7 @@ function hatProcess(payload,inning,allowCelebration=true){
     if(bowlerState.count===3){
       detected++;
       if(!initial&&allowCelebration)
-        milestoneAdd('hat',String(inning)+'|hat|'+delivery.bowlerKey+'|'+delivery.key,delivery.bowler);
+        milestoneAdd('hat',milestoneScope+'|'+String(inning)+'|hat|'+delivery.bowlerKey+'|'+delivery.key,delivery.bowler);
     }
   }
   state.primed=true;
@@ -3753,9 +3805,40 @@ async function fetchHatTrickFeed(){
 function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
   if(!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
   const now=milestoneRead(data,v,second,t1,t2);
-  const prev=milestoneBaseline;milestoneBaseline=now;
-  if(!prev||prev.inning!==now.inning||onBreak||isFinished)return;
-  const prefix=String(now.inning)+'|';
+  const prev=milestoneBaseline;
+  const changedInning=!prev||prev.inning!==now.inning;
+  const wicketChanged=prev&&prev.inning===now.inning&&
+    prev.wickets!==null&&now.wickets!==null&&prev.wickets!==now.wickets;
+  const pairChanged=prev?.part?.key&&now.part?.key&&prev.part.key!==now.part.key;
+  // Each wicket starts a new partnership, even if batsman names are missing.
+  // A changed pair also starts a new epoch; do not carry a previous pair's runs.
+  if(changedInning||wicketChanged||pairChanged){
+    partnershipSerial++;
+    partnershipEpoch={inning:now.inning,serial:partnershipSerial,
+      wickets:now.wickets,pair:now.part?.key||'',
+      // When a wicket has fallen, current total is a valid zero-run anchor.
+      anchor:changedInning?(now.total===0?0:null):(wicketChanged?now.total:null),
+      lastRuns:null};
+  }
+  if(!partnershipEpoch){
+    partnershipSerial++;
+    partnershipEpoch={inning:now.inning,serial:partnershipSerial,
+      wickets:now.wickets,pair:now.part?.key||'',anchor:null,lastRuns:null};
+  }
+  if(now.part){
+    now.part.epoch=partnershipEpoch.serial;
+    // A trustworthy live API total is preferred. Otherwise calculate from the
+    // observed beginning of this partnership (including all extras).
+    if(now.part.runs===null && partnershipEpoch.anchor!==null && now.total!==null)
+      now.part.runs=Math.max(0,now.total-partnershipEpoch.anchor);
+    // Only retain the previous value for missing fields if it is the same epoch.
+    if(now.part.runs===null && partnershipEpoch.lastRuns!==null)
+      now.part.runs=partnershipEpoch.lastRuns;
+    if(now.part.runs!==null)partnershipEpoch.lastRuns=now.part.runs;
+  }
+  milestoneBaseline=now;
+  if(!prev||changedInning||onBreak||isFinished)return;
+  const prefix=milestoneScope+'|'+String(now.inning)+'|';
   for(const n of [50,100,150,200,250]){
     if(prev.total!==null&&now.total!==null&&prev.total<n&&now.total>=n)
       milestoneAdd('team'+n,prefix+'team'+n);
@@ -3776,10 +3859,10 @@ function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
     if(old.maidens!==null&&bowl.maidens!==null&&bowl.maidens>old.maidens)
       milestoneAdd('maiden',prefix+'maiden|'+name+'|'+bowl.maidens,name);
   }
-  if(now.part&&prev.part&&now.part.key===prev.part.key){
+  if(now.part&&prev.part&&now.part.epoch===prev.part.epoch&&now.part.key===prev.part.key){
     for(const n of [50,100]){
-      if(prev.part.runs<n&&now.part.runs>=n)
-        milestoneAdd('part'+n,prefix+'part'+n+'|'+now.part.key,now.part.name);
+      if(prev.part.runs!==null&&now.part.runs!==null&&prev.part.runs<n&&now.part.runs>=n)
+        milestoneAdd('part'+n,prefix+'part'+n+'|'+now.part.epoch+'|'+now.part.key,now.part.name);
     }
   }
   // A hat-trick is evaluated separately from verified, delivery-level events.
