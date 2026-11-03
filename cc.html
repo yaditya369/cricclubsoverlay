@@ -2031,6 +2031,43 @@ html body .overlay.layout4:not(.is-prematch) > .top .team .identity {gap:3px!imp
 @keyframes msImpact{0%{transform:scale(2.4);filter:blur(12px);opacity:0}50%{transform:scale(.85);filter:none;opacity:1}100%{transform:scale(1)}}
 </style>
 
+<style id="milestone-broadcast-sizing-v2">
+/* Milestones use the same stable, full-size typography as boundary celebrations.
+   No zoom/flip/skew: the message enters at its final readable size. */
+html body #milestoneEvent{
+  left:50%;top:58%;width:min(1100px,96vw);max-width:96vw;
+  transform:translate(-50%,-50%);overflow:visible;
+}
+html body #milestoneEvent .ms-content{
+  width:100%;max-width:100%;box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transform:none!important;filter:none!important;
+}
+html body #milestoneEvent .ms-head{
+  font-family:Arial,sans-serif!important;
+  font-size:clamp(42px,7vw,88px)!important;
+  line-height:1.08!important;font-weight:900!important;
+  letter-spacing:1px!important;
+  max-width:100%;overflow-wrap:normal;word-break:normal;
+  text-wrap:balance;-webkit-text-stroke:1px rgba(255,255,255,.45);
+}
+html body #milestoneEvent .ms-name{
+  font-size:clamp(22px,3.6vw,40px)!important;line-height:1.13!important;
+  max-width:96%;text-wrap:balance;
+}
+html body #milestoneEvent .ms-detail{
+  font-size:clamp(16px,2.1vw,24px)!important;line-height:1.2!important;
+}
+html body #milestoneEvent.active .ms-content{
+  animation:msBroadcastEnter 3.4s ease-out both!important;
+}
+@keyframes msBroadcastEnter{
+  0%{opacity:0;transform:translateY(18px)}
+  12%,85%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(0)}
+}
+</style>
+
 <style id="delivery-glyph-bold-center-final">
 /* Final scoped override: center and bold delivery values without changing box geometry. */
 html body .overlay .top .balls > .ball {
@@ -3596,6 +3633,7 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
 
 // Milestone celebrations (Layout 4 only). No fabricated stats or historical replay.
 const milestoneEnabled = !/^(0|false|off)$/i.test(params.get('milestones')||'1');
+const milestoneDemo = /^(1|true|yes|on)$/i.test(params.get('milestoneDemo')||'false');
 const milestoneDefs = {
   bat50:['HALF CENTURY!','#ffd456'],bat100:['CENTURY!','#70f8c7'],
   five:['FIVE WICKETS!','#ff647e'],maiden:['MAIDEN OVER!','#ffd456'],
@@ -3624,7 +3662,7 @@ function milestoneAdd(type,key,name='',detail=''){
 }
 function milestonePlayNext(){
   if(milestoneBusy||!milestoneQueue.length)return;
-  if(document.body.classList.contains('show-final-result')){milestoneQueue.length=0;return;}
+  if(!milestoneDemo && document.body.classList.contains('show-final-result')){milestoneQueue.length=0;return;}
   // Give a boundary/wicket animation time to finish before the milestone.
   if(document.getElementById('scoreEvent')?.classList.contains('active') || Date.now()<milestoneEventDeadline){
     clearTimeout(milestoneWakeTimer);
@@ -3651,6 +3689,29 @@ function milestonePlayNext(){
   el.className='';void el.offsetWidth;el.className='active '+item.type;
   emitNativeEvent('MILESTONE',{milestone:item.type,player:item.name,detail:item.detail},'MILESTONE|'+item.key);
   setTimeout(()=>{el.className='';milestoneBusy=false;milestonePlayNext();},3400);
+}
+// Optional visual QA: play every defined milestone, sequentially, 10 seconds
+// after page load. Does not change scores, live milestone tracking, or API data.
+function startMilestoneDemo(){
+  if(!milestoneDemo || overlayLayout!=='4' || (params.get('view')||'').trim()==='8')return;
+  const samples=[
+    ['team50','','TEAM TOTAL'],['team100','','TEAM TOTAL'],
+    ['team150','','TEAM TOTAL'],['team200','','TEAM TOTAL'],
+    ['team250','','TEAM TOTAL'],
+    ['bat50','BATSMAN','50 RUNS'],['bat100','BATSMAN','100 RUNS'],
+    ['part50','BATSMAN 1 + BATSMAN 2','50-RUN STAND'],
+    ['part100','BATSMAN 1 + BATSMAN 2','100-RUN STAND'],
+    ['five','BOWLER','5 WICKETS'],['maiden','BOWLER','MAIDEN OVER'],
+    ['hat','BOWLER','3 WICKETS IN 3 BALLS']
+  ];
+  for(const [type,name,detail] of samples){
+    milestoneAdd(type,'demo|'+type,name,detail);
+  }
+}
+if(milestoneDemo){
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(startMilestoneDemo,10000),{once:true});
+  }else setTimeout(startMilestoneDemo,10000);
 }
 function milestoneRead(data,v,second,t1,t2){
   const inning=second?2:1,t=second?t2:t1;
@@ -3789,7 +3850,7 @@ function hatProcess(payload,inning,allowCelebration=true){
   return detected;
 }
 function observeHatTrick(data,inning,preMatch,onBreak,isFinished){
-  if(!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
+  if(milestoneDemo||!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
   const payload=hatTrickFeed||data;
   hatProcess(payload,inning,!onBreak&&!isFinished);
 }
@@ -3803,7 +3864,7 @@ async function fetchHatTrickFeed(){
 }
 
 function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
-  if(!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
+  if(milestoneDemo||!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
   const now=milestoneRead(data,v,second,t1,t2);
   const prev=milestoneBaseline;
   const changedInning=!prev||prev.inning!==now.inning;
