@@ -2312,6 +2312,55 @@ html body .overlay.layout4:not(.is-prematch) > .top .team .team-name {
 }
 /* Team identity darkening reverted; original SVG gradient is retained. */
 </style>
+
+<style id="milestone-landscape-legibility-v3">
+/* Broadcast-size milestone treatment: stable dimensions, no squeeze, and
+   readable against match summary/video backgrounds. */
+html body #milestoneEvent {
+  position:fixed!important;left:50%!important;top:48%!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(920px,90vw)!important;max-width:90vw!important;
+  z-index:2147483000!important;filter:none!important;
+}
+html body #milestoneEvent .ms-content {
+  width:100%!important;min-height:190px!important;
+  padding:22px 36px!important;box-sizing:border-box!important;
+  border:2px solid rgba(255,211,85,.88)!important;
+  border-radius:20px!important;
+  background:linear-gradient(110deg,rgba(35,2,11,.97),rgba(112,6,24,.96),rgba(35,2,11,.97))!important;
+  box-shadow:0 16px 50px rgba(0,0,0,.85),inset 0 0 30px rgba(255,194,51,.13)!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  gap:8px!important;transform:none!important;filter:none!important;
+}
+html body #milestoneEvent .ms-head {
+  font-family:Arial,sans-serif!important;font-style:normal!important;
+  font-size:clamp(52px,7.5vw,112px)!important;line-height:1!important;
+  font-weight:900!important;letter-spacing:0!important;
+  white-space:nowrap!important;overflow-wrap:normal!important;
+  text-shadow:0 3px 10px rgba(0,0,0,.8)!important;
+  -webkit-text-stroke:0!important;
+}
+html body #milestoneEvent .ms-name {
+  font:900 clamp(18px,2.8vw,34px)/1.12 Arial,sans-serif!important;
+  letter-spacing:.3px!important;margin:0!important;
+  text-shadow:0 2px 6px #000!important;
+}
+html body #milestoneEvent .ms-detail {
+  font:800 clamp(16px,2vw,25px)/1.15 Arial,sans-serif!important;
+  letter-spacing:1px!important;margin:0!important;
+}
+html body #milestoneEvent.active .ms-content {
+  animation:msCleanReveal 3.4s linear both!important;
+}
+@keyframes msCleanReveal {
+  0%{opacity:0} 9%,88%{opacity:1} 100%{opacity:0}
+}
+@media(max-height:480px) and (orientation:landscape) {
+  html body #milestoneEvent .ms-content{min-height:140px!important;padding:12px 22px!important}
+  html body #milestoneEvent .ms-head{font-size:clamp(44px,7vw,78px)!important}
+}
+</style>
 </head>
 <body>
 <div class="overlay">
