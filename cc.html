@@ -2390,6 +2390,36 @@ html body #milestoneEvent.active:is(.team50,.team100,.team150,.team200,.team250)
  }
 }
 </style>
+
+<style id="layout5-broadcast-angled-scorebar">
+/* Layout 5 is opt-in; all declarations are scoped to .layout5. */
+html body .overlay.layout5 {width:100%!important;max-width:100%!important;height:86px!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;overflow:visible!important;}
+html body .overlay.layout5 > .top {position:absolute!important;top:0!important;left:0!important;width:100%!important;height:65px!important;display:flex!important;overflow:hidden!important;box-sizing:border-box!important;background:linear-gradient(90deg,rgba(65,0,12,var(--overlay-opacity,.80)),rgba(168,8,33,var(--overlay-opacity,.80)) 24%,rgba(17,17,22,var(--overlay-opacity,.80)) 51%,rgba(137,4,25,var(--overlay-opacity,.80)) 80%,rgba(54,0,13,var(--overlay-opacity,.80)))!important;border-top:2px solid #d4ac60!important;border-bottom:1px solid #e3b657!important;border-radius:0!important;}
+html body .overlay.layout5 .l4-svg-panels {display:none!important;}
+html body .overlay.layout5 .team {position:relative!important;height:100%!important;min-width:0!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;background:transparent!important;border:0!important;clip-path:none!important;}
+html body .overlay.layout5 .team.left {width:50%!important;flex:0 0 50%!important;padding:0 9px 0 18px!important;flex-direction:row!important;gap:8px!important;}
+html body .overlay.layout5 .team.right {width:50%!important;flex:0 0 50%!important;padding:0 18px 0 9px!important;flex-direction:row!important;gap:8px!important;}
+html body .overlay.layout5 .identity {position:relative!important;display:flex!important;align-items:center!important;flex:0 0 115px!important;width:115px!important;min-width:0!important;height:100%!important;gap:7px!important;}
+html body .overlay.layout5 .team.right .identity {order:3!important;justify-content:flex-end!important;}
+html body .overlay.layout5 .identity .logo {position:relative!important;display:block!important;width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important;object-fit:contain!important;flex:0 0 34px!important;}
+html body .overlay.layout5 .team-name {position:relative!important;display:block!important;max-width:70px!important;font:900 13px/1.08 Arial,sans-serif!important;color:white!important;text-transform:uppercase!important;text-shadow:0 2px 4px #000!important;white-space:normal!important;overflow:hidden!important;}
+html body .overlay.layout5 .scorebox {position:relative!important;display:flex!important;flex:0 0 120px!important;width:120px!important;height:100%!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;gap:0!important;background:transparent!important;border:0!important;clip-path:none!important;box-shadow:none!important;padding:0!important;margin:0!important;}
+html body .overlay.layout5 .scorebox .mh-hex-outline {display:none!important;}
+html body .overlay.layout5 .score {position:relative!important;font:900 clamp(22px,2.9vw,40px)/1 Arial,sans-serif!important;color:#fff!important;letter-spacing:-.8px!important;text-shadow:0 2px 5px #000!important;}
+html body .overlay.layout5 .meta {position:relative!important;display:flex!important;gap:7px!important;justify-content:center!important;align-items:center!important;font:800 10px/1.15 Arial,sans-serif!important;color:#f7d9a0!important;white-space:nowrap!important;}
+html body .overlay.layout5 .details {position:relative!important;flex:1 1 0!important;min-width:0!important;height:54px!important;max-height:54px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;padding:3px 8px!important;margin:0!important;border-radius:3px!important;background:linear-gradient(180deg,rgba(244,242,241,var(--overlay-opacity,.80)),rgba(201,201,204,var(--overlay-opacity,.80)))!important;color:#111!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7)!important;}
+html body .overlay.layout5 #details1 .l3-batter-portrait,html body .overlay.layout5 #details2 .l3-bowler-portrait {display:none!important;}
+html body .overlay.layout5 .l3-batter-name,html body .overlay.layout5 .bowler-name {color:#151515!important;font-weight:900!important;font-size:clamp(10px,1.3vw,16px)!important;text-shadow:none!important;}
+html body .overlay.layout5 .l3-batter-score,html body .overlay.layout5 .bowler-meta {color:#191919!important;font-weight:900!important;font-size:clamp(10px,1.3vw,17px)!important;text-shadow:none!important;}
+html body .overlay.layout5 .l3-batter,html body .overlay.layout5 .l3-batter-info,html body .overlay.layout5 .l3-bowler-block,html body .overlay.layout5 .l3-bowler-content {background:transparent!important;border:0!important;box-shadow:none!important;}
+html body .overlay.layout5 .l3-batter {padding:0 4px!important;min-width:0!important;}
+html body .overlay.layout5 .l3-batter-info {min-width:0!important;}
+html body .overlay.layout5 .balls {display:none!important;}
+html body .overlay.layout5 > .bottom,html body .overlay.layout5 > .bottom.visible {position:absolute!important;left:0!important;right:0!important;top:65px!important;bottom:auto!important;width:100%!important;height:21px!important;min-height:21px!important;max-height:21px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;margin:0!important;padding:0!important;background:linear-gradient(90deg,rgba(60,0,12,var(--overlay-opacity,.80)),rgba(133,8,28,var(--overlay-opacity,.80)),rgba(38,0,12,var(--overlay-opacity,.80)))!important;border-top:1px solid rgba(255,221,145,.6)!important;overflow:hidden!important;}
+html body .overlay.layout5 > .bottom.visible #bottomText {position:absolute!important;inset:0 110px!important;height:20px!important;line-height:20px!important;display:flex!important;align-items:center!important;justify-content:center!important;transform:none!important;padding:0!important;margin:0!important;font:800 12px/20px Arial,sans-serif!important;color:white!important;white-space:nowrap!important;}
+html body .overlay.layout5 > .bottom.visible .powered-credit {position:absolute!important;right:8px!important;top:0!important;bottom:0!important;left:auto!important;display:flex!important;align-items:center!important;height:20px!important;line-height:20px!important;transform:none!important;}
+@media(max-width:850px){html body .overlay.layout5 .identity{flex-basis:74px!important;width:74px!important}html body .overlay.layout5 .identity .logo{width:24px!important;height:24px!important;flex-basis:24px!important}html body .overlay.layout5 .team-name{font-size:10px!important}html body .overlay.layout5 .scorebox{flex-basis:84px!important;width:84px!important}html body .overlay.layout5 .details{padding:2px!important}}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -2936,12 +2966,13 @@ document.querySelectorAll('.l4-svg-panels linearGradient stop').forEach(stop => 
 // Layout and theme are independent query parameters.
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
 const requestedLayout = (params.get("layout") || "4").trim().toLowerCase();
-const overlayLayout = ["2", "3", "4"].includes(requestedLayout) ? requestedLayout : "1";
+const overlayLayout = ["2", "3", "4", "5"].includes(requestedLayout) ? requestedLayout : "1";
 const requestedTheme = (params.get("theme") || "mh").trim().toLowerCase();
 const overlayTheme = ["blue", "graphite", "red", "mh"].includes(requestedTheme) ? requestedTheme : "mh";
-document.querySelector(".overlay").classList.toggle("layout2", ["2", "3", "4"].includes(overlayLayout));
-document.querySelector(".overlay").classList.toggle("layout3", overlayLayout === "3" || overlayLayout === "4");
-document.querySelector(".overlay").classList.toggle("layout4", overlayLayout === "4");
+document.querySelector(".overlay").classList.toggle("layout2", ["2", "3", "4", "5"].includes(overlayLayout));
+document.querySelector(".overlay").classList.toggle("layout3", overlayLayout === "3" || (overlayLayout === "4" || overlayLayout === "5"));
+document.querySelector(".overlay").classList.toggle("layout4", (overlayLayout === "4" || overlayLayout === "5"));
+document.querySelector(".overlay").classList.toggle("layout5", overlayLayout === "5");
 document.querySelector(".overlay").classList.toggle("theme-blue", overlayTheme === "blue");
 document.querySelector(".overlay").classList.toggle("theme-graphite", overlayTheme === "graphite");
 document.querySelector(".overlay").classList.toggle("theme-red", overlayTheme === "red");
@@ -3051,7 +3082,7 @@ function cricclubsProfileUrl(path) {
 const layout3PortraitCache = new Map();
 const LAYOUT3_PORTRAIT_LIMIT = 24;
 function setPlayerDetails(el, html) {
-  if (overlayLayout !== "3" && overlayLayout !== "4") { el.innerHTML = html; return; }
+  if (overlayLayout !== "3" && (overlayLayout !== "4" && overlayLayout !== "5")) { el.innerHTML = html; return; }
   // Save the live image nodes before replacing score/name text.
   for (const img of el.querySelectorAll('.l3-portrait img, .l3-bowler-portrait img')) {
     const key = img.dataset.portraitKey || img.getAttribute('src');
@@ -3083,7 +3114,7 @@ let l4LastStriker = "";
 let l4LastBatters = "";
 let l4StrikeChangedAt = 0;
 function l4StrikeState(v) {
-  if (overlayLayout !== "4") return {arrival:false,departure:false};
+  if ((overlayLayout !== "4" && overlayLayout !== "5")) return {arrival:false,departure:false};
   const striker=validDisplayName(get(v,"batsman1Name",""));
   const other=validDisplayName(get(v,"batsman2Name",""));
   const pair=[striker,other].filter(Boolean).sort().join("|");
@@ -3103,14 +3134,14 @@ function showBattersLayout3(v) {
     const runs = escapeHTML(get(v, "batsman"+n+"Runs", "0"));
     const balls = escapeHTML(get(v, "batsman"+n+"Balls", "0"));
     const fallback = escapeHTML(name.slice(0,1).toUpperCase());
-    return `<div class="l3-batter${overlayLayout === "4" && n===1 ? " l4-on-strike" : ""}${overlayLayout === "4" && strikeState.arrival ? (n===1 ? " l4-strike-arrival" : " l4-strike-departure") : ""}">
+    return `<div class="l3-batter${(overlayLayout === "4" || overlayLayout === "5") && n===1 ? " l4-on-strike" : ""}${(overlayLayout === "4" || overlayLayout === "5") && strikeState.arrival ? (n===1 ? " l4-strike-arrival" : " l4-strike-departure") : ""}">
       <div class="l3-portrait">${image ? `<img src="${escapeHTML(image)}" alt="" loading="eager" onerror="this.style.display='none'">` : ''}<span class="l3-initial">${fallback}</span></div>
-      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${overlayLayout !== "4" && n===1 ? ' ★' : ''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small>${overlayLayout === "4" && n===1 ? '<span class="l4-score-strike-star" title="On strike" aria-label="On strike">★</span>' : ''}</span></div>
+      <div class="l3-batter-info"><span class="l3-batter-name" title="${escapeHTML(name)}">${escapeHTML(name)}${(overlayLayout !== "4" && overlayLayout !== "5") && n===1 ? ' ★' : ''}</span><span class="l3-batter-score"><b>${runs}</b> <small>(${balls})</small>${(overlayLayout === "4" || overlayLayout === "5") && n===1 ? '<span class="l4-score-strike-star" title="On strike" aria-label="On strike">★</span>' : ''}</span></div>
     </div>`;
   }).join("");
 }
 function showBatters(v){
-  if ((overlayLayout === "3" || overlayLayout === "4")) return showBattersLayout3(v);
+  if ((overlayLayout === "3" || (overlayLayout === "4" || overlayLayout === "5"))) return showBattersLayout3(v);
   const first=validDisplayName(get(v,"batsman1Name",""));
   const second=validDisplayName(get(v,"batsman2Name",""));
   const row=(name,n,strike)=>name ? `<div class="player">
@@ -3228,7 +3259,7 @@ function showBowler(v,balls,inningsOvers){
   }).join('');
   if (!bowler) return "";
   const overLine = `<div class="balls"><span class="this-over-label"><span class="ball-label">THIS OVER</span><span class="this-over-runs" title="Current-over runs">(${overRuns === null ? '—' : overRuns} runs)</span></span>${chips}</div>`;
-  if ((overlayLayout === "3" || overlayLayout === "4")) {
+  if ((overlayLayout === "3" || (overlayLayout === "4" || overlayLayout === "5"))) {
     const image = cricclubsProfileUrl(get(v, 'bowlerProfileImange', ''));
     const initial = escapeHTML(bowlerPortraitInitials(bowler));
     return `<div class="l3-bowler-block">
