@@ -2931,6 +2931,102 @@ html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
 html.cc-view8, html.cc-view8 body { background:transparent!important; }
 html.cc-view8 body > * { display:none!important; visibility:hidden!important; }
 </style>
+<style id="layout5-rendering-isolation-fix">
+/* Must be after Layout 4's authoritative overrides. Scope every rule to Layout 5. */
+html body .overlay.layout2.layout3.layout4.layout5,
+html body.show-final-result .overlay.layout2.layout3.layout4.layout5 {
+ position:fixed!important;display:block!important;left:0!important;right:0!important;
+ top:auto!important;bottom:0!important;width:100%!important;height:86px!important;
+ min-height:86px!important;max-height:86px!important;overflow:visible!important;
+ background:transparent!important;opacity:1!important;visibility:visible!important;
+}
+html body .overlay.layout2.layout3.layout4.layout5 > .top,
+html body.show-final-result .overlay.layout2.layout3.layout4.layout5 > .top {
+ position:absolute!important;display:flex!important;left:0!important;right:0!important;
+ top:0!important;bottom:auto!important;width:100%!important;height:65px!important;
+ min-height:65px!important;max-height:65px!important;flex:none!important;
+ margin:0!important;padding:0!important;visibility:visible!important;
+ background:linear-gradient(90deg,rgba(65,0,12,var(--overlay-opacity,.8)),rgba(168,8,33,var(--overlay-opacity,.8)) 24%,rgba(17,17,22,var(--overlay-opacity,.8)) 51%,rgba(137,4,25,var(--overlay-opacity,.8)) 80%,rgba(54,0,13,var(--overlay-opacity,.8)))!important;
+ border-top:2px solid #d4ac60!important;border-bottom:1px solid #e3b657!important;
+}
+html body .overlay.layout2.layout3.layout4.layout5 > .top .team {display:flex!important;visibility:visible!important;}
+html body .overlay.layout2.layout3.layout4.layout5 > .bottom,
+html body .overlay.layout2.layout3.layout4.layout5 > .bottom.visible,
+html body.show-final-result .overlay.layout2.layout3.layout4.layout5 > .bottom.visible {
+ position:absolute!important;display:flex!important;left:0!important;right:0!important;
+ top:65px!important;bottom:auto!important;width:100%!important;max-width:none!important;
+ height:21px!important;min-height:21px!important;max-height:21px!important;
+ margin:0!important;padding:0!important;flex:none!important;
+ align-items:center!important;justify-content:center!important;
+ background:linear-gradient(90deg,rgba(60,0,12,var(--overlay-opacity,.8)),rgba(133,8,28,var(--overlay-opacity,.8)),rgba(38,0,12,var(--overlay-opacity,.8)))!important;
+ border-top:1px solid rgba(255,221,145,.6)!important;
+}
+html body .overlay.layout2.layout3.layout4.layout5 > .bottom.visible #bottomText,
+html body.show-final-result .overlay.layout2.layout3.layout4.layout5 > .bottom.visible #bottomText {
+ position:absolute!important;display:flex!important;left:110px!important;right:110px!important;
+ top:0!important;bottom:0!important;width:auto!important;height:20px!important;
+ padding:0!important;margin:0!important;transform:none!important;
+ align-items:center!important;justify-content:center!important;
+ font:800 12px/20px Arial,sans-serif!important;color:white!important;
+}
+html body .overlay.layout2.layout3.layout4.layout5 > .bottom.visible .powered-credit {
+ position:absolute!important;display:flex!important;left:auto!important;right:8px!important;
+ top:0!important;bottom:0!important;height:20px!important;transform:none!important;
+ align-items:center!important;
+}
+html body,html {background:transparent!important;}
+</style>
+<style id="layout5-actual-broadcast-visual-fix">
+/* Layout 5 only: replace inherited Layout 4 panel presentation. */
+html body .overlay.layout5 > .top,
+html body.show-final-result .overlay.layout5 > .top {
+ display:flex!important;grid-template-columns:none!important;align-items:stretch!important;
+ background:#30030b!important;isolation:isolate!important;
+ border-top:2px solid #e4bc67!important;border-bottom:1px solid #e4bc67!important;
+}
+html body .overlay.layout5 > .top::before {
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(100deg,#51000d 0%,#bd1129 23%,#21030b 50%,#ad0c22 77%,#51000d 100%)!important;
+}
+html body .overlay.layout5 > .top > .team,
+html body.show-final-result .overlay.layout5 > .top > .team {
+ position:relative!important;display:flex!important;grid-template-columns:none!important;
+ flex:0 0 50%!important;width:50%!important;height:100%!important;
+ min-width:0!important;overflow:hidden!important;background:transparent!important;
+}
+html body .overlay.layout5 > .top > .team.left::before,
+html body .overlay.layout5 > .top > .team.right::before {
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(110deg,#8c061a,#21040d)!important;
+}
+html body .overlay.layout5 > .top > .team.left::before {clip-path:polygon(0 0,100% 0,96% 100%,0 100%)}
+html body .overlay.layout5 > .top > .team.right::before {clip-path:polygon(4% 0,100% 0,100% 100%,0 100%);background:linear-gradient(110deg,#21040d,#a10b20)!important}
+html body .overlay.layout5 > .top .identity {z-index:2!important;}
+html body .overlay.layout5 > .top .details {
+ position:relative!important;z-index:2!important;flex:1 1 0!important;min-width:0!important;
+ background:#ece9e5!important;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%)!important;
+ border-radius:0!important;box-shadow:none!important;
+}
+html body .overlay.layout5 > .top .scorebox {z-index:2!important;flex:0 0 105px!important;width:105px!important;}
+html body .overlay.layout5 > .top .scorebox::before,
+html body .overlay.layout5 > .top .scorebox::after {content:none!important;display:none!important;}
+html body .overlay.layout5 > .top .score {color:#fff!important;opacity:1!important;}
+html body .overlay.layout5 > .top .meta {color:#f5d99e!important;opacity:1!important;}
+html body .overlay.layout5 > .bottom,
+html body .overlay.layout5 > .bottom.visible,
+html body.show-final-result .overlay.layout5 > .bottom.visible {
+ background:#80091d!important;position:absolute!important;top:65px!important;left:0!important;
+ width:100%!important;height:21px!important;display:flex!important;visibility:visible!important;
+}
+@media(max-width:700px){
+ html body .overlay.layout5 > .top .identity{flex:0 0 67px!important;width:67px!important;gap:3px!important;}
+ html body .overlay.layout5 > .top .identity .logo{width:23px!important;height:23px!important;flex-basis:23px!important;}
+ html body .overlay.layout5 > .top .team-name{font-size:9px!important;max-width:42px!important;}
+ html body .overlay.layout5 > .top .scorebox{flex:0 0 74px!important;width:74px!important;}
+ html body .overlay.layout5 > .top .score{font-size:22px!important;}
+ html body .overlay.layout5 > .top .meta{font-size:8px!important;}
+}
+</style>
 <script>
 const params = new URLSearchParams(location.search);
 if ((params.get("view") || "").trim() === "8") {
