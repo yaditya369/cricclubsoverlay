@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Cricket Score Overlay</title>
 <style>
 *{box-sizing:border-box}
@@ -1260,7 +1261,6 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
  .layout2 .prematch-versus {font-size:18px!important;}
 }
 </style>
-
 <style id="match-result-legibility-fix">
 /* Match result: balanced two-team rows, with overs alongside scores. */
 #finalMatchResult{
@@ -1308,7 +1308,6 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
  #finalMatchResult .mr-team strong{font-size:23px}
 }
 </style>
-
 <style id="layout2-grid-regression-fix">
 /* Restore the five-slot broadcast grid. Previous regression CSS replaced it
    with two columns while .team remained display:contents. */
@@ -1332,7 +1331,6 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 .overlay.layout2 .top .player-stats{white-space:nowrap!important}
 .overlay.layout2 .bottom.visible{position:relative!important;inset:auto!important;display:flex!important}
 </style>
-
 <style id="layout2-center-score-highlight">
 /* Match the darker lower information panel without changing layout or opacity controls. */
 .overlay.layout2 .top .team.left .scorebox {
@@ -1346,7 +1344,6 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 .overlay.layout2 .top .team.left .scorebox .score { color: #fff !important; }
 .overlay.layout2 .top .team.left .scorebox .meta { color: #d8e5f5 !important; }
 </style>
-
 <style id="prematch-single-header-fix">
 /* In pre-match/toss, show ONLY the VS header; never the live five-column grid. */
 .overlay.layout2.is-prematch > .top,
@@ -1354,7 +1351,6 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 .overlay.is-prematch > #prematchTemplate:not([hidden]) { display:grid !important; }
 .overlay.is-prematch .bottom { position:relative !important; }
 </style>
-
 <style id="layout2-compact-fixed-55px">
 /* Regression: override inherited flex-basis 70px/25px and outer 1px borders. */
 .overlay.layout2 {border-width:0!important;box-sizing:border-box!important;}
@@ -1442,7 +1438,6 @@ html body .overlay.theme-mh .bottom.visible {
  background-color:transparent!important;
 }
 </style>
-
 <style id="player-name-bold-plus-one-px">
 /* Only batsmen and bowler names: 11px -> 12px, regular -> bold. */
 html body .overlay.layout2:not(.is-prematch) > .top .player-name,
@@ -1460,7 +1455,6 @@ html body .overlay.layout2:not(.is-prematch) > .top .player-score {
   font-weight:700!important;
 }
 </style>
-
 <style id="layout2-45px-top-override">
 /* 45px top + unchanged 15px footer = 60px total; applies only to layout 2. */
 html body .overlay.layout2 {height:60px!important;min-height:60px!important;max-height:60px!important;}
@@ -1468,12 +1462,10 @@ html body .overlay.layout2 > .top,
 html body .overlay.layout2 > .prematch-template:not([hidden]) {flex:0 0 45px!important;height:45px!important;min-height:45px!important;max-height:45px!important;}
 html body .overlay.layout2.is-prematch > #prematchTemplate:not([hidden]) {height:45px!important;min-height:45px!important;max-height:45px!important;}
 </style>
-
 <style id="this-over-white-label">
 /* Keep THIS OVER white in every theme and both layouts. */
 html body .overlay .top .this-over-label .ball-label { color:#ffffff !important; }
 </style>
-
 <style id="bold-this-over-deliveries">
 /* Bold delivery values in THIS OVER, across themes and layouts. */
 html body .overlay .top .balls > .ball {font-weight:900!important;}
@@ -1547,7 +1539,6 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
  .overlay.layout3 #details2 .bowler-row .l3-bowler-initial {font-size:11px;}
 }
 </style>
-
 <style id="layout3-bowler-stacked-fix">
 /* Layout 3: portrait left; bowler name and bowling figures on SAME top row; THIS OVER on second row. */
 .overlay.layout3 #details2 .l3-bowler-block {display:grid!important;grid-template-columns:30px minmax(0,1fr);column-gap:5px;align-items:center;height:100%;min-height:0;width:100%;}
@@ -1562,7 +1553,6 @@ html body .overlay .top .balls > .ball {font-weight:900!important;}
 .overlay.layout3 #details2 .l3-bowler-block .ball {height:16px!important;min-width:16px!important;font-size:9px!important;padding:0 2px!important;}
 @media(max-width:650px){.overlay.layout3 #details2 .l3-bowler-block {grid-template-columns:24px minmax(0,1fr);column-gap:3px;}.overlay.layout3 #details2 .l3-bowler-block .l3-bowler-portrait {width:24px;height:35px;}}
 </style>
-
 <style id="layout4-gold-panels">
 /* Layout 4 only. No changes to the original layouts 1, 2, or 3. */
 html body .overlay.layout4,
@@ -1642,8 +1632,6 @@ html body .overlay.layout4.theme-graphite > .top {
   .overlay.layout4 > .top .team.right .identity {padding-right:12px!important;}
 }
 </style>
-
-
 <style id="layout4-final-refinements">
 /* Layout 4 exclusively: 50px top, existing 15px footer; bottom-aligned. */
 html body .overlay.layout4:not(.is-prematch) {
@@ -1688,8 +1676,6 @@ html body .overlay.layout4 > .top .team .team-name {max-height:20px!important;ov
  html body .overlay.layout4 #details2 .l3-bowler-block {grid-template-columns:26px minmax(0,1fr)!important;}
 }
 </style>
-
-
 <style id="layout4-center-real-transparency-fix">
 /* Layout 4: keep the center hex fill inside the gold SVG only. Disable
    the legacy duplicate center background and border so areas OUTSIDE
@@ -1711,7 +1697,6 @@ html body .overlay.layout4 > .top .team.left .scorebox .mh-hex-outline {
 /* Clear any remaining legacy top-row shading at the center join. */
 html body .overlay.layout4 > .top {background:transparent!important;background-image:none!important;}
 </style>
-
 <style id="layout4-unified-player-font-and-strike">
 /* Layout 4 only: identical bold names and a visible gold striker star. */
 html body .overlay.layout4 #details1 .l3-batter-name,
@@ -1732,7 +1717,6 @@ html body .overlay.layout4 #details1 .l3-batter-name .l4-strike-star {
 .overlay.layout4.theme-blue {--l4-grad-edge:#092344;--l4-grad-mid:#175aa0;--l4-grad-bright:#2d80cc;}
 .overlay.layout4.theme-graphite {--l4-grad-edge:#15191f;--l4-grad-mid:#39424e;--l4-grad-bright:#566273;}
 </style>
-
 <style id="layout4-footer-strike-final-fix">
 /* Layout 4 only: position the 15px footer between the outer SVG shoulders,
    not at the screen edges. Explicit absolute positioning avoids inherited
@@ -1773,8 +1757,6 @@ html body .overlay.layout2.layout4 #details1 .l4-score-strike-star {
   text-shadow:0 0 2px #492000;
 }
 </style>
-
-
 <style id="layout4-striker-highlight-transition">
 /* Layout 4: richer metallic-gold striker emphasis, without changing geometry. */
 html body .overlay.layout4 #details1 .l3-batter {
@@ -1835,7 +1817,6 @@ html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible {
   -webkit-clip-path:inset(0 1.6% 0 1.6%)!important;
 }
 </style>
-
 <style id="layout4-highlight-all-delivery-events">
 /* Layout 4 only: distinct high-contrast indicators for wickets, boundaries and extras. */
 html body .overlay.layout4 .balls .ball {
@@ -1861,7 +1842,6 @@ html body .overlay.layout4 .balls .ball.extra {
   border:2px solid #ffe28a!important;
 }
 </style>
-
 <style id="layout4-delivery-center-alignment-fix">
 /* Layout 4 only: normalize glyph alignment regardless of delivery type/border. */
 html body .overlay.layout4 .top .balls > .ball {
@@ -1885,7 +1865,6 @@ html body .overlay.layout4 .top .balls {
   align-items:center!important;
 }
 </style>
-
 <style id="layout4-powered-credit-visibility-fix">
 /* Layout 4 only: keep the credit fully inside the 20px footer and its SVG shoulders. */
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom.visible,
@@ -1948,7 +1927,6 @@ html body.show-final-result .overlay.layout2.layout4:not(.is-prematch) > .bottom
   z-index:2!important;
 }
 </style>
-
 <style id="layout4-actually-connected-footer-v2">
 /* One uninterrupted lower band; no separate inset rectangle or 1px overlap. */
 html body .overlay.layout2.layout4:not(.is-prematch) > .bottom,
@@ -2005,7 +1983,6 @@ html body .overlay.layout4:not(.is-prematch) > .top .team .identity {gap:3px!imp
  html body .overlay.layout4:not(.is-prematch) > .top #details2 {padding-right:5px!important;}
 }
 </style>
-
 <style id="milestone-celebrations-v1">
 /* Additive milestone layer: existing FOUR/SIX/WICKET styles remain untouched. */
 #milestoneEvent{position:fixed;left:50%;top:49%;transform:translate(-50%,-50%);z-index:1100;pointer-events:none;width:min(900px,94vw);text-align:center;opacity:0;display:none;filter:drop-shadow(0 7px 16px #000)}
@@ -2030,7 +2007,6 @@ html body .overlay.layout4:not(.is-prematch) > .top .team .identity {gap:3px!imp
 @keyframes msFlip{from{transform:perspective(500px) rotateY(-85deg);opacity:0}75%{transform:perspective(500px) rotateY(10deg);opacity:1}to{transform:none}}
 @keyframes msImpact{0%{transform:scale(2.4);filter:blur(12px);opacity:0}50%{transform:scale(.85);filter:none;opacity:1}100%{transform:scale(1)}}
 </style>
-
 <style id="milestone-broadcast-sizing-v2">
 /* Milestones use the same stable, full-size typography as boundary celebrations.
    No zoom/flip/skew: the message enters at its final readable size. */
@@ -2067,7 +2043,6 @@ html body #milestoneEvent.active .ms-content{
   100%{opacity:0;transform:translateY(0)}
 }
 </style>
-
 <style id="delivery-glyph-bold-center-final">
 /* Final scoped override: center and bold delivery values without changing box geometry. */
 html body .overlay .top .balls > .ball {
@@ -2117,7 +2092,6 @@ html body .overlay.layout4 #details1 .l3-batter.l4-on-strike .l3-batter-score sm
   font-weight:800!important;
 }
 </style>
-
 <style id="layout4-this-over-group-centering-final">
 /* Center the full THIS OVER label + delivery sequence in the bowler's second row.
    Previous fixes centered glyphs only, leaving the sequence left-justified. */
@@ -2133,7 +2107,6 @@ html body .overlay.layout4 #details2 .l3-bowler-block .balls > .ball {
   text-align:center!important;line-height:1!important;flex:0 0 auto!important;
 }
 </style>
-
 <style id="layout4-no-player-images-no-gold-highlight">
 /* Layout 4 only: remove batter/bowler portraits and striker gold rectangle. */
 html body .overlay.layout4 #details1 .l3-portrait,
@@ -2182,7 +2155,6 @@ html body .overlay.layout2.layout4:not(.is-prematch) #details1 .l3-batter-info {
   text-align:left!important;
 }
 </style>
-
 <style id="layout4-bowler-typography-and-position-final">
 /* Layout 4 only: match batsmen's name/score sizes, and anchor the bowler at the left. */
 html body .overlay.layout4 #details2 .l3-bowler-block .l3-bowler-content {
@@ -2202,7 +2174,6 @@ html body .overlay.layout4 #details2 .l3-bowler-block .bowler-meta {
   text-align:left!important;
 }
 </style>
-
 <style id="layout4-identity-dividers-v66">
 /* Dividers at the team/player boundary on both sides; do not change center geometry. */
 html body .overlay.layout4:not(.is-prematch) > .top .team.left > .identity {
@@ -2228,7 +2199,6 @@ html body .overlay.layout4 #details2 .balls::-webkit-scrollbar{display:none!impo
 html body .overlay.layout4 #details2 .balls > .ball{flex-shrink:0!important;position:relative!important;transform-origin:center center!important;}
 html body .overlay.layout4 #details2 .balls > .ball.delivery-zoom-in{animation:ccDeliveryZoomV64 1000ms ease-in-out 1!important;z-index:8!important;}
 </style>
-
 <style id="layout4-bowler-left-alignment-v67">
 /* With the portrait removed, the content must occupy grid column 1.
    The inherited Layout 3 rule pins it to column 2 and leaves unused space. */
@@ -2312,7 +2282,6 @@ html body .overlay.layout4:not(.is-prematch) > .top .team .team-name {
 }
 /* Team identity darkening reverted; original SVG gradient is retained. */
 </style>
-
 <style id="milestone-landscape-legibility-v3">
 /* Broadcast-size milestone treatment: stable dimensions, no squeeze, and
    readable against match summary/video backgrounds. */
@@ -2390,7 +2359,6 @@ html body #milestoneEvent.active:is(.team50,.team100,.team150,.team200,.team250)
  }
 }
 </style>
-
 <style id="layout5-broadcast-angled-scorebar">
 /* Layout 5 is opt-in; all declarations are scoped to .layout5. */
 html body .overlay.layout5 {width:100%!important;max-width:100%!important;height:86px!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;overflow:visible!important;}
@@ -2435,97 +2403,91 @@ html body.layout7-active #overSummary,html body.layout7-active #fullInningsBreak
 </style></head>
 <body>
 <div class="overlay">
-  <div class="prematch-template" id="prematchTemplate" hidden>
-  <div class="prematch-side"><span class="prematch-emblem"><img class="prematch-logo" id="preLogo1" alt=""><span class="prematch-initials" id="preInitials1"></span></span><span id="preTeam1"></span></div>
-  <div class="prematch-versus">VS</div>
-  <div class="prematch-side"><span class="prematch-emblem"><img class="prematch-logo" id="preLogo2" alt=""><span class="prematch-initials" id="preInitials2"></span></span><span id="preTeam2"></span></div>
+<div class="prematch-template" hidden="" id="prematchTemplate">
+<div class="prematch-side"><span class="prematch-emblem"><img alt="" class="prematch-logo" id="preLogo1"/><span class="prematch-initials" id="preInitials1"></span></span><span id="preTeam1"></span></div>
+<div class="prematch-versus">VS</div>
+<div class="prematch-side"><span class="prematch-emblem"><img alt="" class="prematch-logo" id="preLogo2"/><span class="prematch-initials" id="preInitials2"></span></span><span id="preTeam2"></span></div>
 </div>
 <div class="top">
-<svg class="l4-svg-panels" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
-  <defs>
-    <linearGradient id="l4-panel-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
-      <stop offset="26%" stop-color="var(--l4-grad-mid,#e60c1c)" stop-opacity="var(--overlay-opacity,.8)"/>
-      <stop offset="50%" stop-color="var(--l4-grad-bright,#f51e2a)" stop-opacity="var(--overlay-opacity,.8)"/>
-      <stop offset="75%" stop-color="var(--l4-grad-late,#c30816)" stop-opacity="var(--overlay-opacity,.8)"/>
-      <stop offset="100%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"/>
-    </linearGradient>
-    <linearGradient id="l4-center-dark-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#8b0b1b" stop-opacity="var(--overlay-opacity,.80)"/>
-      <stop offset="48%" stop-color="#66000e" stop-opacity="var(--overlay-opacity,.80)"/>
-      <stop offset="100%" stop-color="#390008" stop-opacity="var(--overlay-opacity,.80)"/>
-    </linearGradient>
-  </defs>
-  <!-- Layout 4: equal-height hexagons; center overlaps each wing by 15% of center width. -->
-  <g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round">
-    <polygon points="0,2 432.5,2 447.5,50 432.5,98 0,98"/>
-    <polygon points="567.5,2 1000,2 1000,98 567.5,98 552.5,50"/>
-  </g>
-  <!-- Center polygon is 55px tall, extending approximately 2.5px above and below the 50px side panels. Painted last for visible overlap. -->
-  <polygon points="441,2 559,2 575,50 559,98 441,98 425,50"
-           fill="url(#l4-center-dark-gradient)" stroke="#FFD54A" stroke-width="2" stroke-linejoin="round"/>
+<svg aria-hidden="true" class="l4-svg-panels" preserveaspectratio="none" viewbox="0 0 1000 100">
+<defs>
+<lineargradient id="l4-panel-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"></stop>
+<stop offset="26%" stop-color="var(--l4-grad-mid,#e60c1c)" stop-opacity="var(--overlay-opacity,.8)"></stop>
+<stop offset="50%" stop-color="var(--l4-grad-bright,#f51e2a)" stop-opacity="var(--overlay-opacity,.8)"></stop>
+<stop offset="75%" stop-color="var(--l4-grad-late,#c30816)" stop-opacity="var(--overlay-opacity,.8)"></stop>
+<stop offset="100%" stop-color="var(--l4-grad-edge,#6e000a)" stop-opacity="var(--overlay-opacity,.8)"></stop>
+</lineargradient>
+<lineargradient id="l4-center-dark-gradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#8b0b1b" stop-opacity="var(--overlay-opacity,.80)"></stop>
+<stop offset="48%" stop-color="#66000e" stop-opacity="var(--overlay-opacity,.80)"></stop>
+<stop offset="100%" stop-color="#390008" stop-opacity="var(--overlay-opacity,.80)"></stop>
+</lineargradient>
+</defs>
+<!-- Layout 4: equal-height hexagons; center overlaps each wing by 15% of center width. -->
+<g fill="url(#l4-panel-gradient)" stroke="#FFD54A" stroke-linejoin="round" stroke-width="2">
+<polygon points="0,2 432.5,2 447.5,50 432.5,98 0,98"></polygon>
+<polygon points="567.5,2 1000,2 1000,98 567.5,98 552.5,50"></polygon>
+</g>
+<!-- Center polygon is 55px tall, extending approximately 2.5px above and below the 50px side panels. Painted last for visible overlap. -->
+<polygon fill="url(#l4-center-dark-gradient)" points="441,2 559,2 575,50 559,98 441,98 425,50" stroke="#FFD54A" stroke-linejoin="round" stroke-width="2"></polygon>
 </svg>
-    <section class="team left">
-      <div class="identity">
-        <img class="logo" id="logo1" alt="">
-        <div class="team-name" id="name1"></div>
-      </div>
-      <div class="details" id="details1"></div>
-      <div class="scorebox">
-        <svg class="mh-hex-outline" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="9,2 91,2 98,50 91,98 9,98 2,50" vector-effect="non-scaling-stroke"/></svg>
-        <div class="score" id="score1">--/--</div>
-        <div class="meta" id="meta1">
-  <span id="overs1">Overs --</span>
-  <span id="rr1">RR --</span>
+<section class="team left">
+<div class="identity">
+<img alt="" class="logo" id="logo1"/>
+<div class="team-name" id="name1"></div>
 </div>
-      </div>
-    </section>
-
-    <section class="team right">
-      <div class="scorebox">
-        <div class="score" id="score2">--/--</div>
-        <div class="meta" id="meta2">
-  <span id="overs2">Overs --</span>
-  <span id="rr2">RR --</span>
+<div class="details" id="details1"></div>
+<div class="scorebox">
+<svg aria-hidden="true" class="mh-hex-outline" preserveaspectratio="none" viewbox="0 0 100 100"><polygon points="9,2 91,2 98,50 91,98 9,98 2,50" vector-effect="non-scaling-stroke"></polygon></svg>
+<div class="score" id="score1">--/--</div>
+<div class="meta" id="meta1">
+<span id="overs1">Overs --</span>
+<span id="rr1">RR --</span>
 </div>
-      </div>
-      <div class="details" id="details2"></div>
-      <div class="identity">
-        <img class="logo" id="logo2" alt="">
-        <div class="team-name" id="name2"></div>
-      </div>
-    </section>
-  </div>
-
-  <div class="bottom" id="bottom">
-    <span id="bottomText"></span><span class="powered-credit">Powered by <a href="https://cricclubs.com" target="_blank" rel="noopener noreferrer">CricClubs</a></span>
-  </div>
-  <div class="error" id="error"></div>
 </div>
-
+</section>
+<section class="team right">
+<div class="scorebox">
+<div class="score" id="score2">--/--</div>
+<div class="meta" id="meta2">
+<span id="overs2">Overs --</span>
+<span id="rr2">RR --</span>
+</div>
+</div>
+<div class="details" id="details2"></div>
+<div class="identity">
+<img alt="" class="logo" id="logo2"/>
+<div class="team-name" id="name2"></div>
+</div>
+</section>
+</div>
+<div class="bottom" id="bottom">
+<span id="bottomText"></span><span class="powered-credit">Powered by <a href="https://cricclubs.com" rel="noopener noreferrer" target="_blank">CricClubs</a></span>
+</div>
+<div class="error" id="error"></div>
+</div>
 <!-- Full-viewport event layer: sibling of clipped bottom scoreboard. -->
-  <div class="event-animation" id="scoreEvent" aria-live="polite">
-    <div class="event-rays"></div><div class="event-particles"></div>
-    <span class="event-emoji"></span><span class="event-text"></span><span class="event-subtitle"></span>
-  </div>
-
-<div id="fullInningsBreak" aria-live="polite" aria-label="First innings full scorecard">
- <div class="ib-header"><div class="ib-team" id="ibBatTeam"></div><div class="ib-center"><strong>INNINGS BREAK</strong><div class="ib-score" id="ibScore">—</div><span id="ibOvers">— overs</span></div><div class="ib-team" id="ibBowlTeam"><br><span class="ib-target" id="ibTarget"></span></div></div>
- <div class="ib-grid"><section class="ib-panel"><h3 id="ibBatTitle">BATTING</h3><table class="ib-table"><colgroup><col style="width:24%"><col style="width:32%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:12%"></colgroup><thead><tr><th class="ib-name">BATSMAN</th><th class="ib-how">HOW OUT</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody id="ibBatRows"></tbody></table><div class="ib-summary" id="ibFoW"></div></section>
- <div class="ib-right"><section class="ib-panel"><h3 id="ibBowlTitle">BOWLING</h3><table class="ib-table"><colgroup><col style="width:37%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:15%"></colgroup><thead><tr><th class="ib-name">BOWLER</th><th>O</th><th>M</th><th>R</th><th>W</th><th>ECON</th></tr></thead><tbody id="ibBowlRows"></tbody></table></section><section class="ib-panel"><h3>EXTRAS BREAKDOWN</h3><div class="ib-extras" id="ibExtras"></div></section><div class="ib-foot" id="ibFoot">SECOND INNINGS STARTING SOON</div></div></div>
+<div aria-live="polite" class="event-animation" id="scoreEvent">
+<div class="event-rays"></div><div class="event-particles"></div>
+<span class="event-emoji"></span><span class="event-text"></span><span class="event-subtitle"></span>
 </div>
-
-<div id="overSummary" aria-live="polite"><div class="os-head"><span id="osTitle">OVER SUMMARY</span><span id="osOvers"></span></div><div class="os-score" id="osFirstRow"><span id="osTeam"></span><strong id="osScore">—</strong><span id="osRR"></span></div><div class="os-score os-second-score" id="osSecondRow" hidden><span id="osSecondTeam"></span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div><div class="os-grid"><section class="os-panel"><h3>TOP BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>TOP BOWLERS</h3><div id="osBowlers"></div></section></div><div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div></div>
+<div aria-label="First innings full scorecard" aria-live="polite" id="fullInningsBreak">
+<div class="ib-header"><div class="ib-team" id="ibBatTeam"></div><div class="ib-center"><strong>INNINGS BREAK</strong><div class="ib-score" id="ibScore">—</div><span id="ibOvers">— overs</span></div><div class="ib-team" id="ibBowlTeam"><br/><span class="ib-target" id="ibTarget"></span></div></div>
+<div class="ib-grid"><section class="ib-panel"><h3 id="ibBatTitle">BATTING</h3><table class="ib-table"><colgroup><col style="width:24%"/><col style="width:32%"/><col style="width:8%"/><col style="width:8%"/><col style="width:8%"/><col style="width:8%"/><col style="width:12%"/></colgroup><thead><tr><th class="ib-name">BATSMAN</th><th class="ib-how">HOW OUT</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody id="ibBatRows"></tbody></table><div class="ib-summary" id="ibFoW"></div></section>
+<div class="ib-right"><section class="ib-panel"><h3 id="ibBowlTitle">BOWLING</h3><table class="ib-table"><colgroup><col style="width:37%"/><col style="width:12%"/><col style="width:12%"/><col style="width:12%"/><col style="width:12%"/><col style="width:15%"/></colgroup><thead><tr><th class="ib-name">BOWLER</th><th>O</th><th>M</th><th>R</th><th>W</th><th>ECON</th></tr></thead><tbody id="ibBowlRows"></tbody></table></section><section class="ib-panel"><h3>EXTRAS BREAKDOWN</h3><div class="ib-extras" id="ibExtras"></div></section><div class="ib-foot" id="ibFoot">SECOND INNINGS STARTING SOON</div></div></div>
+</div>
+<div aria-live="polite" id="overSummary"><div class="os-head"><span id="osTitle">OVER SUMMARY</span><span id="osOvers"></span></div><div class="os-score" id="osFirstRow"><span id="osTeam"></span><strong id="osScore">—</strong><span id="osRR"></span></div><div class="os-score os-second-score" hidden="" id="osSecondRow"><span id="osSecondTeam"></span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div><div class="os-grid"><section class="os-panel"><h3>TOP BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>TOP BOWLERS</h3><div id="osBowlers"></div></section></div><div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div></div>
 <!-- Match-complete card is viewport centered and independent of the bottom scoreboard. -->
-<div id="finalMatchResult" role="status" aria-live="polite" hidden>
-  <h2>MATCH RESULT</h2>
-  <div class="mr-teams">
-    <div class="mr-team"><img id="mrLogo1" alt="" hidden><div><div class="mr-name" id="mrName1"></div><div class="mr-scoreline"><strong id="mrScore1"></strong><small id="mrOvers1"></small></div></div></div>
-    <div class="mr-team"><img id="mrLogo2" alt="" hidden><div><div class="mr-name" id="mrName2"></div><div class="mr-scoreline"><strong id="mrScore2"></strong><small id="mrOvers2"></small></div></div></div>
-  </div>
-  <div class="mr-result" id="mrWinner"></div>
-  <div class="mr-pom" id="mrPom"></div>
-  <div class="mr-powered">POWERED BY CRICCLUBS</div>
+<div aria-live="polite" hidden="" id="finalMatchResult" role="status">
+<h2>MATCH RESULT</h2>
+<div class="mr-teams">
+<div class="mr-team"><img alt="" hidden="" id="mrLogo1"/><div><div class="mr-name" id="mrName1"></div><div class="mr-scoreline"><strong id="mrScore1"></strong><small id="mrOvers1"></small></div></div></div>
+<div class="mr-team"><img alt="" hidden="" id="mrLogo2"/><div><div class="mr-name" id="mrName2"></div><div class="mr-scoreline"><strong id="mrScore2"></strong><small id="mrOvers2"></small></div></div></div>
+</div>
+<div class="mr-result" id="mrWinner"></div>
+<div class="mr-pom" id="mrPom"></div>
+<div class="mr-powered">POWERED BY CRICCLUBS</div>
 </div>
 <style>
 #finalMatchResult[hidden]{display:none!important}
@@ -2644,7 +2606,6 @@ html body .overlay.layout4 .top .balls > .ball.wicket {
  box-shadow:0 0 0 1px rgba(255,223,113,.45),0 0 9px rgba(255,48,70,.8)!important;
 }
 </style>
-
 <style id="layout4-single-center-border-final">
 /* Layout 4: the full-width l4-svg-panels already draws the center border.
    Suppress only the legacy MH scorebox's second SVG outline and gradient.
@@ -4331,8 +4292,7 @@ if (urlParam("demo") === "matchResult") {
   refresh();
 }
 </script>
-<div id="milestoneEvent" aria-live="polite"><div class="ms-particles"></div><div class="ms-content"><div class="ms-head"></div><div class="ms-name"></div><div class="ms-detail"></div></div></div>
-
+<div aria-live="polite" id="milestoneEvent"><div class="ms-particles"></div><div class="ms-content"><div class="ms-head"></div><div class="ms-name"></div><div class="ms-detail"></div></div></div>
 <script id="layout4-delivery-zoom-v66">
 (function(){
  let previous=null, initialized=false, scheduled=false;
@@ -4384,13 +4344,16 @@ if (urlParam("demo") === "matchResult") {
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script>
-<iframe id="layout7Frame" title="CricClubs Layout 7 scoreboard" scrolling="no" referrerpolicy="no-referrer" srcdoc="&lt;!DOCTYPE html&gt;
+<iframe id="layout7Frame" referrerpolicy="no-referrer" scrolling="no" srcdoc="&lt;!DOCTYPE html&gt;
+
 &lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;/&gt;&lt;meta content=&quot;width=device-width,initial-scale=1&quot; name=&quot;viewport&quot;/&gt;&lt;title&gt;CricClubs Layout 7 — Borderless MH&lt;/title&gt;&lt;style&gt;
-:root{--opacity:.8;--bar-height:94px}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:Arial,Helvetica,sans-serif}body.demo{background:#09090b}.stage{position:fixed;inset:0;pointer-events:none}.board{position:absolute;bottom:10px;left:1%;width:98%;height:var(--bar-height);border-radius:60px;background:linear-gradient(180deg,rgba(215,8,15,var(--opacity)) 0%,rgba(142,0,8,var(--opacity)) 52%,rgba(72,0,8,var(--opacity)) 100%);display:grid;grid-template-columns:8.5% 30.5% 26% 26.5% 8.5%;align-items:center;isolation:isolate}.team{height:100%;position:relative;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;padding-bottom:19px;min-width:0}.logo{position:absolute;top:-39px;left:50%;transform:translateX(-50%);width:73px;height:73px;border-radius:50%;background:linear-gradient(180deg,#a4000b,#570006);display:grid;place-items:center;font-size:13px;font-weight:900;overflow:hidden;box-shadow:0 5px 9px #0004}.logo img{width:100%;height:100%;object-fit:contain}.abbr{font-size:25px;font-weight:900;letter-spacing:.4px}.scorebox{height:73%;min-width:0;border-radius:45px;background:linear-gradient(115deg,rgba(52,0,6,.84),rgba(110,0,11,.65));display:grid;grid-template-columns:37% 63%;align-items:center;padding:5px 9px 5px 19px;gap:0}.score{font-size:clamp(22px,3.2vw,53px);font-weight:900;letter-spacing:-1px;white-space:nowrap}.meta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0}.overs{font-size:clamp(12px,1.7vw,26px);font-weight:900;white-space:nowrap}.chase{max-width:100%;background:linear-gradient(90deg,#73020c,#95060f);border-radius:24px;padding:6px 10px;font-size:clamp(8px,1.15vw,17px);font-weight:900;white-space:nowrap;text-align:center}.batters{padding:0 7px;min-width:0}.batter{height:37px;display:flex;align-items:center;justify-content:space-between;gap:5px;padding:0 12px;font-weight:900;font-size:clamp(12px,1.9vw,27px);min-width:0}.batter.striker{border-radius:24px;background:linear-gradient(90deg,#f22230,#fa343d)}.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.striker .name:before{content:&#x27;▶ &#x27;;font-size:.7em}.stats{white-space:nowrap;font-variant-numeric:tabular-nums}.bowling{height:76%;min-width:0;border-left:2px solid rgba(255,255,255,.9);padding:3px 6px 0 16px;display:flex;flex-direction:column;justify-content:space-between}.bowlerline{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:clamp(11px,1.65vw,24px);font-weight:900;white-space:nowrap}.bowlername{min-width:0;overflow:hidden;text-overflow:ellipsis}.bowlerstats{white-space:nowrap}.balls{display:flex;gap:4px;align-items:center;overflow:hidden}.ball{width:clamp(17px,2.8vw,40px);height:clamp(18px,2.65vw,36px);border-radius:9px;background:linear-gradient(#9c0814,#64020c);display:grid;place-items:center;font-size:clamp(10px,1.5vw,22px);font-weight:900;flex:none;box-shadow:inset 0 -1px 0 #ff9aa088}.ball.four,.ball.six{background:#e52b36}.ball.wicket{background:#3a080a}.brand{font-size:clamp(8px,1.1vw,16px);font-weight:700;text-align:right;white-space:nowrap;opacity:.88;font-style:italic}.message{position:absolute;bottom:calc(var(--bar-height) + 24px);left:50%;transform:translateX(-50%);padding:7px 18px;border-radius:22px;background:#4b0010e8;font-weight:800;font-size:13px;display:none}.message.visible{display:block}@media(max-width:850px){:root{--bar-height:65px}.board{bottom:4px}.logo{width:48px;height:48px;top:-24px;font-size:10px}.team{padding-bottom:11px}.abbr{font-size:15px}.scorebox{padding:3px 5px 3px 10px}.meta{gap:4px}.chase{padding:3px 4px}.batter{height:25px;padding:0 5px}.bowling{padding-left:7px;border-left-width:1px}.balls{gap:2px}.ball{border-radius:5px}.brand{font-size:8px}}
-&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;stage&quot;&gt;&lt;div class=&quot;message&quot; id=&quot;message&quot;&gt;&lt;/div&gt;&lt;div aria-label=&quot;CricClubs live cricket score&quot; class=&quot;board&quot;&gt;&lt;div class=&quot;team&quot;&gt;&lt;div class=&quot;logo&quot; id=&quot;logoBat&quot;&gt;&lt;span id=&quot;initialBat&quot;&gt;IS&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;abbr&quot; id=&quot;teamBat&quot;&gt;IS&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;scorebox&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;score&quot;&gt;92/3&lt;/div&gt;&lt;div class=&quot;meta&quot;&gt;&lt;div class=&quot;overs&quot; id=&quot;overs&quot;&gt;Overs 10.0&lt;/div&gt;&lt;div class=&quot;chase&quot; id=&quot;chase&quot;&gt;Need 64 · 30 Balls · RRR 12.80&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;batters&quot;&gt;&lt;div class=&quot;batter striker&quot;&gt;&lt;span class=&quot;name&quot; id=&quot;batter1&quot;&gt;ROY&lt;/span&gt;&lt;span class=&quot;stats&quot; id=&quot;batter1Stats&quot;&gt;36 (28)&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;batter&quot;&gt;&lt;span class=&quot;name&quot; id=&quot;batter2&quot;&gt;ANWAR&lt;/span&gt;&lt;span class=&quot;stats&quot; id=&quot;batter2Stats&quot;&gt;18 (12)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;bowling&quot;&gt;&lt;div class=&quot;bowlerline&quot;&gt;&lt;span class=&quot;bowlername&quot; id=&quot;bowler&quot;&gt;MANESH&lt;/span&gt;&lt;span class=&quot;bowlerstats&quot; id=&quot;bowlerStats&quot;&gt;1/16 (2.0)&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;balls&quot; id=&quot;balls&quot;&gt;&lt;span class=&quot;ball&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;ball four&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;•&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;2&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;brand&quot;&gt;Powered by CricClubs&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;team&quot;&gt;&lt;div class=&quot;logo&quot; id=&quot;logoBowl&quot;&gt;&lt;span id=&quot;initialBowl&quot;&gt;MH&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;abbr&quot; id=&quot;teamBowl&quot;&gt;MH&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;script&gt;
-&#x27;use strict&#x27;;const p=new URLSearchParams(parent.location.search),demo=false;const opacity=Number(p.get(&#x27;opacity&#x27;)??&#x27;.8&#x27;);document.documentElement.style.setProperty(&#x27;--opacity&#x27;,String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=&gt;document.getElementById(id);const str=(x,f=&#x27;&#x27;)=&gt;x==null||x===&#x27;&#x27;?f:String(x);const get=(o,k,f=&#x27;&#x27;)=&gt;str(o?.[k],f);const num=x=&gt;Number(x);const abbr=s=&gt;str(s,&#x27;TEAM&#x27;).trim().split(/\s+/).map(w=&gt;w[0]).join(&#x27;&#x27;).slice(0,3).toUpperCase();function message(s){$(&#x27;message&#x27;).textContent=s;$(&#x27;message&#x27;).classList.toggle(&#x27;visible&#x27;,!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector(&#x27;img&#x27;)?.remove();$(initialId).textContent=abbr(name);if(!src)return;try{const u=new URL(src,&#x27;https://cricclubs.com/&#x27;);if(u.protocol!==&#x27;https:&#x27;||!(u.hostname===&#x27;cricclubs.com&#x27;||u.hostname.endsWith(&#x27;.cricclubs.com&#x27;)))return;const img=document.createElement(&#x27;img&#x27;);img.alt=&#x27;&#x27;;img.src=u.href;img.onerror=()=&gt;img.remove();e.append(img)}catch{}}
-function setBalls(arr){if(!Array.isArray(arr))return;const root=$(&#x27;balls&#x27;);root.replaceChildren();for(const raw of arr.slice(-6)){const s=str(typeof raw===&#x27;object&#x27;?(raw.ballResult??raw.runs??raw.result):raw,&#x27;•&#x27;).trim(),el=document.createElement(&#x27;span&#x27;);el.className=&#x27;ball&#x27;;if(s===&#x27;4&#x27;)el.classList.add(&#x27;four&#x27;);if(s===&#x27;6&#x27;)el.classList.add(&#x27;six&#x27;);if(/W(?!D)|OUT/i.test(s))el.classList.add(&#x27;wicket&#x27;);el.textContent=s===&#x27;0&#x27;||s===&#x27;.&#x27;?&#x27;•&#x27;:s;root.append(el)}}
-function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??&#x27;&#x27;).toLowerCase()===&#x27;true&#x27;||v.isSecondInningsStarted===1;const bat=second?&#x27;t2&#x27;:&#x27;t1&#x27;,bowl=second?&#x27;t1&#x27;:&#x27;t2&#x27;;const batting=get(v,bat+&#x27;Name&#x27;,&#x27;BATTING&#x27;),bowling=get(v,bowl+&#x27;Name&#x27;,&#x27;BOWLING&#x27;);$(&#x27;teamBat&#x27;).textContent=abbr(batting);$(&#x27;teamBowl&#x27;).textContent=abbr(bowling);$(&#x27;score&#x27;).textContent=get(v,bat+&#x27;Total&#x27;,&#x27;0&#x27;)+&#x27;/&#x27;+get(v,bat+&#x27;Wickets&#x27;,&#x27;0&#x27;);const overs=get(v,bat+&#x27;Overs&#x27;,&#x27;0.0&#x27;);$(&#x27;overs&#x27;).textContent=&#x27;Overs &#x27;+overs;const currentRR=get(v,bat+&#x27;RR&#x27;,&#x27;—&#x27;);let info=&#x27;RR &#x27;+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get(&#x27;overs&#x27;)??15);const parts=String(overs).split(&#x27;.&#x27;);const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&amp;&amp;Number.isFinite(current)&amp;&amp;Number.isFinite(maxOvers)&amp;&amp;maxOvers&gt;0){const need=Math.max(0,target-current);const rrr=remaining&gt;0?(need*6/remaining).toFixed(2):&#x27;—&#x27;;info=need===0?&#x27;TARGET REACHED&#x27;:`Need ${need} · ${remaining} Balls · RRR ${rrr}`;}else{const need=get(v,&#x27;runsRequired&#x27;,get(v,&#x27;runsNeeded&#x27;,&#x27;&#x27;));const rrr=get(v,&#x27;requiredRunRate&#x27;,get(v,&#x27;rrr&#x27;,&#x27;—&#x27;));info=need?`Need ${need} · RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,&#x27;matchStatus&#x27;,get(data,&#x27;status&#x27;,&#x27;&#x27;))) || Boolean(get(v,&#x27;matchResult&#x27;,get(data,&#x27;result&#x27;,&#x27;&#x27;)));if(completedMatch)info=&#x27;MATCH COMPLETE&#x27;;$(&#x27;chase&#x27;).textContent=info;$(&#x27;batter1&#x27;).textContent=get(v,&#x27;batsman1Name&#x27;,&#x27;—&#x27;);$(&#x27;batter2&#x27;).textContent=get(v,&#x27;batsman2Name&#x27;,&#x27;—&#x27;);$(&#x27;batter1Stats&#x27;).textContent=get(v,&#x27;batsman1Runs&#x27;,&#x27;0&#x27;)+&#x27; (&#x27;+get(v,&#x27;batsman1Balls&#x27;,&#x27;0&#x27;)+&#x27;)&#x27;;$(&#x27;batter2Stats&#x27;).textContent=get(v,&#x27;batsman2Runs&#x27;,&#x27;0&#x27;)+&#x27; (&#x27;+get(v,&#x27;batsman2Balls&#x27;,&#x27;0&#x27;)+&#x27;)&#x27;;$(&#x27;bowler&#x27;).textContent=get(v,&#x27;bowlerName&#x27;,&#x27;—&#x27;);$(&#x27;bowlerStats&#x27;).textContent=get(v,&#x27;bowlerWickets&#x27;,&#x27;0&#x27;)+&#x27;/&#x27;+get(v,&#x27;bowlerRuns&#x27;,&#x27;0&#x27;)+&#x27; (&#x27;+get(v,&#x27;bowlerOvers&#x27;,&#x27;0.0&#x27;)+&#x27;)&#x27;;logo(&#x27;logoBat&#x27;,&#x27;initialBat&#x27;,second?v.secondLogo:v.firstLogo,batting);logo(&#x27;logoBowl&#x27;,&#x27;initialBowl&#x27;,second?v.firstLogo:v.secondLogo,bowling);setBalls(data?.balls??v.balls);const result=get(v,&#x27;matchResult&#x27;,get(data,&#x27;result&#x27;,&#x27;&#x27;));const done=/complete|finished/i.test(get(v,&#x27;matchStatus&#x27;,get(data,&#x27;status&#x27;,&#x27;&#x27;)));message(&#x27;&#x27;)}
-window.addEventListener(&#x27;message&#x27;,e=&gt;{if(e.source!==parent||!e.data||e.data.type!==&#x27;cricclubs-layout7-data&#x27;)return;try{render(e.data.payload);message(&#x27;&#x27;)}catch(err){console.warn(&#x27;Layout7 render failed&#x27;,err);message(&#x27;Score data unavailable&#x27;)}});&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
-"></iframe></body>
+:root{--opacity:.8;--bar-height:94px}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:Arial,Helvetica,sans-serif}body.demo{background:#09090b}.stage{position:fixed;inset:0;pointer-events:none}.board{position:absolute;bottom:10px;left:1%;width:98%;height:var(--bar-height);border-radius:60px;background:linear-gradient(180deg,rgba(215,8,15,var(--opacity)) 0%,rgba(142,0,8,var(--opacity)) 52%,rgba(72,0,8,var(--opacity)) 100%);display:grid;grid-template-columns:8.5% 30.5% 26% 26.5% 8.5%;align-items:center;isolation:isolate}.team{height:100%;position:relative;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;padding-bottom:19px;min-width:0}.logo{position:absolute;top:-39px;left:50%;transform:translateX(-50%);width:73px;height:73px;border-radius:50%;background:linear-gradient(180deg,#a4000b,#570006);display:grid;place-items:center;font-size:13px;font-weight:900;overflow:hidden;box-shadow:0 5px 9px #0004}.logo img{width:100%;height:100%;object-fit:contain}.abbr{font-size:25px;font-weight:900;letter-spacing:.4px}.scorebox{height:73%;min-width:0;border-radius:45px;background:linear-gradient(115deg,rgba(52,0,6,.84),rgba(110,0,11,.65));display:grid;grid-template-columns:37% 63%;align-items:center;padding:5px 9px 5px 19px;gap:0}.score{font-size:clamp(22px,3.2vw,53px);font-weight:900;letter-spacing:-1px;white-space:nowrap}.meta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0}.overs{font-size:clamp(12px,1.7vw,26px);font-weight:900;white-space:nowrap}.chase{max-width:100%;background:linear-gradient(90deg,#73020c,#95060f);border-radius:24px;padding:6px 10px;font-size:clamp(8px,1.15vw,17px);font-weight:900;white-space:nowrap;text-align:center}.batters{padding:0 7px;min-width:0}.batter{height:37px;display:flex;align-items:center;justify-content:space-between;gap:5px;padding:0 12px;font-weight:900;font-size:clamp(12px,1.9vw,27px);min-width:0}.batter.striker{border-radius:24px;background:linear-gradient(90deg,#f22230,#fa343d)}.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.striker .name:before{content:'▶ ';font-size:.7em}.stats{white-space:nowrap;font-variant-numeric:tabular-nums}.bowling{height:76%;min-width:0;border-left:2px solid rgba(255,255,255,.9);padding:3px 6px 0 16px;display:flex;flex-direction:column;justify-content:space-between}.bowlerline{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:clamp(11px,1.65vw,24px);font-weight:900;white-space:nowrap}.bowlername{min-width:0;overflow:hidden;text-overflow:ellipsis}.bowlerstats{white-space:nowrap}.balls{display:flex;gap:4px;align-items:center;overflow:hidden}.ball{width:clamp(17px,2.8vw,40px);height:clamp(18px,2.65vw,36px);border-radius:9px;background:linear-gradient(#9c0814,#64020c);display:grid;place-items:center;font-size:clamp(10px,1.5vw,22px);font-weight:900;flex:none;box-shadow:inset 0 -1px 0 #ff9aa088}.ball.four,.ball.six{background:#e52b36}.ball.wicket{background:#3a080a}.brand{font-size:clamp(8px,1.1vw,16px);font-weight:700;text-align:right;white-space:nowrap;opacity:.88;font-style:italic}.message{position:absolute;bottom:calc(var(--bar-height) + 24px);left:50%;transform:translateX(-50%);padding:7px 18px;border-radius:22px;background:#4b0010e8;font-weight:800;font-size:13px;display:none}.message.visible{display:block}@media(max-width:850px){:root{--bar-height:65px}.board{bottom:4px}.logo{width:48px;height:48px;top:-24px;font-size:10px}.team{padding-bottom:11px}.abbr{font-size:15px}.scorebox{padding:3px 5px 3px 10px}.meta{gap:4px}.chase{padding:3px 4px}.batter{height:25px;padding:0 5px}.bowling{padding-left:7px;border-left-width:1px}.balls{gap:2px}.ball{border-radius:5px}.brand{font-size:8px}}
+
+.logo{font-size:0!important}.logo img{display:block}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;stage&quot;&gt;&lt;div class=&quot;message&quot; id=&quot;message&quot;&gt;&lt;/div&gt;&lt;div aria-label=&quot;CricClubs live cricket score&quot; class=&quot;board&quot;&gt;&lt;div class=&quot;team&quot;&gt;&lt;div class=&quot;logo&quot; id=&quot;logoBat&quot;&gt;&lt;/div&gt;&lt;div class=&quot;abbr&quot; id=&quot;teamBat&quot;&gt;IS&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;scorebox&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;score&quot;&gt;92/3&lt;/div&gt;&lt;div class=&quot;meta&quot;&gt;&lt;div class=&quot;overs&quot; id=&quot;overs&quot;&gt;Overs 10.0&lt;/div&gt;&lt;div class=&quot;chase&quot; id=&quot;chase&quot;&gt;Need 64 · 30 Balls · RRR 12.80&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;batters&quot;&gt;&lt;div class=&quot;batter striker&quot;&gt;&lt;span class=&quot;name&quot; id=&quot;batter1&quot;&gt;ROY&lt;/span&gt;&lt;span class=&quot;stats&quot; id=&quot;batter1Stats&quot;&gt;36 (28)&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;batter&quot;&gt;&lt;span class=&quot;name&quot; id=&quot;batter2&quot;&gt;ANWAR&lt;/span&gt;&lt;span class=&quot;stats&quot; id=&quot;batter2Stats&quot;&gt;18 (12)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;bowling&quot;&gt;&lt;div class=&quot;bowlerline&quot;&gt;&lt;span class=&quot;bowlername&quot; id=&quot;bowler&quot;&gt;MANESH&lt;/span&gt;&lt;span class=&quot;bowlerstats&quot; id=&quot;bowlerStats&quot;&gt;1/16 (2.0)&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;balls&quot; id=&quot;balls&quot;&gt;&lt;span class=&quot;ball&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;ball four&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;•&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;ball&quot;&gt;2&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;brand&quot;&gt;Powered by CricClubs&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;team&quot;&gt;&lt;div class=&quot;logo&quot; id=&quot;logoBowl&quot;&gt;&lt;/div&gt;&lt;div class=&quot;abbr&quot; id=&quot;teamBowl&quot;&gt;MH&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;script&gt;
+'use strict';const p=new URLSearchParams(parent.location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.documentElement.style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=&gt;document.getElementById(id);const str=(x,f='')=&gt;x==null||x===''?f:String(x);const get=(o,k,f='')=&gt;str(o?.[k],f);const num=x=&gt;Number(x);const abbr=s=&gt;str(s,'TEAM').trim().split(/\s+/).map(w=&gt;w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=&gt;img.remove();e.append(img)}catch{}}
+function setBalls(arr){if(!Array.isArray(arr))return;const root=$('balls');root.replaceChildren();for(const raw of arr.slice(-6)){const s=str(typeof raw==='object'?(raw.ballResult??raw.runs??raw.result):raw,'•').trim(),el=document.createElement('span');el.className='ball';if(s==='4')el.classList.add('four');if(s==='6')el.classList.add('six');if(/W(?!D)|OUT/i.test(s))el.classList.add('wicket');el.textContent=s==='0'||s==='.'?'•':s;root.append(el)}}
+function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');$('teamBat').textContent=abbr(batting);$('teamBowl').textContent=abbr(bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');$('overs').textContent='Overs '+overs;const currentRR=get(v,bat+'RR','—');let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&amp;&amp;Number.isFinite(current)&amp;&amp;Number.isFinite(maxOvers)&amp;&amp;maxOvers&gt;0){const need=Math.max(0,target-current);const rrr=remaining&gt;0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} · ${remaining} Balls · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} · RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=info;$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=get(v,'bowlerName','—');$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',v.firstLogo,batting);logo('logoBowl','initialBowl',v.secondLogo,bowling);setBalls(data?.balls??v.balls);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+window.addEventListener('message',e=&gt;{if(e.source!==parent||!e.data||e.data.type!=='cricclubs-layout7-data')return;try{render(e.data.payload);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}});&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+" title="CricClubs Layout 7 scoreboard"></iframe></body>
 </html>
