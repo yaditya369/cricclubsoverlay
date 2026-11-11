@@ -2394,6 +2394,79 @@ body.layout7-active .overlay>.top,body.layout7-active .overlay>.bottom,body.layo
 body.layout7-active .overlay{min-height:0!important;height:0!important;overflow:visible!important}
 #layout7Frame{display:none;position:fixed;bottom:var(--scoreboard-bottom-offset,0px);left:0;width:100%;height:150px;border:0;background:transparent;pointer-events:none;z-index:40}
 body.layout7-active #layout7Frame{display:block}
+</style><style id="layout7-exclusive-fix">
+html body.layout7-active .overlay,
+html body.layout7-active.show-final-result .overlay {display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+html body.layout7-active #layout7Frame {display:block!important;visibility:visible!important;opacity:1!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:155px!important;border:0!important;background:transparent!important;pointer-events:none!important;z-index:30!important}
+html body.layout7-active #finalMatchResult:not([hidden]) {z-index:50!important}
+html body.layout7-active #overSummary,html body.layout7-active #fullInningsBreak,html body.layout7-active #scoreEvent {z-index:45}
+</style><style id="layout7-direct-scoped-v2">#ccL7{--opacity:.8;--bar-h:60px;--bar-w:96%;--junction:13px}
+#ccL7, #ccL7 *{box-sizing:border-box}
+#ccL7, #ccL7{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:white;font-family:Arial,Helvetica,sans-serif}
+#ccL7 .stage{position:absolute;inset:0;pointer-events:none;overflow:visible}
+#ccL7 .board{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;width:var(--bar-w);height:var(--bar-h);border-radius:36px;background:linear-gradient(180deg,rgba(211,14,28,var(--opacity)),rgba(124,4,17,var(--opacity)) 65%,rgba(66,2,12,var(--opacity)));box-shadow:0 3px 9px #0008;overflow:visible;isolation:isolate}
+#ccL7 .board>.team, #ccL7 .board>.scorebox, #ccL7 .board>.batters, #ccL7 .board>.bowling, #ccL7 .board>.brand{position:absolute;min-width:0;margin:0}
+#ccL7 .team{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:visible;z-index:4;padding-bottom:5px}
+#ccL7 .logo{position:absolute;left:50%;top:-25px;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;background:linear-gradient(#a30b19,#2c0309);box-shadow:0 2px 5px #0009;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#ccL7 .logo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+#ccL7 .abbr{font-size:14px;line-height:1;font-weight:900;white-space:nowrap;text-shadow:0 1px 2px #000}
+#ccL7 .scorebox{display:flex;align-items:center;gap:9px;padding:2px 8px 2px 12px;border-radius:28px 0 0 28px;background:linear-gradient(100deg,rgba(39,1,7,.9),rgba(87,1,13,.8));overflow:hidden;z-index:1}
+#ccL7 .score{font-size:clamp(20px,2.55vw,37px);font-weight:900;letter-spacing:-.8px;white-space:nowrap;flex:0 0 auto}
+#ccL7 .meta{display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden}
+#ccL7 .overs{font-size:clamp(12px,1.4vw,19px);font-weight:900;white-space:nowrap}
+#ccL7 .chase{font-size:clamp(9px,1.02vw,13px);font-weight:800;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center;border-radius:12px;background:#830716;padding:3px 5px}
+#ccL7 .batters{display:flex;flex-direction:column;justify-content:center;z-index:2;overflow:hidden}
+#ccL7 .batter{height:50%;min-height:0;display:flex;align-items:center;justify-content:space-between;gap:4px;padding:0 8px;font-size:clamp(12px,1.35vw,19px);font-weight:900;line-height:1;white-space:nowrap}
+#ccL7 .batter.striker{background:linear-gradient(90deg,#d71b2b,#f33543);border-radius:0 var(--junction) var(--junction) 0}
+#ccL7 .name{overflow:hidden;text-overflow:ellipsis;min-width:0;white-space:nowrap}
+#ccL7 .striker .name:before{content:"▶ ";font-size:.7em}
+#ccL7 .stats{white-space:nowrap;font-variant-numeric:tabular-nums;flex:none}
+#ccL7 .bowling{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:1px 8px 2px 12px;border-left:1px solid #ffffff60;overflow:hidden}
+#ccL7 .bowlerline{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:clamp(12px,1.25vw,18px);font-weight:900;min-width:0;white-space:nowrap}
+#ccL7 .bowlername{min-width:0;overflow:hidden;text-overflow:ellipsis}
+#ccL7 .bowlerstats{flex:none;white-space:nowrap}
+#ccL7 .balls{display:flex;align-items:center;gap:4px;overflow:hidden;min-width:0}
+#ccL7 .ball{display:flex;flex:0 0 auto;align-items:center;justify-content:center;width:clamp(17px,1.85vw,26px);height:clamp(17px,1.85vw,26px);border-radius:50%;font-size:clamp(10px,1.1vw,15px);font-weight:900;background:#870918;line-height:1}
+#ccL7 .ball.dot:after{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
+#ccL7 .ball.four, #ccL7 .ball.six{background:#e92b3a}
+#ccL7 .ball.extra{font-size:10px}
+#ccL7 .ball.wicket{background:#260008}
+#ccL7 .brand{display:flex;align-items:center;justify-content:center;z-index:5;font-size:clamp(7px,.8vw,11px);font-style:italic;font-weight:700;white-space:nowrap;overflow:hidden}
+#ccL7 .message{display:none;position:absolute;left:50%;bottom:105px;transform:translateX(-50%)}
+#ccL7 .message.visible{display:block}
+/* Exact user-supplied panel coordinates, relative to the 60px bar. */
+#ccL7 .board>.team:first-child{left:0%;top:0px;width:8%;height:70px}
+#ccL7 .board>.scorebox{left:8%;top:5px;width:28%;height:50px}
+#ccL7 .board>.batters{left:36%;top:0px;width:27%;height:60px}
+#ccL7 .board>.bowling{left:63%;top:0px;width:29%;height:60px}
+#ccL7 .board>.team:nth-last-child(1){left:92%;top:0px;width:8%;height:70px}
+#ccL7 .board>.brand{left:80%;top:49px;width:17%;height:10px}
+@media(max-width:700px){#ccL7 .logo{width:42px;height:42px;top:-21px}
+#ccL7 .abbr{font-size:11px}
+#ccL7 .scorebox{gap:4px;padding-left:7px}
+#ccL7 .batter{padding:0 4px}
+#ccL7 .bowling{padding-left:5px;gap:4px}
+#ccL7 .balls{gap:2px}}
+/* Layout 7 direct-DOM container: one CSS coordinate system, no iframe. */
+#ccL7{position:fixed!important;inset:auto 0 0 0!important;width:100%!important;height:100px!important;min-height:0!important;max-height:none!important;z-index:999!important;overflow:visible!important;pointer-events:none!important;background:transparent!important;color:white;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box;display:none}
+body.layout7-active #ccL7{display:block!important}
+#ccL7 .stage{position:relative!important;width:100%!important;height:100%!important;inset:auto!important;overflow:visible!important}
+#ccL7 .board{bottom:10px!important;height:60px!important;width:96%!important;min-height:0!important;max-height:60px!important}
+#ccL7 .board>.team:first-child{left:0%;top:0;width:8%;height:70px}
+#ccL7 .board>.scorebox{left:8%;top:5px;width:28%;height:50px}
+#ccL7 .board>.batters{left:36%;top:0;width:27%;height:60px}
+#ccL7 .board>.bowling{left:63%;top:0;width:29%;height:60px}
+#ccL7 .board>.team:last-child{left:92%;top:0;width:8%;height:70px}
+#ccL7 .board>.brand{left:80%;top:49px;width:17%;height:10px}
+#ccL7 .message{bottom:105px}
+@media(max-width:700px){#ccL7 .brand{font-size:6px!important;justify-content:flex-start!important;padding-left:0!important;letter-spacing:-.25px!important}#ccL7 .team .abbr{font-size:10px!important}}
+html body.layout7-active .overlay,html body.layout7-active.show-final-result .overlay{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+#ccL7 .board>.scorebox{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;padding:2px 8px 2px 12px!important}
+#ccL7 .board>.scorebox>.score{display:block!important;flex:0 0 auto!important;width:auto!important;max-width:none!important;position:static!important;transform:none!important}
+#ccL7 .board>.scorebox>.meta{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;flex:1 1 auto!important;gap:3px!important;min-width:0!important;position:static!important;transform:none!important}
+#ccL7 .board>.scorebox>.meta>.overs,#ccL7 .board>.scorebox>.meta>.chase{position:static!important;transform:none!important;display:block!important;line-height:1.1!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+#ccL7 .board>.scorebox>.meta>.chase{padding:3px 5px!important}
+
 </style></head>
 <body>
 <div class="overlay">
@@ -4011,13 +4084,7 @@ function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
 }
 
 
-let latestLayout7Data=null;
-function publishLayout7(data){
- latestLayout7Data=data;
- if(typeof window.layout7DirectRender==='function')window.layout7DirectRender(data);
-}
-window.addEventListener('load',()=>{if(latestLayout7Data)publishLayout7(latestLayout7Data)});if(latestLayout7Data)publishLayout7(latestLayout7Data)}
-});
+let latestLayout7Data=null; function publishLayout7(data){latestLayout7Data=data;if(typeof window.ccLayout7Render==='function')window.ccLayout7Render(data);}
 
 function render(data){
   const v=data.values||{};
@@ -4335,65 +4402,12 @@ if (urlParam("demo") === "matchResult") {
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script>
-<div id="layout7Root" aria-label="CricClubs Layout 7 scoreboard"><div class="stage"><div class="message" id="message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="logoBat"></div><div class="abbr" id="teamBat">IS</div></div><div class="scorebox"><div class="score" id="score">92/3</div><div class="meta"><div class="overs" id="overs">Overs 10.0</div><div class="chase" id="chase">Need 64 · 30 Balls · RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="batter1">ROY</span><span class="stats" id="batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="batter2">ANWAR</span><span class="stats" id="batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="bowler">MANESH</span><span class="bowlerstats" id="bowlerStats">1/16 (2.0)</span></div><div class="balls" id="balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="logoBowl"></div><div class="abbr" id="teamBowl">MH</div></div></div></div></div><style id="layout7-direct-style">#layout7Root{--opacity:.8;--bar-h:60px;--bar-w:96%;--junction:13px}
-#layout7Root, #layout7Root *{box-sizing:border-box}
-#layout7Root, #layout7Root{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:white;font-family:Arial,Helvetica,sans-serif}
-#layout7Root .stage{position:absolute;inset:0;pointer-events:none;overflow:visible}
-#layout7Root .board{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;width:var(--bar-w);height:var(--bar-h);border-radius:36px;background:linear-gradient(180deg,rgba(211,14,28,var(--opacity)),rgba(124,4,17,var(--opacity)) 65%,rgba(66,2,12,var(--opacity)));box-shadow:0 3px 9px #0008;overflow:visible;isolation:isolate}
-#layout7Root .board>.team, #layout7Root .board>.scorebox, #layout7Root .board>.batters, #layout7Root .board>.bowling, #layout7Root .board>.brand{position:absolute;min-width:0;margin:0}
-#layout7Root .team{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:visible;z-index:4;padding-bottom:5px}
-#layout7Root .logo{position:absolute;left:50%;top:-25px;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;background:linear-gradient(#a30b19,#2c0309);box-shadow:0 2px 5px #0009;overflow:hidden;display:flex;align-items:center;justify-content:center}
-#layout7Root .logo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-#layout7Root .abbr{font-size:14px;line-height:1;font-weight:900;white-space:nowrap;text-shadow:0 1px 2px #000}
-#layout7Root .scorebox{display:flex;align-items:center;gap:9px;padding:2px 8px 2px 12px;border-radius:28px 0 0 28px;background:linear-gradient(100deg,rgba(39,1,7,.9),rgba(87,1,13,.8));overflow:hidden;z-index:1}
-#layout7Root .score{font-size:clamp(20px,2.55vw,37px);font-weight:900;letter-spacing:-.8px;white-space:nowrap;flex:0 0 auto}
-#layout7Root .meta{display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden}
-#layout7Root .overs{font-size:clamp(12px,1.4vw,19px);font-weight:900;white-space:nowrap}
-#layout7Root .chase{font-size:clamp(9px,1.02vw,13px);font-weight:800;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center;border-radius:12px;background:#830716;padding:3px 5px}
-#layout7Root .batters{display:flex;flex-direction:column;justify-content:center;z-index:2;overflow:hidden}
-#layout7Root .batter{height:50%;min-height:0;display:flex;align-items:center;justify-content:space-between;gap:4px;padding:0 8px;font-size:clamp(12px,1.35vw,19px);font-weight:900;line-height:1;white-space:nowrap}
-#layout7Root .batter.striker{background:linear-gradient(90deg,#d71b2b,#f33543);border-radius:0 var(--junction) var(--junction) 0}
-#layout7Root .name{overflow:hidden;text-overflow:ellipsis;min-width:0;white-space:nowrap}
-#layout7Root .striker .name:before{content:"▶ ";font-size:.7em}
-#layout7Root .stats{white-space:nowrap;font-variant-numeric:tabular-nums;flex:none}
-#layout7Root .bowling{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:1px 8px 2px 12px;border-left:1px solid #ffffff60;overflow:hidden}
-#layout7Root .bowlerline{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:clamp(12px,1.25vw,18px);font-weight:900;min-width:0;white-space:nowrap}
-#layout7Root .bowlername{min-width:0;overflow:hidden;text-overflow:ellipsis}
-#layout7Root .bowlerstats{flex:none;white-space:nowrap}
-#layout7Root .balls{display:flex;align-items:center;gap:4px;overflow:hidden;min-width:0}
-#layout7Root .ball{display:flex;flex:0 0 auto;align-items:center;justify-content:center;width:clamp(17px,1.85vw,26px);height:clamp(17px,1.85vw,26px);border-radius:50%;font-size:clamp(10px,1.1vw,15px);font-weight:900;background:#870918;line-height:1}
-#layout7Root .ball.dot:after{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
-#layout7Root .ball.four, #layout7Root .ball.six{background:#e92b3a}
-#layout7Root .ball.extra{font-size:10px}
-#layout7Root .ball.wicket{background:#260008}
-#layout7Root .brand{display:flex;align-items:center;justify-content:center;z-index:5;font-size:clamp(7px,.8vw,11px);font-style:italic;font-weight:700;white-space:nowrap;overflow:hidden}
-#layout7Root .message{display:none;position:absolute;left:50%;bottom:105px;transform:translateX(-50%)}
-#layout7Root .message.visible{display:block}
-#layout7Root .board>.team:first-child{left:0%;top:0px;width:8%;height:70px}
-#layout7Root .board>.scorebox{left:8%;top:5px;width:28%;height:50px}
-#layout7Root .board>.batters{left:36%;top:0px;width:27%;height:60px}
-#layout7Root .board>.bowling{left:63%;top:0px;width:29%;height:60px}
-#layout7Root .board>.team:nth-last-child(1){left:92%;top:0px;width:8%;height:70px}
-#layout7Root .board>.brand{left:80%;top:49px;width:17%;height:10px}
-@media(max-width:700px){#layout7Root .logo{width:42px;height:42px;top:-21px}
-#layout7Root .abbr{font-size:11px}
-#layout7Root .scorebox{gap:4px;padding-left:7px}
-#layout7Root .batter{padding:0 4px}
-#layout7Root .bowling{padding-left:5px;gap:4px}
-#layout7Root .balls{gap:2px}}
-#layout7Root{display:none;position:fixed;left:0;right:0;bottom:0;height:105px;pointer-events:none;overflow:visible;z-index:40;box-sizing:border-box;background:transparent;color:white;font-family:Arial,Helvetica,sans-serif;--opacity:.8;--bar-h:60px;--bar-w:96%;--junction:13px}
-body.layout7-active #layout7Root{display:block}
-#layout7Root .stage{position:absolute;inset:0;overflow:visible}
-#layout7Root .board{bottom:10px}
-</style>
-<script id="layout7-direct-runtime">(function(){
-'use strict';
-const root=document.getElementById('layout7Root');
+<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 · 30 Balls · RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><script id="layout7-direct-runtime-v2">(function(){
 
-const p=new URLSearchParams(window.location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');root.style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>root.querySelector('#'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();e.append(img)}catch{}}
+'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();e.append(img)}catch{}}
 function setBalls(arr){if(!Array.isArray(arr))return;const root=$('balls');root.replaceChildren();for(const raw of arr.slice(-6)){const s=str(typeof raw==='object'?(raw.ballResult??raw.runs??raw.result):raw,'•').trim(),el=document.createElement('span');el.className='ball';if(s==='0'||s==='.'||s==='•')el.classList.add('dot');if(/wd|nb|N\+|W\+/i.test(s))el.classList.add('extra');if(s==='4')el.classList.add('four');if(s==='6')el.classList.add('six');if(/W(?!D)|OUT/i.test(s))el.classList.add('wicket');el.textContent=s==='0'||s==='.'||s==='•'?'':s;root.append(el)}}
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');$('teamBat').textContent=abbr(batting);$('teamBowl').textContent=abbr(bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');$('overs').textContent='Overs '+overs;const currentRR=get(v,bat+'RR','—');let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} · ${remaining} Balls · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} · RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=info;$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=get(v,'bowlerName','—');$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',v.firstLogo,batting);logo('logoBowl','initialBowl',v.secondLogo,bowling);setBalls(data?.balls??v.balls);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
-window.layout7DirectRender = function(data){ try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')} };
-})();</script>
-</body>
+window.ccLayout7Render=function(data){try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
+})();
+if(typeof latestLayout7Data!=="undefined" && latestLayout7Data && window.ccLayout7Render)window.ccLayout7Render(latestLayout7Data);</script></body>
 </html>
