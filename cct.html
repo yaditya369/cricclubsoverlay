@@ -3002,6 +3002,8 @@ html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
 <style id="view1-footer-visibility">
 /* Only view=1 displays the shared secondary footer; other views retain the main scoreboard. */
 html.cc-hide-footer #bottom { display:none!important; visibility:hidden!important; }
+/* API view=8 suppresses the complete broadcast overlay, including Layout 7. */
+html.cc-api-view8 .overlay, html.cc-api-view8 #ccL7, html.cc-api-view8 #milestoneEvent, html.cc-api-view8 #scoreEvent { display:none!important; visibility:hidden!important; }
 </style>
 <style id="view8-hide-entire-overlay">
 /* view=8: transparent video-only output, including all independent animation layers. */
@@ -3017,6 +3019,7 @@ document.documentElement.classList.add("cc-hide-footer");
 function updateFooterVisibilityFromResponse(data) {
   const showFooter = data != null && Object.prototype.hasOwnProperty.call(data, "view") && String(data.view) === "1";
   document.documentElement.classList.toggle("cc-hide-footer", !showFooter);
+  document.documentElement.classList.toggle("cc-api-view8", String(data?.view ?? "").trim() === "8");
 }
 if ((params.get("view") || "").trim() === "8") {
   document.documentElement.classList.add("cc-view8");
@@ -4381,7 +4384,7 @@ function syncHeaderHeight() {
 }
 window.addEventListener('resize',syncHeaderHeight);
 if (urlParam("demo") === "toss" && overlayLayout === "7") {
-  // Offline Layout 7 toss preview: no API requests, no live match required.
+  // Toss preview loads the selected match from the live API in its own script.
   stopped = true;
 } else if (urlParam("demo") === "matchResult") {
   // Preview card is already rendered above; do not fetch or overwrite it.
@@ -4591,26 +4594,48 @@ body.layout7-toss-demo #ccL7 .board>.team .logo:not(:has(img))::after{content:'�
 body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad1428,#410713);border:2px solid #f6bdc6}
 </style>
 <script id="layout7-offline-toss-preview">
-(function(){
+(async function(){
   const query=new URLSearchParams(location.search);
   if(query.get('demo')!=='toss' || query.get('layout')!=='7')return;
+  const root=document.getElementById('ccL7');if(!root)return;
   document.body.classList.add('layout7-toss-demo');
-  const root=document.getElementById('ccL7');
-  if(!root)return;
   const board=root.querySelector('.board');
-  const left=root.querySelector('#ccL7_teamBat'),right=root.querySelector('#ccL7_teamBowl');
-  if(left)left.textContent='MH';
-  if(right)right.textContent='IS';
   const content=document.createElement('div');content.className='toss-preview';
   const match=document.createElement('div');match.className='toss-match';
-  match.textContent='MONEY HEIST vs INNOVATION STRIKERS';
   const info=document.createElement('div');info.className='toss-info';
-  const title=document.createElement('strong');title.textContent='Money Heist won the toss';
-  const subtitle=document.createElement('small');subtitle.textContent='Elected to BAT first';
+  const title=document.createElement('strong'),subtitle=document.createElement('small');
   info.append(title,subtitle);content.append(match,info);
   board.insertBefore(content,board.querySelector('.brand'));
-  // The shared footer stays hidden because no live response with view=1 exists.
-  document.documentElement.classList.add('cc-hide-footer');
+  const val=x=>String(x??'').trim();
+  const pick=(o,keys)=>{for(const k of keys){if(val(o?.[k]))return val(o[k]);}return '';};
+  const short=(name)=>name.split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,3).toUpperCase();
+  function update(data){
+    const v=data?.values||data||{};
+    const a=pick(v,['t1Name','team1Name','firstTeamName']),b=pick(v,['t2Name','team2Name','secondTeamName']);
+    if(!a||!b){match.textContent='Waiting for match teams';title.textContent='Toss information unavailable';subtitle.textContent='';return;}
+    match.textContent=a+' vs '+b;
+    const left=document.getElementById('ccL7_teamBat'),right=document.getElementById('ccL7_teamBowl');
+    if(left)left.textContent=pick(v,['t1Code','t1ShortName','t1Abbr'])||short(a);
+    if(right)right.textContent=pick(v,['t2Code','t2ShortName','t2Abbr'])||short(b);
+    const logos=[['ccL7_logoBat',v.firstLogo],['ccL7_logoBowl',v.secondLogo]];
+    for(const [id,src] of logos){const el=document.getElementById(id);if(!el)continue;el.querySelector('img')?.remove();if(!src)continue;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))continue;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();el.append(img);}catch{}}
+    const toss=pick(v,['toss','tossDetails','tossResult'])||pick(data,['toss']);
+    let winner=pick(v,['tossWinner','tossWonBy','tossWonByTeam','tossWinnerName','tossWon']);
+    if(winner){const norm=winner.toLowerCase();const codesA=[a,pick(v,['t1Code','t1ShortName','t1Abbr'])].filter(Boolean).map(x=>x.toLowerCase());const codesB=[b,pick(v,['t2Code','t2ShortName','t2Abbr'])].filter(Boolean).map(x=>x.toLowerCase());if(codesA.includes(norm))winner=a;else if(codesB.includes(norm))winner=b;}
+    if(!winner&&toss){const matchWinner=toss.match(/^(.*?)\s+won\s+the\s+toss/i);if(matchWinner)winner=matchWinner[1].trim();}
+    let decision=pick(v,['tossDecision','electedTo','tossChoice']);
+    if(!decision&&toss){const found=toss.match(/(?:elected|chose|opted)\s+to\s+(bat|bowl|field)/i);if(found)decision=found[1];}
+    title.textContent=winner?winner+' won the toss':(toss||'Toss not announced');
+    subtitle.textContent=decision?'Elected to '+(decision.toLowerCase()==='field'?'BOWL':decision.toUpperCase())+' first':'';
+    // Demo mode intentionally shows the preview even if the live API is view=8.
+    document.documentElement.classList.remove('cc-api-view8');
+    document.documentElement.classList.add('cc-hide-footer');
+  }
+  const overrides=['team1','team2'];
+  if(overrides.every(k=>query.has(k))){update({values:{t1Name:query.get('team1'),t2Name:query.get('team2'),tossWon:query.get('winner')||'',tossDecision:query.get('decision')||''}});return;}
+  match.textContent='Loading match teams…';title.textContent='Loading toss…';
+  try{const response=await fetch(API,{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);update(await response.json());}
+  catch(e){match.textContent='Unable to load match';title.textContent='Live API unavailable';subtitle.textContent='Use team1, team2, winner, decision query parameters for an offline test';console.warn('Toss preview fetch failed',e);}
 })();
 </script>
 </body>
