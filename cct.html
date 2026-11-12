@@ -4516,6 +4516,12 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
 #ccL7 .balls .ball.six{background:linear-gradient(155deg,#52d991 0%,#16834a 50%,#07522c 100%)!important}
 #ccL7 .balls .ball.extra{background:linear-gradient(155deg,#5bb3f3 0%,#1769aa 50%,#073967 100%)!important}
 #ccL7 .balls .ball.dot,#ccL7 .balls .ball:not(.wicket):not(.four):not(.six):not(.extra){background:linear-gradient(155deg,#c22b43 0%,#870918 55%,#4b0610 100%)!important}
+/* Layout 7 delivery containment regression fix: do not let chips escape into batters. */
+#ccL7 .bowling .over-ribbon{width:100%!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;isolation:isolate!important;position:relative!important}
+#ccL7 .bowling .over-caption{flex:0 0 auto!important;position:relative!important;z-index:1!important}
+#ccL7 .bowling .balls{position:relative!important;display:flex!important;flex:1 1 0!important;flex-wrap:nowrap!important;justify-content:flex-start!important;align-items:center!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;scroll-behavior:auto!important;isolation:isolate!important}
+#ccL7 .bowling .balls .ball[hidden]{display:none!important}
+#ccL7 .bowling .balls .ball{position:relative!important;flex:0 0 auto!important;transform-origin:center center!important}
 </style>
 <div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 · 30 Balls · RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">— runs</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><script id="layout7-direct-runtime-v2">(function(){
 
@@ -4570,8 +4576,28 @@ function setBalls(arr,overs){
     if(raw===recent[recent.length-1] && previousSignature)el.classList.add('new-delivery');
     root.append(el);
   }
-  // Preserve the latest delivery on the right; earlier balls clip on the left.
-  requestAnimationFrame(()=>{root.scrollLeft=root.scrollWidth});
+  // Keep every chip inside the over ribbon. If the ribbon is too narrow,
+  // remove oldest visible chips rather than scrolling the flex container.
+  // This prevents a transformed wicket chip from appearing before THIS OVER.
+  const fitDeliveries=()=>{
+    if(!root.isConnected)return;
+    root.scrollLeft=0;
+    const chips=Array.from(root.children);
+    for(const chip of chips)chip.hidden=false;
+    const available=root.clientWidth;
+    if(available<=0)return;
+    const gap=parseFloat(getComputedStyle(root).columnGap)||0;
+    let used=0;
+    for(let i=chips.length-1;i>=0;i--){
+      const chip=chips[i];
+      const width=chip.getBoundingClientRect().width;
+      const next=used+width+(used?gap:0);
+      if(next>available && i<chips.length-1){chip.hidden=true;continue;}
+      used=next;
+    }
+  };
+  fitDeliveries();
+  requestAnimationFrame(fitDeliveries);
 }
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
 // Prefer the exact team shortcode supplied by CricClubs; derive initials only as fallback.
