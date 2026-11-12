@@ -3010,10 +3010,13 @@ html.cc-view8 body > * { display:none!important; visibility:hidden!important; }
 </style>
 <script>
 const params = new URLSearchParams(location.search);
-// Default and every non-1 view hide the shared footer, including its powered credit.
+// Footer visibility is controlled by the top-level `view` in the API response,
+// not by the URL query parameter. Hide until the first valid response arrives.
 // Layout 7's single main scoreboard (#ccL7) is intentionally unaffected.
-if ((params.get("view") || "").trim() !== "1") {
-  document.documentElement.classList.add("cc-hide-footer");
+document.documentElement.classList.add("cc-hide-footer");
+function updateFooterVisibilityFromResponse(data) {
+  const showFooter = data != null && Object.prototype.hasOwnProperty.call(data, "view") && String(data.view) === "1";
+  document.documentElement.classList.toggle("cc-hide-footer", !showFooter);
 }
 if ((params.get("view") || "").trim() === "8") {
   document.documentElement.classList.add("cc-view8");
@@ -4138,6 +4141,7 @@ function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
 let latestLayout7Data=null; function publishLayout7(data){latestLayout7Data=data;if(typeof window.ccLayout7Render==='function')window.ccLayout7Render(data);}
 
 function render(data){
+  updateFooterVisibilityFromResponse(data);
   const v=data.values||{};
   const second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
   const t1=teamScore(v,"t1");
@@ -4376,7 +4380,10 @@ function syncHeaderHeight() {
   if(height>0)overlay.style.setProperty('--live-header-height',height+'px');
 }
 window.addEventListener('resize',syncHeaderHeight);
-if (urlParam("demo") === "matchResult") {
+if (urlParam("demo") === "toss" && overlayLayout === "7") {
+  // Offline Layout 7 toss preview: no API requests, no live match required.
+  stopped = true;
+} else if (urlParam("demo") === "matchResult") {
   // Preview card is already rendered above; do not fetch or overwrite it.
 } else if (overSummaryEnabled && urlParam("demo") === "secondInningsSummary") {
   const a={name:'DEMO XI',total:156,wickets:8,overs:'20.0',rr:'7.80'};
@@ -4569,5 +4576,42 @@ $('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCod
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
-if(typeof latestLayout7Data!=="undefined" && latestLayout7Data && window.ccLayout7Render)window.ccLayout7Render(latestLayout7Data);</script></body>
+if(typeof latestLayout7Data!=="undefined" && latestLayout7Data && window.ccLayout7Render)window.ccLayout7Render(latestLayout7Data);</script><style id="layout7-toss-preview-style">
+/* The toss uses the existing rounded Layout 7 board, not a separate footer. */
+body.layout7-toss-demo #ccL7 .board>.scorebox,
+body.layout7-toss-demo #ccL7 .board>.batters,
+body.layout7-toss-demo #ccL7 .board>.bowling,
+body.layout7-toss-demo #ccL7 .board>.brand{display:none!important}
+body.layout7-toss-demo #ccL7 .board>.toss-preview{position:absolute;left:9%;width:83%;top:0;height:60px;display:flex;align-items:stretch;min-width:0;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body.layout7-toss-demo #ccL7 .toss-match{flex:0 0 65%;min-width:0;display:flex;align-items:center;justify-content:center;padding:0 10px;box-sizing:border-box;font-size:clamp(13px,1.75vw,27px);font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+body.layout7-toss-demo #ccL7 .toss-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:0 10px 0 16px;box-sizing:border-box;border-left:1px solid rgba(255,255,255,.3)}
+body.layout7-toss-demo #ccL7 .toss-info strong{font-size:clamp(11px,1.2vw,19px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.layout7-toss-demo #ccL7 .toss-info small{font-size:clamp(10px,.98vw,15px);font-weight:800;color:#ffe0e1}
+body.layout7-toss-demo #ccL7 .board>.team .logo:not(:has(img))::after{content:'🏏';font-size:22px}
+body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad1428,#410713);border:2px solid #f6bdc6}
+</style>
+<script id="layout7-offline-toss-preview">
+(function(){
+  const query=new URLSearchParams(location.search);
+  if(query.get('demo')!=='toss' || query.get('layout')!=='7')return;
+  document.body.classList.add('layout7-toss-demo');
+  const root=document.getElementById('ccL7');
+  if(!root)return;
+  const board=root.querySelector('.board');
+  const left=root.querySelector('#ccL7_teamBat'),right=root.querySelector('#ccL7_teamBowl');
+  if(left)left.textContent='MH';
+  if(right)right.textContent='IS';
+  const content=document.createElement('div');content.className='toss-preview';
+  const match=document.createElement('div');match.className='toss-match';
+  match.textContent='MONEY HEIST vs INNOVATION STRIKERS';
+  const info=document.createElement('div');info.className='toss-info';
+  const title=document.createElement('strong');title.textContent='Money Heist won the toss';
+  const subtitle=document.createElement('small');subtitle.textContent='Elected to BAT first';
+  info.append(title,subtitle);content.append(match,info);
+  board.insertBefore(content,board.querySelector('.brand'));
+  // The shared footer stays hidden because no live response with view=1 exists.
+  document.documentElement.classList.add('cc-hide-footer');
+})();
+</script>
+</body>
 </html>
