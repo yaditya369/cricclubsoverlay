@@ -2475,6 +2475,25 @@ html body.layout7-active .overlay,html body.layout7-active.show-final-result .ov
 #ccL7 .board>.batters{top:9px!important;height:50px!important;padding:0!important;box-sizing:border-box!important}
 #ccL7 .board>.batters .batter{padding-left:15px!important}
 
+
+/* Layout 7: compact broadcast typography and delivery ribbon. */
+#ccL7 .batter.striker .name{font-size:clamp(15px,1.65vw,22px)!important;font-weight:900!important;display:flex;align-items:center;gap:5px}
+#ccL7 .striker .name:before{content:"🏏"!important;font-size:17px!important;display:inline-flex;align-items:center;justify-content:center;line-height:1!important;flex:none}
+#ccL7 .bowlerline{font-size:clamp(15px,1.48vw,21px)!important}
+#ccL7 .bowling{gap:3px!important}
+#ccL7 .over-ribbon{display:flex;align-items:center;gap:5px;min-width:0;overflow:hidden}
+#ccL7 .over-caption{display:flex;flex:none;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.05;font-weight:900;white-space:nowrap}
+#ccL7 .over-caption .over-runs{font-size:10px;color:#fff}
+#ccL7 .balls{flex:1;min-width:0;overflow:hidden!important;display:flex!important;justify-content:flex-end!important;gap:4px!important}
+#ccL7 .ball{font-weight:900!important;color:#fff!important}
+#ccL7 .ball.new-delivery{animation:ccL7BallIn .3s ease-out both}
+#ccL7 .ball.four{background:#168d52!important;color:#fff!important}
+#ccL7 .ball.six{background:#216bd1!important;color:#fff!important}
+#ccL7 .ball.wicket{background:#1c0608!important;color:#ffdcdf!important;outline:1px solid #ff7e87}
+#ccL7 .ball.extra{background:#b87a06!important;color:#fff!important}
+#ccL7 .ball.dot{background:#870918!important}
+@keyframes ccL7BallIn{from{opacity:.3;transform:translateX(8px) scale(.75)}to{opacity:1;transform:translateX(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){#ccL7 .ball{animation:none!important}}
 </style></head>
 <body>
 <div class="overlay">
@@ -4100,7 +4119,7 @@ function render(data){
   const t1=teamScore(v,"t1");
   const t2=teamScore(v,"t2");
   const isLayout2 = document.querySelector(".overlay").classList.contains("layout2");
-  if(overlayLayout==="7")publishLayout7(data);
+  if(overlayLayout==="7"){publishLayout7(data);queueMicrotask(()=>{const el=document.getElementById('ccL7_chase'),source=document.getElementById('bottomText');if(el&&source&&source.textContent.trim())el.textContent=source.textContent.trim();});}
   const bottom=$("bottom");
   const bottomText=$("bottomText");
   const powered=$("powered");
@@ -4418,14 +4437,41 @@ if (urlParam("demo") === "matchResult") {
   color:#fff !important;
 }
 </style>
-<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 · 30 Balls · RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><script id="layout7-direct-runtime-v2">(function(){
+<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 · 30 Balls · RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">— runs</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><script id="layout7-direct-runtime-v2">(function(){
 
 'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();e.append(img)}catch{}}
-function setBalls(arr){if(!Array.isArray(arr))return;const root=$('balls');root.replaceChildren();for(const raw of arr.slice(-6)){const s=str(typeof raw==='object'?(raw.ballResult??raw.runs??raw.result):raw,'•').trim(),el=document.createElement('span');el.className='ball';if(s==='0'||s==='.'||s==='•')el.classList.add('dot');if(/wd|nb|N\+|W\+/i.test(s))el.classList.add('extra');if(s==='4')el.classList.add('four');if(s==='6')el.classList.add('six');if(/W(?!D)|OUT/i.test(s))el.classList.add('wicket');el.textContent=s==='0'||s==='.'||s==='•'?'':s;root.append(el)}}
+let lastBallSignature='';
+function setBalls(arr,overs){
+  if(!Array.isArray(arr))return;
+  const root=$('balls');
+  // Reuse the same current-over selection and run calculations as other layouts.
+  let recent=arr;
+  try{if(typeof currentOverBalls==='function'){recent=currentOverBalls(arr,overs)||arr.slice(-7)}}catch(e){recent=arr.slice(-7)}
+  const total=typeof thisOverRuns==='function'?thisOverRuns(recent):null;
+  $('overRuns').textContent=(total==null?'—':total)+' runs';
+  const signature=JSON.stringify(recent);
+  if(signature===lastBallSignature)return;
+  const previousSignature=lastBallSignature;lastBallSignature=signature;
+  root.replaceChildren();
+  for(const raw of recent){
+    const s=str(typeof raw==='object'?(raw.ballResult??raw.runs??raw.result):raw,'•').trim();
+    const el=document.createElement('span');el.className='ball';
+    if(s==='0'||s==='.'||s==='•')el.classList.add('dot');
+    if(/wd|wide|nb|no.?ball|lb|bye|N\+|W\+/i.test(s))el.classList.add('extra');
+    if(s==='4')el.classList.add('four');if(s==='6')el.classList.add('six');
+    if(/^(?:\d+W|W|WICKET|OUT)$/i.test(s))el.classList.add('wicket');
+    el.textContent=s==='0'||s==='.'||s==='•'?'':s;
+    if(raw===recent[recent.length-1] && previousSignature)el.classList.add('new-delivery');
+    root.append(el);
+  }
+  // Preserve the latest delivery on the right; earlier balls clip on the left.
+  requestAnimationFrame(()=>{root.scrollLeft=root.scrollWidth});
+}
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
 // Prefer the exact team shortcode supplied by CricClubs; derive initials only as fallback.
 const teamCode=(side,name)=>{const keys=[side+'Code',side+'code',side+'CODE',side+'shortcode',side+'ShortCode',side+'Shortcode',side+'shortCode',side+'ShortName',side+'shortName',side+'Abbreviation',side+'Abbr'];for(const obj of [v,data]){if(!obj||typeof obj!=='object')continue;for(const key of keys){const value=obj[key];if(value!=null&&String(value).trim())return String(value).trim();}}return abbr(name)};
-$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');$('overs').textContent='Overs '+overs;const currentRR=get(v,bat+'RR','—');let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} · ${remaining} Balls · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} · RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=info;$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=get(v,'bowlerName','—');$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',v.firstLogo,batting);logo('logoBowl','initialBowl',v.secondLogo,bowling);setBalls(data?.balls??v.balls);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');$('overs').textContent='Overs '+overs;const currentRR=get(v,bat+'RR','—');let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} · ${remaining} Balls · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} · RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=(document.getElementById('bottomText')?.textContent?.trim()||info);$('batter1').textContent=limitL7Name(get(v,'batsman1Name','—'),16);$('batter2').textContent=limitL7Name(get(v,'batsman2Name','—'),16);$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',v.firstLogo,batting);logo('logoBowl','initialBowl',v.secondLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
 if(typeof latestLayout7Data!=="undefined" && latestLayout7Data && window.ccLayout7Render)window.ccLayout7Render(latestLayout7Data);</script></body>
