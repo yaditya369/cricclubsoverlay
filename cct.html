@@ -2519,7 +2519,14 @@ html body.layout7-active .overlay,html body.layout7-active.show-final-result .ov
 #ccL7 .board>.batters{left:33.5%!important;width:27%!important}
 #ccL7 .board>.bowling{left:62%!important;width:30%!important}
 #ccL7 .balls{justify-content:flex-start!important}
-</style></head>
+</style><style id="cc-l7-basic-deliveries-v1">
+/* Layout 7: basic delivery rendering. Keep all chips in one stable row. */
+#ccL7 .bowling .over-ribbon{display:flex!important;align-items:center!important;min-width:0!important;overflow:hidden!important}
+#ccL7 .bowling .balls{display:flex!important;flex:1 1 0!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;align-content:center!important;gap:4px!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;scroll-behavior:auto!important;}
+#ccL7 .bowling .balls>.ball{display:inline-flex!important;position:relative!important;flex:0 0 clamp(17px,1.85vw,26px)!important;width:clamp(17px,1.85vw,26px)!important;height:clamp(17px,1.85vw,26px)!important;align-items:center!important;justify-content:center!important;line-height:1!important;white-space:nowrap!important;transform:none!important;animation:none!important;transition:none!important;margin:0!important;}
+#ccL7 .bowling .balls>.ball[hidden]{display:none!important}
+</style>
+</head>
 <body>
 <div class="overlay">
 <div class="prematch-template" hidden="" id="prematchTemplate">
@@ -4596,48 +4603,26 @@ function formatL7Delivery(raw){
 function setBalls(arr,overs){
   if(!Array.isArray(arr))return;
   const root=$('balls');
-  // Reuse the same current-over selection and run calculations as other layouts.
   let recent=arr;
-  try{if(typeof currentOverBalls==='function'){recent=currentOverBalls(arr,overs)||arr.slice(-7)}}catch(e){recent=arr.slice(-7)}
+  try{if(typeof currentOverBalls==='function')recent=currentOverBalls(arr,overs)||arr.slice(-7)}
+  catch(e){recent=arr.slice(-7)}
   const total=typeof thisOverRuns==='function'?thisOverRuns(recent):null;
   $('overRuns').textContent=(total==null?'—':total)+' runs';
   const signature=JSON.stringify(recent);
   if(signature===lastBallSignature)return;
-  const previousSignature=lastBallSignature;lastBallSignature=signature;
-  root.replaceChildren();
+  lastBallSignature=signature;
+  // Simple, deterministic flex row: no measuring, scrolling, or animation.
+  const fragment=document.createDocumentFragment();
   for(const raw of recent){
-    const s=str(typeof raw==='object'?(raw.ballResult??raw.runs??raw.result):raw,'•').trim();
-    // Layout 7 display-only delivery normalization. Never mutate source tokens.
     const formatted=formatL7Delivery(raw);
-    const el=document.createElement('span');el.className='ball';
-    el.classList.add(formatted.kind);
-    el.textContent=formatted.text;
-    if(raw===recent[recent.length-1] && previousSignature)el.classList.add('new-delivery');
-    root.append(el);
+    const chip=document.createElement('span');
+    chip.className='ball '+formatted.kind;
+    chip.textContent=formatted.text;
+    fragment.appendChild(chip);
   }
-  // Keep every chip inside the over ribbon. If the ribbon is too narrow,
-  // remove oldest visible chips rather than scrolling the flex container.
-  // This prevents a transformed wicket chip from appearing before THIS OVER.
-  const fitDeliveries=()=>{
-    if(!root.isConnected)return;
-    root.scrollLeft=0;
-    const chips=Array.from(root.children);
-    for(const chip of chips)chip.hidden=false;
-    const available=root.clientWidth;
-    if(available<=0)return;
-    const gap=parseFloat(getComputedStyle(root).columnGap)||0;
-    let used=0;
-    for(let i=chips.length-1;i>=0;i--){
-      const chip=chips[i];
-      const width=chip.getBoundingClientRect().width;
-      const next=used+width+(used?gap:0);
-      if(next>available && i<chips.length-1){chip.hidden=true;continue;}
-      used=next;
-    }
-  };
-  fitDeliveries();
-  requestAnimationFrame(fitDeliveries);
+  root.replaceChildren(fragment);
 }
+
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
 // Prefer the exact team shortcode supplied by CricClubs; derive initials only as fallback.
 const teamCode=(side,name)=>{const keys=[side+'Code',side+'code',side+'CODE',side+'shortcode',side+'ShortCode',side+'Shortcode',side+'shortCode',side+'ShortName',side+'shortName',side+'Abbreviation',side+'Abbr'];for(const obj of [v,data]){if(!obj||typeof obj!=='object')continue;for(const key of keys){const value=obj[key];if(value!=null&&String(value).trim())return String(value).trim();}}return abbr(name)};
