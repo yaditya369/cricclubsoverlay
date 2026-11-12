@@ -2495,6 +2495,11 @@ html body.layout7-active .overlay,html body.layout7-active.show-final-result .ov
 #ccL7 .ball.dot{background:#870918!important}
 @keyframes ccL7BallIn{from{opacity:.3;transform:translateX(8px) scale(.75)}to{opacity:1;transform:translateX(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){#ccL7 .ball{animation:none!important}}
+/* Layout 7: requested panel coordinates and left-anchored delivery sequence. */
+#ccL7 .board>.scorebox{left:9%!important;width:25%!important}
+#ccL7 .board>.batters{left:33.5%!important;width:27%!important}
+#ccL7 .board>.bowling{left:62%!important;width:30%!important}
+#ccL7 .balls{justify-content:flex-start!important}
 </style></head>
 <body>
 <div class="overlay">
@@ -4446,6 +4451,12 @@ if (urlParam("demo") === "matchResult") {
   background:linear-gradient(90deg,#d91b31,#f12a42) !important;
   color:#fff !important;
 }
+
+/* Final Layout 7 panel coordinates, after legacy overrides. */
+#ccL7 .board>.scorebox{left:9%!important;width:25%!important}
+#ccL7 .board>.batters{left:33.5%!important;width:27%!important}
+#ccL7 .board>.bowling{left:62%!important;width:30%!important}
+#ccL7 .balls{justify-content:flex-start!important}
 </style>
 <div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 · 30 Balls · RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">— runs</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><script id="layout7-direct-runtime-v2">(function(){
 
