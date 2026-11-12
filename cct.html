@@ -4460,6 +4460,10 @@ if (urlParam("demo") === "matchResult") {
 </style>
 
 <style id="cc-l7-glossy-delivery-v1">
+/* Layout 7 only: batsmen panel moved left, with the existing 27% width. */
+#ccL7 .board>.batters{left:32.5%!important;width:27%!important}
+/* Force circular delivery chips regardless of inherited styling. */
+#ccL7 .balls .ball{box-sizing:border-box!important;aspect-ratio:1 / 1!important;border-radius:50%!important;min-width:0!important;min-height:0!important;padding:0!important;flex-shrink:0!important}
 /* Layout 7 only: glossy, dimensional delivery chips. No additional animation workload. */
 #ccL7 .balls .ball{
   position:relative!important;isolation:isolate;
