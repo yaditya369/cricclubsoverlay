@@ -4458,6 +4458,32 @@ if (urlParam("demo") === "matchResult") {
 #ccL7 .board>.bowling{left:62%!important;width:30%!important}
 #ccL7 .balls{justify-content:flex-start!important}
 </style>
+
+<style id="cc-l7-glossy-delivery-v1">
+/* Layout 7 only: glossy, dimensional delivery chips. No additional animation workload. */
+#ccL7 .balls .ball{
+  position:relative!important;isolation:isolate;
+  border:1px solid rgba(255,255,255,.48)!important;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.46),inset 0 -3px 5px rgba(0,0,0,.28),0 1px 3px rgba(0,0,0,.38)!important;
+  text-shadow:0 1px 1px rgba(0,0,0,.55);
+  overflow:hidden;
+}
+#ccL7 .balls .ball::before{
+  content:"";position:absolute;left:12%;top:7%;width:76%;height:39%;
+  border-radius:50% 50% 43% 43%;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.63),rgba(255,255,255,.16) 68%,transparent);
+  opacity:.8;z-index:-1;
+}
+#ccL7 .balls .ball.wicket{
+  background:linear-gradient(155deg,#c31c39 0%,#800020 46%,#3f0612 100%)!important;
+  border:1.5px solid #ffd2d9!important;
+  box-shadow:0 0 0 1px rgba(255,130,153,.55),0 0 7px rgba(225,38,75,.75),inset 0 1px 2px rgba(255,255,255,.65),inset 0 -3px 4px rgba(0,0,0,.36)!important;
+}
+#ccL7 .balls .ball.four{background:linear-gradient(155deg,#f8d76b 0%,#d4a017 49%,#8c5d05 100%)!important}
+#ccL7 .balls .ball.six{background:linear-gradient(155deg,#52d991 0%,#16834a 50%,#07522c 100%)!important}
+#ccL7 .balls .ball.extra{background:linear-gradient(155deg,#5bb3f3 0%,#1769aa 50%,#073967 100%)!important}
+#ccL7 .balls .ball.dot,#ccL7 .balls .ball:not(.wicket):not(.four):not(.six):not(.extra){background:linear-gradient(155deg,#c22b43 0%,#870918 55%,#4b0610 100%)!important}
+</style>
 <div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 · 30 Balls · RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">— runs</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><script id="layout7-direct-runtime-v2">(function(){
 
 'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();e.append(img)}catch{}}
