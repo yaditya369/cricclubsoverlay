@@ -2400,7 +2400,26 @@ html body.layout7-active.show-final-result .overlay {display:none!important;visi
 html body.layout7-active #layout7Frame {display:block!important;visibility:visible!important;opacity:1!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:155px!important;border:0!important;background:transparent!important;pointer-events:none!important;z-index:30!important}
 html body.layout7-active #finalMatchResult:not([hidden]) {z-index:50!important}
 html body.layout7-active #overSummary,html body.layout7-active #fullInningsBreak,html body.layout7-active #scoreEvent {z-index:45}
-</style><style id="layout7-direct-scoped-v2">#ccL7{--opacity:.8;--bar-h:60px;--bar-w:96%;--junction:13px}
+</style><style id="cc-l7-brand-isolation-fix">
+/* Layout 7 only: branding is an overlay, never a flex/grid participant. */
+#ccL7 .board { position:absolute!important; isolation:isolate!important; }
+#ccL7 .board > .brand {
+  position:absolute!important; display:block!important;
+  left:auto!important;right:8.2%!important;top:auto!important;bottom:3px!important;
+  width:auto!important;max-width:16%!important;height:9px!important;
+  margin:0!important;padding:0!important;
+  line-height:9px!important;text-align:right!important;
+  font-size:clamp(6px,.55vw,8px)!important;
+  white-space:nowrap!important;pointer-events:none!important;
+  z-index:6!important;
+}
+/* Give delivery chips their own bounded line above the branding. */
+#ccL7 .board > .bowling { min-width:0!important;overflow:hidden!important; }
+#ccL7 .bowling .over-ribbon { min-width:0!important;max-width:100%!important;overflow:hidden!important; }
+#ccL7 .bowling .balls { min-width:0!important;overflow:hidden!important; }
+#ccL7 .bowling .balls .ball { align-items:center!important;justify-content:center!important;line-height:1!important; }
+</style>
+<style id="layout7-direct-scoped-v2">#ccL7{--opacity:.8;--bar-h:60px;--bar-w:96%;--junction:13px}
 #ccL7, #ccL7 *{box-sizing:border-box}
 #ccL7, #ccL7{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:white;font-family:Arial,Helvetica,sans-serif}
 #ccL7 .stage{position:absolute;inset:0;pointer-events:none;overflow:visible}
