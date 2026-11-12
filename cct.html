@@ -3000,10 +3000,11 @@ html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
 }
 </style>
 <style id="view1-footer-visibility">
-/* Only view=1 displays the shared secondary footer; other views retain the main scoreboard. */
+/* The shared footer is visible only for API view=1. */
 html.cc-hide-footer #bottom { display:none!important; visibility:hidden!important; }
-/* API view=8 suppresses the complete broadcast overlay, including Layout 7. */
-html.cc-api-view8 .overlay, html.cc-api-view8 #ccL7, html.cc-api-view8 #milestoneEvent, html.cc-api-view8 #scoreEvent { display:none!important; visibility:hidden!important; }
+/* Any API view other than 1 suppresses every visual overlay, including Layout 7, animations and summaries. */
+html.cc-api-view-hidden, html.cc-api-view-hidden body { background:transparent!important; }
+html.cc-api-view-hidden body > * { display:none!important; visibility:hidden!important; }
 </style>
 <style id="view8-hide-entire-overlay">
 /* view=8: transparent video-only output, including all independent animation layers. */
@@ -3014,12 +3015,12 @@ html.cc-view8 body > * { display:none!important; visibility:hidden!important; }
 const params = new URLSearchParams(location.search);
 // Footer visibility is controlled by the top-level `view` in the API response,
 // not by the URL query parameter. Hide until the first valid response arrives.
-// Layout 7's single main scoreboard (#ccL7) is intentionally unaffected.
-document.documentElement.classList.add("cc-hide-footer");
+// Hide the entire overlay until a valid view=1 API response arrives.
+document.documentElement.classList.add("cc-hide-footer", "cc-api-view-hidden");
 function updateFooterVisibilityFromResponse(data) {
   const showFooter = data != null && Object.prototype.hasOwnProperty.call(data, "view") && String(data.view) === "1";
   document.documentElement.classList.toggle("cc-hide-footer", !showFooter);
-  document.documentElement.classList.toggle("cc-api-view8", String(data?.view ?? "").trim() === "8");
+  document.documentElement.classList.toggle("cc-api-view-hidden", !showFooter);
 }
 if ((params.get("view") || "").trim() === "8") {
   document.documentElement.classList.add("cc-view8");
@@ -4575,7 +4576,7 @@ function setBalls(arr,overs){
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
 // Prefer the exact team shortcode supplied by CricClubs; derive initials only as fallback.
 const teamCode=(side,name)=>{const keys=[side+'Code',side+'code',side+'CODE',side+'shortcode',side+'ShortCode',side+'Shortcode',side+'shortCode',side+'ShortName',side+'shortName',side+'Abbreviation',side+'Abbr'];for(const obj of [v,data]){if(!obj||typeof obj!=='object')continue;for(const key of keys){const value=obj[key];if(value!=null&&String(value).trim())return String(value).trim();}}return abbr(name)};
-$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} · ${remaining} Balls · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} · RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=completedMatch?'':info;$('batter1').textContent=limitL7Name(get(v,'batsman1Name','—'),16);$('batter2').textContent=limitL7Name(get(v,'batsman2Name','—'),16);$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',v.firstLogo,batting);logo('logoBowl','initialBowl',v.secondLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} · ${remaining} Balls · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} · RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=completedMatch?'':info;$('batter1').textContent=limitL7Name(get(v,'batsman1Name','—'),16);$('batter2').textContent=limitL7Name(get(v,'batsman2Name','—'),16);$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
@@ -4617,7 +4618,8 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
     const left=document.getElementById('ccL7_teamBat'),right=document.getElementById('ccL7_teamBowl');
     if(left)left.textContent=pick(v,['t1Code','t1ShortName','t1Abbr'])||short(a);
     if(right)right.textContent=pick(v,['t2Code','t2ShortName','t2Abbr'])||short(b);
-    const logos=[['ccL7_logoBat',v.firstLogo],['ccL7_logoBowl',v.secondLogo]];
+    // CricClubs' firstLogo belongs to t2, secondLogo to t1 (same mapping as the match-result panel).
+    const logos=[['ccL7_logoBat',v.secondLogo],['ccL7_logoBowl',v.firstLogo]];
     for(const [id,src] of logos){const el=document.getElementById(id);if(!el)continue;el.querySelector('img')?.remove();if(!src)continue;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))continue;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();el.append(img);}catch{}}
     const toss=pick(v,['toss','tossDetails','tossResult'])||pick(data,['toss']);
     let winner=pick(v,['tossWinner','tossWonBy','tossWonByTeam','tossWinnerName','tossWon']);
@@ -4627,12 +4629,12 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
     if(!decision&&toss){const found=toss.match(/(?:elected|chose|opted)\s+to\s+(bat|bowl|field)/i);if(found)decision=found[1];}
     title.textContent=winner?winner+' won the toss':(toss||'Toss not announced');
     subtitle.textContent=decision?'Elected to '+(decision.toLowerCase()==='field'?'BOWL':decision.toUpperCase())+' first':'';
-    // Demo mode intentionally shows the preview even if the live API is view=8.
-    document.documentElement.classList.remove('cc-api-view8');
+    // Demo obeys the same view gate as live data. Offline overrides simulate view=1.
+    updateFooterVisibilityFromResponse(data);
     document.documentElement.classList.add('cc-hide-footer');
   }
   const overrides=['team1','team2'];
-  if(overrides.every(k=>query.has(k))){update({values:{t1Name:query.get('team1'),t2Name:query.get('team2'),tossWon:query.get('winner')||'',tossDecision:query.get('decision')||''}});return;}
+  if(overrides.every(k=>query.has(k))){update({view:1,values:{t1Name:query.get('team1'),t2Name:query.get('team2'),tossWon:query.get('winner')||'',tossDecision:query.get('decision')||''}});return;}
   match.textContent='Loading match teams…';title.textContent='Loading toss…';
   try{const response=await fetch(API,{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);update(await response.json());}
   catch(e){match.textContent='Unable to load match';title.textContent='Live API unavailable';subtitle.textContent='Use team1, team2, winner, decision query parameters for an offline test';console.warn('Toss preview fetch failed',e);}
