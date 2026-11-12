@@ -2999,6 +2999,10 @@ html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
   html body.show-final-result .overlay.layout2.layout4 > .bottom.visible #bottomText {padding-left:85px!important;padding-right:85px!important;}
 }
 </style>
+<style id="view1-footer-visibility">
+/* Only view=1 displays the shared secondary footer; other views retain the main scoreboard. */
+html.cc-hide-footer #bottom { display:none!important; visibility:hidden!important; }
+</style>
 <style id="view8-hide-entire-overlay">
 /* view=8: transparent video-only output, including all independent animation layers. */
 html.cc-view8, html.cc-view8 body { background:transparent!important; }
@@ -3006,6 +3010,11 @@ html.cc-view8 body > * { display:none!important; visibility:hidden!important; }
 </style>
 <script>
 const params = new URLSearchParams(location.search);
+// Default and every non-1 view hide the shared footer, including its powered credit.
+// Layout 7's single main scoreboard (#ccL7) is intentionally unaffected.
+if ((params.get("view") || "").trim() !== "1") {
+  document.documentElement.classList.add("cc-hide-footer");
+}
 if ((params.get("view") || "").trim() === "8") {
   document.documentElement.classList.add("cc-view8");
 }
