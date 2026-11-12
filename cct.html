@@ -4483,6 +4483,15 @@ if (urlParam("demo") === "matchResult") {
   border:1.5px solid #ffd2d9!important;
   box-shadow:0 0 0 1px rgba(255,130,153,.55),0 0 7px rgba(225,38,75,.75),inset 0 1px 2px rgba(255,255,255,.65),inset 0 -3px 4px rgba(0,0,0,.36)!important;
 }
+/* Layout 7 only: high-contrast wicket chip, distinct from normal red runs. */
+#ccL7 .balls .ball.wicket{
+  background:linear-gradient(145deg,#ff6b70 0%,#ed182b 32%,#b5001b 70%,#720012 100%)!important;
+  color:#fff!important;
+  border:2px solid #fff1f1!important;
+  outline:1px solid #ff4657!important;
+  box-shadow:0 0 0 2px rgba(255,48,73,.55),0 0 9px rgba(255,38,65,.9),inset 0 2px 2px rgba(255,255,255,.7),inset 0 -3px 4px rgba(74,0,0,.5)!important;
+  text-shadow:0 1px 2px #56000a!important;
+}
 #ccL7 .balls .ball.four{background:linear-gradient(155deg,#f8d76b 0%,#d4a017 49%,#8c5d05 100%)!important}
 #ccL7 .balls .ball.six{background:linear-gradient(155deg,#52d991 0%,#16834a 50%,#07522c 100%)!important}
 #ccL7 .balls .ball.extra{background:linear-gradient(155deg,#5bb3f3 0%,#1769aa 50%,#073967 100%)!important}
@@ -4492,6 +4501,33 @@ if (urlParam("demo") === "matchResult") {
 
 'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();e.append(img)}catch{}}
 let lastBallSignature='';
+function formatL7Delivery(raw){
+  const source=raw&&typeof raw==='object'?(raw.ballResult??raw.result??raw.runs??raw.delivery??''):raw;
+  const value=String(source??'').trim();
+  const token=value.replace(/\s+/g,'').toUpperCase();
+  if(token==='0'||token==='.'||token==='•')return {text:'',kind:'dot'};
+  // Wicket plus completed runs, in either W+1 or 1W form.
+  let m=token.match(/^(?:W|WICKET|OUT)(?:\+(\d+))?$/);
+  if(m)return {text:m[1]&&+m[1]>0?'W+'+(+m[1]):'W',kind:'wicket'};
+  m=token.match(/^(\d+)(?:W|WICKET|OUT)$/);
+  if(m)return {text:+m[1]>0?'W+'+(+m[1]):'W',kind:'wicket'};
+  // Wide and no-ball prefix counts include the mandatory one-run penalty.
+  // An explicit +N represents additional runs (e.g. Wd+4 or Nb+6).
+  m=token.match(/^(\d+)?(WD|WIDE|NB|NOBALL|NO-BALL)(?:\+(\d+))?$/);
+  if(m){const prefix=m[1]==null?null:+m[1],extra=m[3]==null?(prefix==null?0:Math.max(0,prefix-1)):+m[3];const letter=/^(WD|WIDE)$/.test(m[2])?'Y':'N';return {text:letter+(extra?'+'+extra:''),kind:'extra'};}
+  // Also accept aliases in display-oriented sources (Y+4, N+6).
+  m=token.match(/^([YN])(?:\+(\d+))?$/);
+  if(m)return {text:m[1]+(m[2]&&+m[2]?'+'+(+m[2]):''),kind:'extra'};
+  // Byes/leg-byes: 4B, B+4, 2LB, LB+2 and spelled-out variants.
+  m=token.match(/^(\d+)?(LB|LEGBYE|LEG-BYE|B|BYE|BYES)(?:\+(\d+))?$/);
+  if(m){const letter=/^(LB|LEGBYE|LEG-BYE)$/.test(m[2])?'L':'B';const runs=m[3]==null?(m[1]==null?0:+m[1]):+m[3];return {text:letter+(runs?'+'+runs:''),kind:'extra'};}
+  m=token.match(/^([BL])\+(\d+)$/);
+  if(m)return {text:m[1]+'+'+(+m[2]),kind:'extra'};
+  m=token.match(/^(\d+)$/);
+  if(m)return {text:String(+m[1]),kind:+m[1]===4?'four':+m[1]===6?'six':'run'};
+  // Unknown tokens remain visible rather than being silently mis-scored.
+  return {text:value||'•',kind:'run'};
+}
 function setBalls(arr,overs){
   if(!Array.isArray(arr))return;
   const root=$('balls');
@@ -4506,12 +4542,11 @@ function setBalls(arr,overs){
   root.replaceChildren();
   for(const raw of recent){
     const s=str(typeof raw==='object'?(raw.ballResult??raw.runs??raw.result):raw,'•').trim();
+    // Layout 7 display-only delivery normalization. Never mutate source tokens.
+    const formatted=formatL7Delivery(raw);
     const el=document.createElement('span');el.className='ball';
-    if(s==='0'||s==='.'||s==='•')el.classList.add('dot');
-    if(/wd|wide|nb|no.?ball|lb|bye|N\+|W\+/i.test(s))el.classList.add('extra');
-    if(s==='4')el.classList.add('four');if(s==='6')el.classList.add('six');
-    if(/^(?:\d+W|W|WICKET|OUT)$/i.test(s))el.classList.add('wicket');
-    el.textContent=s==='0'||s==='.'||s==='•'?'':s;
+    el.classList.add(formatted.kind);
+    el.textContent=formatted.text;
     if(raw===recent[recent.length-1] && previousSignature)el.classList.add('new-delivery');
     root.append(el);
   }
