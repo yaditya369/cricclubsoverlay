@@ -3637,6 +3637,15 @@ function showFinalMatchResult(data,v,t1,t2){
   showSecondary(postMatchMessage(data,v));
 }
 function showSecondary(message) {
+  // Layout 7 only: preserve the victory result beneath Overs/RR, but omit POM.
+  // Other layouts keep the original shared secondary message unchanged.
+  if (overlayLayout === "7") {
+    const l7Result = document.getElementById("ccL7_chase");
+    if (l7Result) {
+      const text = String(message ?? "");
+      l7Result.textContent = text.replace(/\s*[·•|]\s*POM\s*:\s*.*$/i, "").trim();
+    }
+  }
   $("bottomText").textContent=message;
   $("bottom").classList.add("visible");
   $("bottom").classList.add("projection");
