@@ -2702,7 +2702,7 @@ body.layout7-active #overSummary.os-v2 .os-extra{background:linear-gradient(155d
   <div class="os-score os-second-score" hidden id="osSecondRow"><span id="osSecondTeam"></span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div>
   <div class="os-deliveries" id="osDeliveries" aria-label="Deliveries in completed over"></div>
   <div class="os-metrics" id="osMetrics"></div>
-  <div class="os-grid"><section class="os-panel"><h3>BATTERS · MATCH TOTALS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>BOWLER · MATCH TOTALS</h3><div id="osBowlers"></div></section></div>
+  <div class="os-grid"><section class="os-panel"><h3>BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>BOWLER</h3><div id="osBowlers"></div></section></div>
   <div class="os-situation" id="osSituation"></div>
   <div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div>
 </div>
@@ -3912,7 +3912,33 @@ function summaryNumber(value){const n=Number(value);return value!==null&&value!=
 function summaryDeliveries(balls){return Array.isArray(balls)?balls.slice(-overSummaryConfig.maxBalls).map(x=>String(x)):[];}
 function summaryBallClass(x){const s=String(x).toUpperCase();return /^(W|W\+|\d+W)/.test(s)?'wicket':/^(WD|Y|N|NB|B|LB|L)(?:\+|\d|$)/.test(s)?'extra':/6/.test(s)?'six':/4/.test(s)?'four':'normal';}
 function summaryOverRuns(balls){if(!Array.isArray(balls)||!balls.length)return null;let runs=0;for(const x of balls){const v=String(x).toUpperCase().trim();if(/^(W|•|\.|0)$/.test(v))continue;const parts=v.match(/\d+/g);if(parts)runs+=parts.reduce((a,b)=>a+Number(b),0);else if(/^(WD|NB|N|WIDE|NO BALL)$/.test(v))runs+=1;else return null;}return runs;}
-function renderOverMetrics(balls){const list=summaryDeliveries(balls);const fours=list.filter(x=>/4/.test(x)).length,sixes=list.filter(x=>/6/.test(x)).length,wickets=list.filter(x=>summaryBallClass(x)==='wicket').length;const runs=summaryOverRuns(list);$('osDeliveries').innerHTML=list.map(x=>`<span class="os-ball os-${summaryBallClass(x)}">${escapeScore(x==='0'?'•':x)}</span>`).join('')||'<span class="os-unavailable">Delivery details unavailable</span>';$('osMetrics').innerHTML=[['RUNS',runs??'—'],['WICKETS',list.length?wickets:'—'],['EXTRAS','—'],['4s',list.length?fours:'—'],['6s',list.length?sixes:'—']].map(([k,v])=>`<div class="os-metric"><small>${k}</small><strong>${v}</strong></div>`).join('');}
+function summaryExtraRuns(balls){
+  if(!Array.isArray(balls)||!balls.length)return null;
+  let extras=0;
+  for(const raw of balls){
+    const token=String(raw).trim().toUpperCase().replace(/\s+/g,'');
+    if(/^(?:[0-6]|\.|•|W|[0-6]W)$/.test(token))continue;
+    const parsed=token==='Y'?{wide:true,noBall:false}:parseExtraBall(token);
+    if(!parsed)return null;
+    const nums=[...token.matchAll(/\d+/g)].map(m=>Number(m[0]));
+    if(nums.length>1)return null;
+    // Wides, no-balls, byes and leg-byes are extras; for mixed NB+boundary
+    // tokens the aggregate may include bat runs, so do not guess.
+    if(parsed.noBall && /\+/.test(token))return null;
+    extras+=nums.length?nums[0]:(parsed.wide||parsed.noBall?1:0);
+  }
+  return extras;
+}
+function renderOverMetrics(balls){
+  const list=summaryDeliveries(balls);
+  const fours=list.filter(x=>/^4$/.test(String(x).trim())).length;
+  const sixes=list.filter(x=>/^6$/.test(String(x).trim())).length;
+  const wickets=list.filter(x=>summaryBallClass(x)==='wicket').length;
+  const runs=typeof thisOverRuns==='function'?thisOverRuns(list):summaryOverRuns(list);
+  const extras=summaryExtraRuns(list);
+  $('osDeliveries').innerHTML=list.map(x=>`<span class="os-ball os-${summaryBallClass(x)}">${escapeScore(x==='0'?'•':x)}</span>`).join('')||'<span class="os-unavailable">Delivery details unavailable</span>';
+  $('osMetrics').innerHTML=[['RUNS',runs??'—'],['WICKETS',list.length?wickets:'—'],['EXTRAS',extras??'—'],['4s',list.length?fours:'—'],['6s',list.length?sixes:'—']].map(([k,v])=>`<div class="os-metric"><small>${k}</small><strong>${v}</strong></div>`).join('');
+}
 // Layout 7 partnership state: prefer explicit API totals; otherwise track from a
 // witnessed wicket/innings start. Never mislabel an innings total as a partnership.
 const osPartnershipState={inning:null,wickets:null,anchorRuns:null,anchorBalls:null,lastRuns:null,lastBalls:null};
@@ -3934,7 +3960,10 @@ function osPartnership(data,t,second){
     }
     if(runs!==null&&balls!==null)break;
   }
-  if(runs===0&&balls===0&&total>0&&delivered>0){runs=null;balls=null;}
+  // At 0 wickets this IS the opening partnership, even if the page was loaded mid-innings.
+  // Do not trust a stale API zero in this case.
+  if(wickets===0&&total!==null){runs=total;balls=delivered;}
+  else if(runs===0&&balls===0&&total>0&&delivered>0){runs=null;balls=null;}
   const state=osPartnershipState;
   const reset=state.inning!==innings||(wickets!==null&&state.wickets!==null&&wickets!==state.wickets);
   if(reset){state.anchorRuns=null;state.anchorBalls=null;state.lastRuns=null;state.lastBalls=null;}
@@ -3960,17 +3989,17 @@ function renderCompactSummary(card,t,second,overNo,breakMode,balls,liveData){
   renderOverMetrics(list);
   const bat=Array.isArray(d.batting)?d.batting.filter(x=>x.r!==null&&x.r!==undefined).slice(-overSummaryConfig.maxBatters):[];
   const bowl=Array.isArray(d.bowling)?d.bowling.slice(-overSummaryConfig.maxBowlers):[];
-  $('osBatters').innerHTML=bat.length?bat.map(p=>{const no=p.notOut===true||/^(not out|retired hurt)$/i.test(String(p.howOut||'').trim());return `<div class="os-row"><span>${escapeScore(p.name)}${no?'*':''}</span><span>${numberOrDash(p.r)} (${numberOrDash(p.b)}) <small>match</small></span></div>`;}).join(''):'<div class="os-unavailable">Batter contributions unavailable</div>';
+  $('osBatters').innerHTML=bat.length?bat.map(p=>{const no=p.notOut===true||/^(not out|retired hurt)$/i.test(String(p.howOut||'').trim());return `<div class="os-row"><span>${escapeScore(p.name)}${no?'*':''}</span><span>${numberOrDash(p.r)} (${numberOrDash(p.b)})</span></div>`;}).join(''):'<div class="os-unavailable">Batter contributions unavailable</div>';
   const live=liveData||latestLayout7Data||{};
   const lv=live.values||live;
   const bowlerName=lv.bowlerName;
   const bowlerAvailable=bowlerName && String(bowlerName).trim() && String(bowlerName)!=='—';
   // The footer and summary MUST use identical CricClubs live fields.
   $('osBowlers').innerHTML=bowlerAvailable
-    ? `<div class="os-row"><span>${escapeScore(bowlerName)}</span><span>${escapeScore(lv.bowlerWickets??'0')}/${escapeScore(lv.bowlerRuns??'0')} (${escapeScore(lv.bowlerOvers??'0.0')}) <small>match</small></span></div>`
-    : bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${numberOrDash(p.wickets)}/${numberOrDash(p.runs)} (${numberOrDash(p.overs)}) <small>match</small></span></div>`).join(''):'<div class="os-unavailable">Bowler figures unavailable</div>';
+    ? `<div class="os-row"><span>${escapeScore(bowlerName)}</span><span>${escapeScore(lv.bowlerWickets??'0')}/${escapeScore(lv.bowlerRuns??'0')} (${escapeScore(lv.bowlerOvers??'0.0')})</span></div>`
+    : bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${numberOrDash(p.wickets)}/${numberOrDash(p.runs)} (${numberOrDash(p.overs)})</span></div>`).join(''):'<div class="os-unavailable">Bowler figures unavailable</div>';
   const liveBatters=[1,2].map(i=>({name:lv['batsman'+i+'Name'],runs:lv['batsman'+i+'Runs'],balls:lv['batsman'+i+'Balls']})).filter(p=>p.name&&String(p.name).trim()&&String(p.name)!=='—');
-  if(liveBatters.length) $('osBatters').innerHTML=liveBatters.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${escapeScore(p.runs??'0')} (${escapeScore(p.balls??'0')}) <small>match</small></span></div>`).join('');
+  if(liveBatters.length) $('osBatters').innerHTML=liveBatters.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${escapeScore(p.runs??'0')} (${escapeScore(p.balls??'0')})</span></div>`).join('');
   $('osSituation').innerHTML=`<div class="os-situation-primary">${breakMode?'INNINGS COMPLETE':'PROJECTED SCORE '+(summaryNumber(t.rr)!==null&&summaryNumber(t.overs)!==null?Math.round(Number(t.rr)*20):'—')}</div><div class="os-situation-meta"><span>${osPartnershipMarkup(liveData||latestLayout7Data,t,false)}</span><span>RR ${escapeScore(t.rr??'—')}</span></div>`;
   $('osExtras').textContent='';$('osFooter').textContent='';
 }
