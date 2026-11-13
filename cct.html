@@ -3961,6 +3961,18 @@ function osPartnership(data,t,second){
   const innings=second?2:1;
   const total=summaryNumber(t?.total),wickets=summaryNumber(t?.wickets);
   const delivered=overBalls(t?.overs);
+  // CricClubs authoritative current partnership totals take precedence over all fallbacks.
+  const currentMap=v?.currentPartnershipMap;
+  if(currentMap&&typeof currentMap==='object'){
+    const apiRuns=summaryNumber(currentMap.partnershipTotalRuns);
+    const apiBalls=summaryNumber(currentMap.partnershipTotalBalls);
+    if(apiRuns!==null&&apiBalls!==null){
+      const state=osPartnershipState;
+      state.inning=innings;state.wickets=wickets;
+      state.lastRuns=apiRuns;state.lastBalls=apiBalls;
+      return {runs:apiRuns,balls:apiBalls};
+    }
+  }
   const sources=[v?.partnership,v?.currentPartnership,data?.partnership,data?.currentPartnership,data?.current?.partnership];
   let runs=null,balls=null;
   for(const src of [v,data,data?.current,...sources]){
@@ -4563,9 +4575,15 @@ async function refresh(){
     const response=await fetch(API,{cache:"no-store"});
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
     const liveData=await response.json();
-    await fetchHatTrickFeed();
-    render(liveData);
-    $("error").style.display="none";
+    // Ignore non-scoreboard API frames without disturbing the last valid render,
+    // delivery tracker, over-summary state, or animation lifecycle.
+    if (String(liveData?.view) !== "1") {
+      console.debug("CricClubs: ignoring non-scoreboard view", liveData?.view);
+    } else {
+      await fetchHatTrickFeed();
+      render(liveData);
+      $("error").style.display="none";
+    }
   }catch(e){
     console.error("CricClubs refresh/render failed:", e);
     $("error").textContent="Live score temporarily unavailable. Retrying…";
