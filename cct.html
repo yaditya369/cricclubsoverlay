@@ -2526,6 +2526,12 @@ html body.layout7-active .overlay,html body.layout7-active.show-final-result .ov
 #ccL7 .bowling .balls>.ball{display:inline-flex!important;position:relative!important;flex:0 0 clamp(17px,1.85vw,26px)!important;width:clamp(17px,1.85vw,26px)!important;height:clamp(17px,1.85vw,26px)!important;align-items:center!important;justify-content:center!important;line-height:1!important;white-space:nowrap!important;transform:none!important;animation:none!important;transition:none!important;margin:0!important;}
 #ccL7 .bowling .balls>.ball[hidden]{display:none!important}
 </style>
+<style id="cc-l7-delivery-zoom-isolated">
+/* Same zoom keyframes as Layout 4; transforms never affect flex geometry. */
+#ccL7 .balls > .ball {position:relative!important;transform-origin:center center!important;flex-shrink:0!important}
+#ccL7 .balls > .ball.delivery-zoom-in {animation:ccDeliveryZoomV64 1000ms ease-in-out 1!important;z-index:8!important}
+@media(prefers-reduced-motion:reduce){#ccL7 .balls > .ball.delivery-zoom-in{animation:none!important}}
+</style>
 </head>
 <body>
 <div class="overlay">
@@ -4549,7 +4555,20 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
 #ccL7 .bowling .balls .ball[hidden]{display:none!important}
 #ccL7 .bowling .balls .ball{position:relative!important;flex:0 0 auto!important;transform-origin:center center!important}
 </style>
-<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 of 30 balls. RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">— runs</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><style id="layout7-chase-fit-v1">
+<style id="cc-l7-brand-and-zero-runs-final">
+/* Layout 7 only: align the credit to the extreme right of the 60px board. */
+#ccL7 .board > .brand {
+  left:auto!important;right:0!important;
+  top:auto!important;bottom:2px!important;
+  width:auto!important;max-width:20%!important;height:auto!important;
+  display:block!important;position:absolute!important;
+  padding:0 3px 0 0!important;margin:0!important;
+  text-align:right!important;white-space:nowrap!important;
+  line-height:10px!important;z-index:7!important;
+  pointer-events:none!important;
+}
+</style>
+<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 of 30 balls. RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">(0 runs)</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><style id="layout7-chase-fit-v1">
 /* Layout 7 only: keep full chase and RRR text within existing score capsule. */
 #ccL7 .board>.scorebox>.meta>.chase{max-width:100%!important;min-width:0!important;font-size:11px;letter-spacing:-.2px;white-space:nowrap!important;text-overflow:clip!important;overflow:visible!important;}
 #ccL7 .board>.scorebox>.meta{overflow:hidden!important;}
@@ -4607,19 +4626,29 @@ function setBalls(arr,overs){
   try{if(typeof currentOverBalls==='function')recent=currentOverBalls(arr,overs)||arr.slice(-7)}
   catch(e){recent=arr.slice(-7)}
   const total=typeof thisOverRuns==='function'?thisOverRuns(recent):null;
-  $('overRuns').textContent=(total==null?'—':total)+' runs';
+  $('overRuns').textContent='('+(total==null?0:total)+' runs)';
   const signature=JSON.stringify(recent);
   if(signature===lastBallSignature)return;
+  // Animate only an appended delivery, never the initial render, corrections,
+  // over resets, or unchanged 5-second API refreshes.
+  let animateIndex=-1;
+  if(lastBallSignature){
+    try{
+      const previous=JSON.parse(lastBallSignature);
+      if(Array.isArray(previous) && recent.length===previous.length+1 &&
+         previous.every((ball,i)=>JSON.stringify(ball)===JSON.stringify(recent[i])))
+        animateIndex=recent.length-1;
+    }catch(e){}
+  }
   lastBallSignature=signature;
-  // Simple, deterministic flex row: no measuring, scrolling, or animation.
   const fragment=document.createDocumentFragment();
-  for(const raw of recent){
+  recent.forEach((raw,i)=>{
     const formatted=formatL7Delivery(raw);
     const chip=document.createElement('span');
-    chip.className='ball '+formatted.kind;
+    chip.className='ball '+formatted.kind+(i===animateIndex?' delivery-zoom-in':'');
     chip.textContent=formatted.text;
     fragment.appendChild(chip);
-  }
+  });
   root.replaceChildren(fragment);
 }
 
