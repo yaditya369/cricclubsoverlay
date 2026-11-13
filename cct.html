@@ -3514,6 +3514,30 @@ function overBalls(overs){
   return Number.isFinite(o)&&Number.isFinite(b)?o*6+b:null;
 }
 
+// Determine the match outcome from verified match state or the second-innings score.
+// A completed chase or all-out innings must not wait for a CricClubs result string.
+function matchCompletion(data,v,t1,t2,second){
+  const official=textField(data,v,["result","matchResult"]);
+  const status=textField(data,v,["matchStatus","status","statusText","matchState"]);
+  const explicitlyDone=completed(data,v) || /\b(completed|finished|match ended|match over|abandoned|no result|tied)\b/i.test(status);
+  if(!second && !explicitlyDone)return {finished:false,result:""};
+  const first=Number(t1.total), chase=Number(t2.total), wickets=Number(t2.wickets);
+  const played=overBalls(t2.overs);
+  const limit=Number(optional(v.maxOvers,v.maximumOvers,v.totalOvers,v.oversLimit,v.matchOvers,urlParam("overs")));
+  const reached=second && Number.isFinite(first) && Number.isFinite(chase) && chase>first;
+  const allOut=second && Number.isFinite(wickets) && wickets>=10;
+  const oversDone=second && Number.isFinite(limit) && limit>0 && played!==null && played>=limit*6;
+  const finished=explicitlyDone || reached || allOut || oversDone;
+  if(!finished)return {finished:false,result:""};
+  if(official)return {finished:true,result:official};
+  if(/abandoned|no result/i.test(status))return {finished:true,result:"No result"};
+  if(second && Number.isFinite(first) && Number.isFinite(chase)){
+    if(chase>first)return {finished:true,result:`${t2.name || "Chasing team"} won by ${Math.max(0,10-wickets)} wickets`};
+    if(chase===first)return {finished:true,result:"Match tied"};
+    if(allOut || oversDone)return {finished:true,result:`${t1.name || "First batting team"} won by ${first-chase} runs`};
+  }
+  return {finished:true,result:"Match completed"};
+}
 function completed(data,v){
   return [
     data.isMatchEnded,data.matchEnded,data.isCompleted,
@@ -4031,7 +4055,7 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
   // Trigger when polling crosses a completed-over boundary, even if the API
   // skips the exact 15.0 state and first reports 15.1. The over being summarized
   // is the last *completed* over, not the current over.
-  if(prev===null || prev.second!==second || onBreak || completed(data,v))return;
+  if(prev===null || prev.second!==second || onBreak || matchCompletion(data,v,t1,t2,second).finished)return;
   const completedBefore=prev.completedCount;
   const completedNow=completedCount;
   if(completedNow<=completedBefore || completedNow<1)return;
@@ -4371,8 +4395,11 @@ function render(data){
   const bottomText=$("bottomText");
   const powered=$("powered");
   const onBreak=inningsBreak(data,v,t1,t2,second);
-  const isFinished=completed(data,v) && Boolean(textField(data,v,["result","matchResult"]));
-  if(isFinished && finalMatchSummaryEnabled) showFinalMatchResult(data,v,t1,t2);
+  const matchOutcome=matchCompletion(data,v,t1,t2,second);
+  const isFinished=matchOutcome.finished;
+  // Keep the derived result local; never mutate the original CricClubs payload.
+  const resultData=isFinished ? {...data, result:matchOutcome.result, values:{...v,matchResult:matchOutcome.result}} : data;
+  if(isFinished && finalMatchSummaryEnabled) showFinalMatchResult(resultData,resultData.values,t1,t2);
   else {$("finalMatchResult").hidden=true;document.body.classList.remove("show-final-result");}
   if(isFinished||onBreak) dismissOverSummary();
   observeCompletedOver(data,v,t1,t2,second,onBreak);
@@ -4387,7 +4414,7 @@ function render(data){
     });
   } else if(!(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
   const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
-  observeNativeMatchState(data,v,second,t1,t2,preMatch,onBreak,isFinished);
+  observeNativeMatchState(resultData,resultData.values,second,t1,t2,preMatch,onBreak,isFinished);
   // Milestones are optional: they must never interrupt core live-score rendering.
   try {
     observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished);
@@ -4890,7 +4917,7 @@ function setBalls(arr,overs){
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
 // Prefer the exact team shortcode supplied by CricClubs; derive initials only as fallback.
 const teamCode=(side,name)=>{const keys=[side+'Code',side+'code',side+'CODE',side+'shortcode',side+'ShortCode',side+'Shortcode',side+'shortCode',side+'ShortName',side+'shortName',side+'Abbreviation',side+'Abbr'];for(const obj of [v,data]){if(!obj||typeof obj!=='object')continue;for(const key of keys){const value=obj[key];if(value!=null&&String(value).trim())return String(value).trim();}}return abbr(name)};
-$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining}. RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining}. RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=completedMatch?'':info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining}. RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining}. RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
