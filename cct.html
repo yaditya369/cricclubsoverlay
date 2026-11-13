@@ -2649,7 +2649,7 @@ html body #ccL7 .bowling .balls > .ball.delivery-zoom-in {
   <div class="os-score os-second-score" hidden id="osSecondRow"><span id="osSecondTeam"></span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div>
   <div class="os-deliveries" id="osDeliveries" aria-label="Deliveries in completed over"></div>
   <div class="os-metrics" id="osMetrics"></div>
-  <div class="os-grid"><section class="os-panel"><h3>THIS OVER · BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>THIS OVER · BOWLER</h3><div id="osBowlers"></div></section></div>
+  <div class="os-grid"><section class="os-panel"><h3>BATTERS · MATCH TOTALS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>BOWLER · MATCH TOTALS</h3><div id="osBowlers"></div></section></div>
   <div class="os-situation" id="osSituation"></div>
   <div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div>
 </div>
@@ -3882,31 +3882,32 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
   if(!overSummaryEnabled)return;
   const t=second?t2:t1;
   const n=overBalls(t.overs);
-  const key=(second?'2':'1')+':'+Math.floor((n||0)/6);
-  const valid=n!==null&&n>0&&n%6===0;
-  // Establish baseline on first load: don't replay a summary from hours ago.
-  if(previousOverState===null){previousOverState={second,n};return;}
+  if(n===null)return;
   const prev=previousOverState;
   previousOverState={second,n};
-  // For nextBall mode, dismiss when the next over's first delivery has been recorded.
-  // Any increase in delivered-ball count after the completed over qualifies.
-  if(awaitingNextBall && (awaitingNextBall.second !== second || (n !== null && n > awaitingNextBall.n))) {
-    dismissOverSummary();
-  }
-  if(onBreak||completed(data,v)||!valid||prev.second!==second||prev.n===null||n<=prev.n||lastShownOverKey===key)return;
+  if(awaitingNextBall && (awaitingNextBall.second!==second || n>awaitingNextBall.n))dismissOverSummary();
+  // Trigger when polling crosses a completed-over boundary, even if the API
+  // skips the exact 15.0 state and first reports 15.1. The over being summarized
+  // is the last *completed* over, not the current over.
+  if(prev===null || prev.second!==second || prev.n===null || n<=prev.n || onBreak || completed(data,v))return;
+  const completedBefore=Math.floor(prev.n/6),completedNow=Math.floor(n/6);
+  if(completedNow<=completedBefore || completedNow<1)return;
+  const key=(second?'2':'1')+':'+completedNow;
+  if(lastShownOverKey===key)return;
   lastShownOverKey=key;
-  if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
-  else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
+  if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls);
+  else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls);
   document.body.classList.add('show-over-summary');
   if(overSummaryTimer)clearTimeout(overSummaryTimer);
-  if(summaryUntilNextBall) awaitingNextBall={second,n};
+  overSummaryTimer=null;
+  if(summaryUntilNextBall)awaitingNextBall={second,n:completedNow*6};
   else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
-  // Fetch updated full scorecard when configured. Only refresh the popup if still showing this over.
   if(scorecardUrl){fetchFullScorecard(true).then(()=>{
-    if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key)
-      if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,Math.floor(n/6),data.balls);
-  else renderCompactSummary(loadedFullCard,t,false,Math.floor(n/6),false,data.balls);
-  });}
+    if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key){
+      if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls);
+      else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls);
+    }
+  }).catch(err=>console.warn('End-of-over scorecard refresh failed',err));}
 }
 
 
@@ -4241,7 +4242,7 @@ function render(data){
     if(scorecardUrl)fetchFullScorecard(true).then(()=>{
       if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls);
     });
-  } else if((!overSummaryTimer && !awaitingNextBall) || !(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
+  } else if(!(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
   const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
   observeNativeMatchState(data,v,second,t1,t2,preMatch,onBreak,isFinished);
   // Milestones are optional: they must never interrupt core live-score rendering.
