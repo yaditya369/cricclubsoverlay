@@ -3127,13 +3127,7 @@ html body .overlay.layout2.layout4 > .bottom.visible .powered-credit {
   html body.show-final-result .overlay.layout2.layout4 > .bottom.visible #bottomText {padding-left:85px!important;padding-right:85px!important;}
 }
 </style>
-<style id="view1-footer-visibility">
-/* The shared footer is visible only for API view=1. */
-html.cc-hide-footer #bottom { display:none!important; visibility:hidden!important; }
-/* Any API view other than 1 suppresses every visual overlay, including Layout 7, animations and summaries. */
-html.cc-api-view-hidden, html.cc-api-view-hidden body { background:transparent!important; }
-html.cc-api-view-hidden body > * { display:none!important; visibility:hidden!important; }
-</style>
+
 <style id="view8-hide-entire-overlay">
 /* view=8: transparent video-only output, including all independent animation layers. */
 html.cc-view8, html.cc-view8 body { background:transparent!important; }
@@ -3141,14 +3135,10 @@ html.cc-view8 body > * { display:none!important; visibility:hidden!important; }
 </style>
 <script>
 const params = new URLSearchParams(location.search);
-// Footer visibility is controlled by the top-level `view` in the API response,
-// not by the URL query parameter. Hide until the first valid response arrives.
-// Hide the entire overlay until a valid view=1 API response arrives.
-document.documentElement.classList.add("cc-hide-footer", "cc-api-view-hidden");
+// Do not hide the overlay based on API `view`. Keep the function as a
+// compatibility hook for existing live-data and toss-preview callers.
 function updateFooterVisibilityFromResponse(data) {
-  const showFooter = data != null && Object.prototype.hasOwnProperty.call(data, "view") && String(data.view) === "1";
-  document.documentElement.classList.toggle("cc-hide-footer", !showFooter);
-  document.documentElement.classList.toggle("cc-api-view-hidden", !showFooter);
+  // Intentionally no-op: valid scoring updates must not toggle visibility.
 }
 if ((params.get("view") || "").trim() === "8") {
   document.documentElement.classList.add("cc-view8");
@@ -4768,7 +4758,7 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
 <style id="cc-l7-brand-and-zero-runs-final">
 /* Layout 7 only: align the credit to the extreme right of the 60px board. */
 #ccL7 .board > .brand {
-  left:auto!important;right:0!important;
+  left:auto!important;right:12px!important;
   top:auto!important;bottom:2px!important;
   width:auto!important;max-width:20%!important;height:auto!important;
   display:block!important;position:absolute!important;
