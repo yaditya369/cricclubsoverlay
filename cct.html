@@ -1260,6 +1260,19 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
  .layout2 .prematch-emblem {width:28px!important;height:28px!important;}
  .layout2 .prematch-versus {font-size:18px!important;}
 }
+
+/* Isolated, responsive MH end-of-over component; no changes to scoreboard selectors. */
+#overSummary.os-v2{--os-red:#ad1224;--os-bg:#160b10;--os-panel:#32131d;--os-gold:#f2c35c;position:fixed!important;left:50%!important;top:calc((100dvh - 78px)/2)!important;transform:translate(-50%,-50%)!important;width:min(750px,92vw)!important;max-height:calc(100dvh - 94px);overflow:hidden;box-sizing:border-box;padding:12px!important;border:1px solid #a6414c!important;border-radius:18px!important;background:linear-gradient(140deg,rgba(44,9,18,.97),rgba(11,10,14,.98))!important;box-shadow:0 16px 48px #000a!important;color:white!important;font:600 clamp(11px,1.1vw,15px)/1.25 Arial,sans-serif!important;z-index:60!important}
+#overSummary.os-v2 .os-head{background:linear-gradient(100deg,#7b0d1d,#c21d32)!important;padding:9px 13px;border-radius:11px;font-weight:900;letter-spacing:1px}
+#overSummary.os-v2 .os-score{padding:8px 4px;min-height:25px}#overSummary.os-v2 .os-score strong{font-size:clamp(20px,2.3vw,30px)}
+#overSummary.os-v2 .os-deliveries{display:flex;align-items:center;justify-content:center;gap:8px;min-height:37px;flex-wrap:wrap;margin:3px 0 9px}
+#overSummary.os-v2 .os-ball{display:grid;place-items:center;flex:0 0 33px;width:33px;height:33px;border-radius:50%;font-weight:900;font-size:14px;color:#fff;background:radial-gradient(circle at 30% 22%,#85818a,#33323a 70%);box-shadow:inset 0 1px 2px #fff6,0 2px 5px #0008;border:1px solid #ffffff60}
+#overSummary.os-v2 .os-wicket{background:radial-gradient(circle at 30% 22%,#f15b70,#81071a 70%)}#overSummary.os-v2 .os-four{background:radial-gradient(circle at 30% 22%,#ffe4a1,#bd7906 70%);color:#27140b}#overSummary.os-v2 .os-six{background:radial-gradient(circle at 30% 22%,#70e6a2,#067d46 70%)}#overSummary.os-v2 .os-extra{background:radial-gradient(circle at 30% 22%,#7ac6f4,#12518d 70%)}
+#overSummary.os-v2 .os-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-bottom:10px}#overSummary.os-v2 .os-metric{display:flex;flex-direction:column;align-items:center;gap:2px;background:#30232b;border-radius:8px;padding:7px 3px}#overSummary.os-v2 .os-metric small{font-size:10px;color:#d2c2c7}#overSummary.os-v2 .os-metric strong{font-size:19px}
+#overSummary.os-v2 .os-grid{gap:9px}#overSummary.os-v2 .os-panel{background:#32131d!important;border:1px solid #6e2c3a;border-radius:10px;padding:10px}#overSummary.os-v2 .os-panel h3{color:#ffd8a6!important;font-size:11px;margin:0 0 8px}#overSummary.os-v2 .os-row{padding:4px 0;gap:5px}#overSummary.os-v2 .os-row small{font-size:9px;color:#aaa}#overSummary.os-v2 .os-unavailable{font-size:11px;color:#c8b6ba}
+#overSummary.os-v2 .os-situation{background:linear-gradient(100deg,#4e0c1b,#7b172a);border-radius:10px;text-align:center;padding:10px;margin-top:9px}#overSummary.os-v2 .os-situation-primary{font-size:clamp(14px,1.8vw,21px);font-weight:900;letter-spacing:.25px}#overSummary.os-v2 .os-situation-meta{display:flex;justify-content:space-evenly;gap:8px;margin-top:7px;font-size:11px;color:#f3d4da}
+#overSummary.os-v2 .os-foot{background:transparent!important;padding:3px 4px 0;margin-top:3px;color:#cdb9bd;font-size:10px}
+@media(max-height:500px){#overSummary.os-v2{padding:7px!important;top:calc((100dvh - 70px)/2)!important}#overSummary.os-v2 .os-head{padding:5px 10px}#overSummary.os-v2 .os-score{padding:4px}#overSummary.os-v2 .os-deliveries{margin:0 0 5px;min-height:29px}#overSummary.os-v2 .os-ball{width:27px;height:27px;flex-basis:27px;font-size:12px}#overSummary.os-v2 .os-metric{padding:4px 2px}#overSummary.os-v2 .os-metric strong{font-size:16px}#overSummary.os-v2 .os-metrics{margin-bottom:5px}#overSummary.os-v2 .os-panel{padding:6px}#overSummary.os-v2 .os-panel h3{margin-bottom:3px}#overSummary.os-v2 .os-situation{padding:6px;margin-top:5px}#overSummary.os-v2 .os-foot{display:none}}
 </style>
 <style id="match-result-legibility-fix">
 /* Match result: balanced two-team rows, with overs alongside scores. */
@@ -2630,7 +2643,16 @@ html body #ccL7 .bowling .balls > .ball.delivery-zoom-in {
 <div class="ib-grid"><section class="ib-panel"><h3 id="ibBatTitle">BATTING</h3><table class="ib-table"><colgroup><col style="width:24%"/><col style="width:32%"/><col style="width:8%"/><col style="width:8%"/><col style="width:8%"/><col style="width:8%"/><col style="width:12%"/></colgroup><thead><tr><th class="ib-name">BATSMAN</th><th class="ib-how">HOW OUT</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody id="ibBatRows"></tbody></table><div class="ib-summary" id="ibFoW"></div></section>
 <div class="ib-right"><section class="ib-panel"><h3 id="ibBowlTitle">BOWLING</h3><table class="ib-table"><colgroup><col style="width:37%"/><col style="width:12%"/><col style="width:12%"/><col style="width:12%"/><col style="width:12%"/><col style="width:15%"/></colgroup><thead><tr><th class="ib-name">BOWLER</th><th>O</th><th>M</th><th>R</th><th>W</th><th>ECON</th></tr></thead><tbody id="ibBowlRows"></tbody></table></section><section class="ib-panel"><h3>EXTRAS BREAKDOWN</h3><div class="ib-extras" id="ibExtras"></div></section><div class="ib-foot" id="ibFoot">SECOND INNINGS STARTING SOON</div></div></div>
 </div>
-<div aria-live="polite" id="overSummary"><div class="os-head"><span id="osTitle">OVER SUMMARY</span><span id="osOvers"></span></div><div class="os-score" id="osFirstRow"><span id="osTeam"></span><strong id="osScore">—</strong><span id="osRR"></span></div><div class="os-score os-second-score" hidden="" id="osSecondRow"><span id="osSecondTeam"></span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div><div class="os-grid"><section class="os-panel"><h3>TOP BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>TOP BOWLERS</h3><div id="osBowlers"></div></section></div><div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div></div>
+<div aria-live="polite" id="overSummary" class="os-v2">
+  <div class="os-head"><span id="osTitle">END OF OVER SUMMARY</span><span id="osOvers"></span></div>
+  <div class="os-score" id="osFirstRow"><span id="osTeam"></span><strong id="osScore">—</strong><span id="osRR"></span></div>
+  <div class="os-score os-second-score" hidden id="osSecondRow"><span id="osSecondTeam"></span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div>
+  <div class="os-deliveries" id="osDeliveries" aria-label="Deliveries in completed over"></div>
+  <div class="os-metrics" id="osMetrics"></div>
+  <div class="os-grid"><section class="os-panel"><h3>THIS OVER · BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>THIS OVER · BOWLER</h3><div id="osBowlers"></div></section></div>
+  <div class="os-situation" id="osSituation"></div>
+  <div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div>
+</div>
 <!-- Match-complete card is viewport centered and independent of the bottom scoreboard. -->
 <div aria-live="polite" hidden="" id="finalMatchResult" role="status">
 <h2>MATCH RESULT</h2>
@@ -3807,7 +3829,7 @@ async function fetchFullScorecard(force=false){
 // summary=1 remains an alias for the end-of-over summary for older links.
 const summaryParams = new URLSearchParams(location.search);
 const enabledFlag = value => /^(1|true|on|yes)$/i.test(String(value ?? '0'));
-const overSummaryEnabled = enabledFlag(summaryParams.get('overSummary') ?? summaryParams.get('summary'));
+const overSummaryEnabled = enabledFlag(summaryParams.get('showOverSummary') ?? summaryParams.get('overSummary') ?? summaryParams.get('summary') ?? 'true');
 // Explicit summary=0 disables the final match-result popup as well.
 const finalMatchSummaryEnabled = summaryParams.get('summary') !== '0';
 // Innings-break summary is disabled by default; opt in with ?inningsBreakSummary=1.
@@ -3827,38 +3849,34 @@ function dismissOverSummary(){
   awaitingNextBall = null;
   document.body.classList.remove('show-over-summary');
 }
+// All display composition is isolated here so the summary can be redesigned without touching live score rendering.
+const overSummaryConfig = Object.freeze({ maxBalls: 12, maxBatters: 2, maxBowlers: 1 });
+function summaryNumber(value){const n=Number(value);return value!==null&&value!==undefined&&value!==''&&Number.isFinite(n)?n:null;}
+function summaryDeliveries(balls){return Array.isArray(balls)?balls.slice(-overSummaryConfig.maxBalls).map(x=>String(x)):[];}
+function summaryBallClass(x){const s=String(x).toUpperCase();return /W/.test(s)&&!/^WD/.test(s)?'wicket':/6/.test(s)?'six':/4/.test(s)?'four':/^(WD|N|NB|B|LB)/.test(s)?'extra':'normal';}
+function summaryOverRuns(balls){if(!Array.isArray(balls)||!balls.length)return null;let runs=0;for(const x of balls){const v=String(x).toUpperCase().trim();if(/^(W|•|\.|0)$/.test(v))continue;const parts=v.match(/\d+/g);if(parts)runs+=parts.reduce((a,b)=>a+Number(b),0);else if(/^(WD|NB|N|WIDE|NO BALL)$/.test(v))runs+=1;else return null;}return runs;}
+function renderOverMetrics(balls){const list=summaryDeliveries(balls);const fours=list.filter(x=>/4/.test(x)).length,sixes=list.filter(x=>/6/.test(x)).length,wickets=list.filter(x=>summaryBallClass(x)==='wicket').length;const runs=summaryOverRuns(list);$('osDeliveries').innerHTML=list.map(x=>`<span class="os-ball os-${summaryBallClass(x)}">${escapeScore(x==='0'?'•':x)}</span>`).join('')||'<span class="os-unavailable">Delivery details unavailable</span>';$('osMetrics').innerHTML=[['RUNS',runs??'—'],['WICKETS',list.length?wickets:'—'],['EXTRAS','—'],['4s',list.length?fours:'—'],['6s',list.length?sixes:'—']].map(([k,v])=>`<div class="os-metric"><small>${k}</small><strong>${v}</strong></div>`).join('');}
 function renderCompactSummary(card,t,second,overNo,breakMode,balls){
-  const d=card||{};
-  $('osTitle').textContent='MATCH SUMMARY';
-  $('osOvers').textContent=`${t.overs} OVERS`;
-  $('osTeam').textContent=t.name;
-  $('osScore').textContent=`${t.total}/${t.wickets}`;
-  $('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;
-  $('osSecondRow').hidden=true;
-  $('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo} COMPLETE`;
-  const bat=Array.isArray(d.batting)?d.batting.slice().filter(x=>Number.isFinite(Number(x.r))).sort((a,b)=>Number(b.r)-Number(a.r)).slice(0,3):[];
-  const bowl=Array.isArray(d.bowling)?d.bowling.slice().filter(x=>x.wickets!=null&&x.runs!=null).sort((a,b)=>Number(b.wickets)-Number(a.wickets)||Number(a.runs)-Number(b.runs)).slice(0,3):[];
-  $('osBatters').innerHTML=bat.length?bat.map(p=>{
-    const notOut=p.notOut===true||/^(not out|retired hurt)$/i.test(String(p.howOut||'').trim());
-    return `<div class="os-row"><span>${escapeScore(p.name)}${notOut?'*':''}</span><span>${escapeScore(p.r)} (${numberOrDash(p.b)})</span></div>`;
-  }).join(''):'<div class="os-row">Player stats unavailable</div>';
-  $('osBowlers').innerHTML=bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${escapeScore(p.wickets)}/${escapeScore(p.runs)} (${numberOrDash(p.overs)})</span></div>`).join(''):'<div class="os-row">Bowling stats unavailable</div>';
-  const ex=d.extras||{};
-  const extras=ex.total??(Object.values(ex).length&&Object.values(ex).every(x=>Number.isFinite(Number(x)))?Object.values(ex).reduce((a,b)=>a+Number(b),0):null);
-  $('osExtras').textContent=extras==null?'':`EXTRAS ${extras}`;
-  $('osFooter').textContent=breakMode?`TARGET ${Number(t.total)+1} · 2ND INNINGS SOON`:(Array.isArray(balls)&&balls.length?`RECENT: ${balls.slice(-6).map(x=>String(x)).join(' · ')}`:'');
+  const d=card||{};const list=summaryDeliveries(balls);
+  $('osTitle').textContent=breakMode?'INNINGS SUMMARY':'END OF OVER SUMMARY';$('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo}`;
+  $('osTeam').textContent=t.name;$('osScore').textContent=`${t.total}/${t.wickets}`;$('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;$('osSecondRow').hidden=true;
+  renderOverMetrics(list);
+  const bat=Array.isArray(d.batting)?d.batting.filter(x=>x.r!==null&&x.r!==undefined).slice(-overSummaryConfig.maxBatters):[];
+  const bowl=Array.isArray(d.bowling)?d.bowling.slice(-overSummaryConfig.maxBowlers):[];
+  $('osBatters').innerHTML=bat.length?bat.map(p=>{const no=p.notOut===true||/^(not out|retired hurt)$/i.test(String(p.howOut||'').trim());return `<div class="os-row"><span>${escapeScore(p.name)}${no?'*':''}</span><span>${numberOrDash(p.r)} (${numberOrDash(p.b)}) <small>match</small></span></div>`;}).join(''):'<div class="os-unavailable">Batter contributions unavailable</div>';
+  $('osBowlers').innerHTML=bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${numberOrDash(p.wickets)}/${numberOrDash(p.runs)} (${numberOrDash(p.overs)}) <small>match</small></span></div>`).join(''):'<div class="os-unavailable">Bowler figures unavailable</div>';
+  $('osSituation').innerHTML=`<div class="os-situation-primary">${breakMode?'INNINGS COMPLETE':'PROJECTED SCORE '+(summaryNumber(t.rr)!==null&&summaryNumber(t.overs)!==null?Math.round(Number(t.rr)*20):'—')}</div><div class="os-situation-meta"><span>PARTNERSHIP —</span><span>RR ${escapeScore(t.rr??'—')}</span></div>`;
+  $('osExtras').textContent='';$('osFooter').textContent='';
 }
 function renderBothTeamsSummary(card,first,second,overNo,balls){
   renderCompactSummary(card,second,true,overNo,false,balls);
-  $('osSecondRow').hidden=false;
-  $('osTeam').textContent=first.name;
-  $('osScore').textContent=`${first.total}/${first.wickets}`;
-  $('osRR').textContent=`${first.overs} OV`;
-  $('osSecondTeam').textContent=second.name;
-  $('osSecondScore').textContent=`${second.total}/${second.wickets}`;
-  $('osSecondRR').textContent=`${second.overs} OV · RR ${second.rr}`;
-  const need=Math.max(0,Number(first.total)+1-Number(second.total));
-  $('osFooter').textContent=`TARGET ${Number(first.total)+1} · NEED ${need} RUNS`;
+  $('osTeam').textContent=second.name;$('osScore').textContent=`${second.total}/${second.wickets}`;$('osRR').textContent=`${second.overs} OV · RR ${second.rr}`;
+  const firstRuns=summaryNumber(first.total),secondRuns=summaryNumber(second.total),bowled=overBalls(second.overs);
+  const need=firstRuns!==null&&secondRuns!==null?Math.max(0,firstRuns+1-secondRuns):null;
+  const remaining=bowled!==null?Math.max(0,120-bowled):null;
+  const rrr=need!==null&&remaining!==null&&remaining>0?(need*6/remaining).toFixed(2):'—';
+  $('osSituation').innerHTML=`<div class="os-situation-primary">${need===null?'CHASE DETAILS UNAVAILABLE':`NEED ${need} RUN${need===1?'':'S'} TO WIN IN ${remaining??'—'} BALLS`}</div><div class="os-situation-meta"><span>PARTNERSHIP —</span><span>RR ${escapeScore(second.rr??'—')}</span><span>RRR ${rrr}</span></div>`;
+  $('osFooter').textContent=firstRuns!==null?`TARGET ${firstRuns+1}`:'';
 }
 function observeCompletedOver(data,v,t1,t2,second,onBreak){
   if(!overSummaryEnabled)return;
@@ -4443,13 +4461,13 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
 } else if (urlParam("demo") === "matchResult") {
   // Preview card is already rendered above; do not fetch or overwrite it.
 } else if (overSummaryEnabled && urlParam("demo") === "secondInningsSummary") {
-  const a={name:'DEMO XI',total:156,wickets:8,overs:'20.0',rr:'7.80'};
-  const b={name:'PRACTICE XI',total:74,wickets:2,overs:'10.0',rr:'7.40'};
-  renderBothTeamsSummary(demoFullCard,a,b,10,['1','4','0','2','1','0']);
+  const a={name:'INNOVATION STRIKERS',total:180,wickets:7,overs:'20.0',rr:'9.00'};
+  const b={name:'MONEY HEIST',total:137,wickets:4,overs:'15.0',rr:'9.13'};
+  renderBothTeamsSummary(null,a,b,15,['1','4','0','W','1','6']);
   document.body.classList.add('show-over-summary');
 } else if (overSummaryEnabled && urlParam("demo") === "overSummary") {
-  const t={name:'RAGING BULLS',total:63,wickets:2,overs:'8.0',rr:'7.88'};
-  renderCompactSummary(demoFullCard,t,false,8,false,['1','4','0','2','1','0']);
+  const t={name:'MONEY HEIST',total:137,wickets:4,overs:'15.0',rr:'9.13'};
+  renderCompactSummary(null,t,false,15,false,['1','4','0','W','1','6']);
   document.body.classList.add('show-over-summary');
 } else if (inningsBreakSummaryEnabled && urlParam("demo") === "inningsBreak") {
   render({
