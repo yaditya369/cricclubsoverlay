@@ -3214,8 +3214,8 @@ if ((params.get("view") || "").trim() === "8") {
   document.documentElement.classList.add("cc-view8");
 }
 
-const clubId = params.get("clubId") || "22594";
-const matchId = params.get("matchId") || "1374";
+const clubId = (params.get("clubId") || "").trim();
+const matchId = (params.get("matchId") || "").trim();
 
 // refresh is expressed in seconds (e.g. refresh=5).
 // Legacy refreshInterval remains supported in milliseconds for older links.
@@ -4627,7 +4627,7 @@ function render(data){
         message=`Need ${needed}`;
         if(Number.isFinite(limit)&&limit>0&&ballsBowled!==null){
           const left=Math.max(0,limit*6-ballsBowled);
-          if(left>0) message+=overlayLayout==="7"?` of ${left}. RRR ${(needed*6/left).toFixed(2)}`:` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
+          if(left>0) message+=overlayLayout==="7"?` of ${left} · RRR ${(needed*6/left).toFixed(2)}`:` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
         }
       }
     }else{
@@ -4642,9 +4642,19 @@ function render(data){
 async function refresh(){
   if(stopped)return;
   try{
-    const response=await fetch(API,{cache:"no-store"});
-    if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    const liveData=await response.json();
+    // Bound both the HTTP request and body read so Android WebView cannot
+    // permanently stall the single-flight refresh loop on a pending fetch.
+    const controller=new AbortController();
+    let requestTimeout;
+    let liveData;
+    try {
+      requestTimeout=setTimeout(()=>controller.abort(),8000);
+      const response=await fetch(API,{cache:"no-store",signal:controller.signal});
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      liveData=await response.json();
+    } finally {
+      clearTimeout(requestTimeout);
+    }
     // Ignore non-scoreboard API frames without disturbing the last valid render,
     // delivery tracker, over-summary state, or animation lifecycle.
     if (String(liveData?.view) !== "1") {
@@ -4728,8 +4738,12 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
       totalOvers: "20"
     }, balls: []
   });
-} else {
+} else if (clubId && matchId) {
   refresh();
+} else {
+  console.error("CricClubs: clubId and matchId are required; live polling not started.");
+  const errorNode=document.getElementById("error");
+  if(errorNode){errorNode.textContent="Missing clubId or matchId in overlay URL";errorNode.style.display="block";}
 }
 </script>
 <div aria-live="polite" id="milestoneEvent"><div class="ms-particles"></div><div class="ms-content"><div class="ms-head"></div><div class="ms-name"></div><div class="ms-detail"></div></div></div>
@@ -4856,7 +4870,14 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
   pointer-events:none!important;
 }
 </style>
-<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 of 30. RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">(0 runs)</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><style id="layout7-chase-fit-v1">
+<style id="cc-l7-no-placeholder-data">
+/* Do not show an uninitialized live scoreboard. Demo modes are exempt. */
+html.cc-l7-awaiting-live #ccL7 .board{visibility:hidden!important}
+</style>
+<script>
+if(!new URLSearchParams(location.search).has('demo'))document.documentElement.classList.add('cc-l7-awaiting-live');
+</script>
+<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat"></div></div><div class="scorebox"><div class="score" id="ccL7_score"></div><div class="meta"><div class="overs" id="ccL7_overs"></div><div class="chase" id="ccL7_chase"></div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1"></span><span class="stats" id="ccL7_batter1Stats"></span></div><div class="batter"><span class="name" id="ccL7_batter2"></span><span class="stats" id="ccL7_batter2Stats"></span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler"></span><span class="bowlerstats" id="ccL7_bowlerStats"></span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns"></span></div><div class="balls" id="ccL7_balls"></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl"></div></div></div></div></div><style id="layout7-chase-fit-v1">
 /* Layout 7 only: keep full chase and RRR text within existing score capsule. */
 #ccL7 .board>.scorebox>.meta>.chase{max-width:100%!important;min-width:0!important;font-size:11px;letter-spacing:-.2px;white-space:nowrap!important;text-overflow:clip!important;overflow:visible!important;}
 #ccL7 .board>.scorebox>.meta{overflow:hidden!important;}
@@ -4995,9 +5016,9 @@ function setBalls(arr,overs){
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
 // Prefer the exact team shortcode supplied by CricClubs; derive initials only as fallback.
 const teamCode=(side,name)=>{const keys=[side+'Code',side+'code',side+'CODE',side+'shortcode',side+'ShortCode',side+'Shortcode',side+'shortCode',side+'ShortName',side+'shortName',side+'Abbreviation',side+'Abbr'];for(const obj of [v,data]){if(!obj||typeof obj!=='object')continue;for(const key of keys){const value=obj[key];if(value!=null&&String(value).trim())return String(value).trim();}}return abbr(name)};
-$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining}. RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining}. RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
-window.ccLayout7Render=function(data){try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
+window.ccLayout7Render=function(data){try{render(data);message('');document.documentElement.classList.remove('cc-l7-awaiting-live')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
 if(typeof latestLayout7Data!=="undefined" && latestLayout7Data && window.ccLayout7Render)window.ccLayout7Render(latestLayout7Data);</script><style id="layout7-toss-preview-style">
 /* The toss uses the existing rounded Layout 7 board, not a separate footer. */
