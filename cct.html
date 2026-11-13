@@ -1320,6 +1320,49 @@ body.layout7-active #overSummary.os-v2 .os-situation-meta{display:flex!important
 body.layout7-active #overSummary.os-v2 .os-target-inline{color:#ffdb83!important;font-weight:900!important;white-space:nowrap!important}
 body.layout7-active #overSummary.os-v2 .os-foot{display:none!important}
 </style>
+
+<style id="layout7-approved-summary-visual-v3">
+/* Layout 7 only. Broadcast-size reference proportions; leave the footer scoreboard untouched. */
+body.layout7-active #overSummary.os-v2{
+ --os-width:1100px!important;width:min(1100px,82vw)!important;
+ max-height:calc(100dvh - 115px)!important;
+ padding:27px 38px 22px!important;border:2px solid #ff2839!important;
+ border-radius:37px!important;
+ background:linear-gradient(115deg,rgba(12,0,3,.98),rgba(40,0,5,.97) 65%,rgba(8,0,3,.99))!important;
+ box-shadow:0 0 17px #f10c2b88,inset 0 0 19px #b9001666,0 15px 35px #0009!important;
+ font:700 clamp(13px,1.35vw,21px)/1.15 Arial,sans-serif!important;
+}
+body.layout7-active #overSummary.os-v2:before{inset:8px;border-radius:29px;border-color:#a31325}
+body.layout7-active #overSummary.os-v2 .os-head{
+ top:-29px;height:54px;min-width:min(610px,62vw);border-radius:17px 17px 22px 22px!important;
+ padding:0 30px!important;font-size:clamp(18px,2.5vw,34px)!important;letter-spacing:1px!important;
+ background:linear-gradient(#ff2736 0%,#a00011 62%,#470007)!important;
+}
+body.layout7-active #overSummary.os-v2 .os-score{padding:8px 0 6px!important;gap:12px!important}
+body.layout7-active #overSummary.os-v2 .os-score>span:first-child{font-size:clamp(20px,2.5vw,36px)!important;max-width:78%}
+body.layout7-active #overSummary.os-v2 .os-score>strong{font-size:clamp(19px,2vw,30px)!important}
+body.layout7-active #overSummary.os-v2 .os-deliveries{min-height:64px!important;gap:clamp(8px,2vw,25px)!important;margin:1px 0 13px!important;flex-wrap:wrap!important}
+body.layout7-active #overSummary.os-v2 .os-ball{width:clamp(34px,4.5vw,66px)!important;height:clamp(34px,4.5vw,66px)!important;flex:0 0 clamp(34px,4.5vw,66px)!important;font-size:clamp(17px,2.7vw,34px)!important;border:2px solid #ffffff66!important}
+body.layout7-active #overSummary.os-v2 .os-metrics{gap:0!important;margin:0 0 16px!important;border:2px solid #f3263a;border-radius:19px!important;overflow:hidden;background:linear-gradient(90deg,#c50017,#200005 50%,#a30012)!important}
+body.layout7-active #overSummary.os-v2 .os-metric{min-height:66px;background:transparent!important;border:0!important;border-right:1px solid #ff6b7c!important;border-radius:0!important;padding:9px 4px!important;gap:2px!important}
+body.layout7-active #overSummary.os-v2 .os-metric:first-child{background:linear-gradient(110deg,#a90014,#ff152d)!important}
+body.layout7-active #overSummary.os-v2 .os-metric:last-child{border-right:0!important}
+body.layout7-active #overSummary.os-v2 .os-metric small{font-size:clamp(12px,1.5vw,20px)!important;line-height:1.1!important}
+body.layout7-active #overSummary.os-v2 .os-metric strong{font-size:clamp(19px,2.6vw,35px)!important;line-height:1.1!important}
+body.layout7-active #overSummary.os-v2 .os-grid{grid-template-columns:1fr 1fr!important;gap:22px!important}
+body.layout7-active #overSummary.os-v2 .os-panel{padding:0 13px 10px!important;border:2px solid #ae1224!important;border-radius:17px!important;background:linear-gradient(110deg,#160003,#050002)!important}
+body.layout7-active #overSummary.os-v2 .os-panel h3{font-size:clamp(14px,1.7vw,22px)!important;padding:7px 20px!important;margin:0 0 7px -13px!important;border-radius:12px 0 15px 0!important;background:linear-gradient(#ed0924,#83000e)!important}
+body.layout7-active #overSummary.os-v2 .os-row{font-size:clamp(13px,1.5vw,20px)!important;padding:7px 10px!important;gap:12px!important;border-radius:10px!important;background:linear-gradient(90deg,#292326,#090709)!important;margin:4px 0!important}
+body.layout7-active #overSummary.os-v2 .os-row span:first-child{flex:1;min-width:0}
+body.layout7-active #overSummary.os-v2 .os-row span:last-child{font-weight:900}
+body.layout7-active #overSummary.os-v2 .os-situation{margin-top:14px!important;padding:10px 15px!important;border:2px solid #e82137!important;border-radius:18px!important;background:linear-gradient(90deg,#a60012,#280005 53%,#9c0012)!important}
+body.layout7-active #overSummary.os-v2 .os-situation-primary{font-size:clamp(14px,1.8vw,24px)!important;letter-spacing:0!important}
+body.layout7-active #overSummary.os-v2 .os-situation-meta{font-size:clamp(12px,1.45vw,19px)!important;margin-top:6px!important;flex-wrap:nowrap!important;gap:8px!important}
+body.layout7-active #overSummary.os-v2 .os-situation-meta>span{flex:1;min-width:0;text-align:center;border-right:1px solid #e86572;padding:3px 5px}
+body.layout7-active #overSummary.os-v2 .os-situation-meta>span:last-child{border-right:0}
+body.layout7-active #overSummary.os-v2 .os-target-inline{color:#ffdc86!important}
+@media(max-height:560px){body.layout7-active #overSummary.os-v2{width:min(1000px,82vw)!important;padding:17px 26px 12px!important;border-radius:22px!important}body.layout7-active #overSummary.os-v2 .os-head{height:34px;top:-19px;font-size:clamp(16px,2vw,25px)!important}body.layout7-active #overSummary.os-v2 .os-deliveries{min-height:42px!important;margin:0 0 7px!important}body.layout7-active #overSummary.os-v2 .os-ball{width:clamp(29px,3.6vw,45px)!important;height:clamp(29px,3.6vw,45px)!important;flex-basis:clamp(29px,3.6vw,45px)!important;font-size:clamp(14px,2vw,24px)!important}body.layout7-active #overSummary.os-v2 .os-metric{min-height:43px;padding:4px!important}body.layout7-active #overSummary.os-v2 .os-metrics{margin-bottom:8px!important}body.layout7-active #overSummary.os-v2 .os-panel h3{padding:4px 12px!important;margin-bottom:3px!important}body.layout7-active #overSummary.os-v2 .os-row{padding:4px 8px!important;margin:2px 0!important}body.layout7-active #overSummary.os-v2 .os-situation{margin-top:7px!important;padding:5px 10px!important}body.layout7-active #overSummary.os-v2 .os-score{padding:3px!important}}
+</style>
 <style id="match-result-legibility-fix">
 /* Match result: balanced two-team rows, with overs alongside scores. */
 #finalMatchResult{
@@ -2696,13 +2739,40 @@ body.layout7-active #overSummary.os-v2 .os-extra{background:linear-gradient(155d
 <div class="ib-grid"><section class="ib-panel"><h3 id="ibBatTitle">BATTING</h3><table class="ib-table"><colgroup><col style="width:24%"/><col style="width:32%"/><col style="width:8%"/><col style="width:8%"/><col style="width:8%"/><col style="width:8%"/><col style="width:12%"/></colgroup><thead><tr><th class="ib-name">BATSMAN</th><th class="ib-how">HOW OUT</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody id="ibBatRows"></tbody></table><div class="ib-summary" id="ibFoW"></div></section>
 <div class="ib-right"><section class="ib-panel"><h3 id="ibBowlTitle">BOWLING</h3><table class="ib-table"><colgroup><col style="width:37%"/><col style="width:12%"/><col style="width:12%"/><col style="width:12%"/><col style="width:12%"/><col style="width:15%"/></colgroup><thead><tr><th class="ib-name">BOWLER</th><th>O</th><th>M</th><th>R</th><th>W</th><th>ECON</th></tr></thead><tbody id="ibBowlRows"></tbody></table></section><section class="ib-panel"><h3>EXTRAS BREAKDOWN</h3><div class="ib-extras" id="ibExtras"></div></section><div class="ib-foot" id="ibFoot">SECOND INNINGS STARTING SOON</div></div></div>
 </div>
+<style id="layout7-broadcast-reference-v4">
+/* Strictly scoped to Layout 7's summary. Designed for 1536x688 broadcast frame. */
+body.layout7-active #overSummary.os-v2{width:min(1220px,82vw)!important;max-height:calc(100dvh - 112px)!important;top:calc((100dvh - 84px)/2)!important;padding:28px 52px 20px!important;border:2px solid #ff273e!important;border-radius:45px!important;background:radial-gradient(ellipse at 50% 20%,#270006 0%,#100003 72%,#070003 100%)!important;box-shadow:0 0 0 2px #53000b,0 0 23px #ec122c88,inset 0 0 27px #8c001366!important;}
+body.layout7-active #overSummary.os-v2:before{inset:8px!important;border-radius:36px!important;border:1px solid #9e1427!important}
+body.layout7-active #overSummary.os-v2 .os-head{top:-31px!important;height:61px!important;min-width:min(690px,65vw)!important;border-radius:21px!important;font-size:clamp(21px,3vw,43px)!important;box-shadow:inset 0 4px 7px #ff8b9080,0 5px 10px #000a,0 0 12px #ff001f!important}
+body.layout7-active #overSummary.os-v2 .os-score{padding:5px 0 2px!important;gap:12px!important}
+body.layout7-active #overSummary.os-v2 .os-score>span:first-child{font-size:clamp(23px,2.8vw,42px)!important;max-width:82%!important}
+body.layout7-active #overSummary.os-v2 .os-score>strong{display:none!important}
+body.layout7-active #overSummary.os-v2 .os-deliveries{min-height:68px!important;margin:0 0 12px!important;gap:clamp(10px,2.4vw,38px)!important;flex-wrap:nowrap!important}
+body.layout7-active #overSummary.os-v2 .os-ball{width:clamp(35px,4.9vw,76px)!important;height:clamp(35px,4.9vw,76px)!important;flex:0 0 clamp(35px,4.9vw,76px)!important;font-size:clamp(19px,2.9vw,43px)!important;box-shadow:inset 0 3px 8px #ffffff65,0 3px 6px #000b!important}
+body.layout7-active #overSummary.os-v2 .os-metrics{margin:0 0 15px!important;border-radius:24px!important;box-shadow:inset 0 3px 8px #ff74773d!important}
+body.layout7-active #overSummary.os-v2 .os-metric{min-height:83px!important;padding:9px 3px!important;justify-content:center!important}
+body.layout7-active #overSummary.os-v2 .os-metric small{font-size:clamp(13px,1.7vw,25px)!important;text-transform:none!important}
+body.layout7-active #overSummary.os-v2 .os-metric strong{font-size:clamp(21px,2.8vw,40px)!important}
+body.layout7-active #overSummary.os-v2 .os-grid{grid-template-columns:1fr 1fr!important;gap:27px!important}
+body.layout7-active #overSummary.os-v2 .os-panel{min-height:122px!important;padding:0 18px 9px!important;border-radius:20px!important}
+body.layout7-active #overSummary.os-v2 .os-panel h3{font-size:clamp(15px,1.8vw,25px)!important;padding:7px 22px!important;margin-left:-18px!important;text-transform:none!important}
+body.layout7-active #overSummary.os-v2 .os-row{font-size:clamp(14px,1.65vw,24px)!important;padding:6px 12px!important;margin:3px 0!important;min-height:31px!important}
+body.layout7-active #overSummary.os-v2 .os-situation{display:grid!important;grid-template-columns:1fr 1.1fr!important;align-items:center!important;gap:8px!important;margin-top:14px!important;min-height:72px!important;padding:8px 18px!important}
+body.layout7-active #overSummary.os-v2 .os-situation-primary{grid-column:2;grid-row:1;text-align:center!important;font-size:clamp(16px,1.8vw,26px)!important}
+body.layout7-active #overSummary.os-v2 .os-situation-meta{grid-column:1;grid-row:1;display:flex!important;justify-content:space-evenly!important;font-size:clamp(13px,1.55vw,23px)!important;margin:0!important}
+body.layout7-active #overSummary.os-v2 .os-situation-meta>span{border-right:1px solid #e86572!important;padding:5px 9px!important}
+body.layout7-active #overSummary.os-v2 .os-situation-meta>span:last-child{border:0!important}
+body.layout7-active #overSummary.os-v2 .os-target-inline{display:none!important}
+@media(max-height:760px){body.layout7-active #overSummary.os-v2{padding:20px 40px 13px!important}body.layout7-active #overSummary.os-v2 .os-head{top:-24px!important;height:48px!important;font-size:clamp(19px,2.6vw,35px)!important}body.layout7-active #overSummary.os-v2 .os-score>span:first-child{font-size:clamp(20px,2.45vw,34px)!important}body.layout7-active #overSummary.os-v2 .os-deliveries{min-height:56px!important;margin-bottom:9px!important}body.layout7-active #overSummary.os-v2 .os-ball{width:clamp(32px,4.2vw,61px)!important;height:clamp(32px,4.2vw,61px)!important;flex-basis:clamp(32px,4.2vw,61px)!important;font-size:clamp(17px,2.5vw,34px)!important}body.layout7-active #overSummary.os-v2 .os-metric{min-height:65px!important;padding:5px!important}body.layout7-active #overSummary.os-v2 .os-metrics{margin-bottom:11px!important}body.layout7-active #overSummary.os-v2 .os-panel{min-height:102px!important}body.layout7-active #overSummary.os-v2 .os-row{padding:4px 10px!important}body.layout7-active #overSummary.os-v2 .os-situation{min-height:58px!important;margin-top:10px!important;padding:6px 12px!important}}
+@media(max-height:490px){body.layout7-active #overSummary.os-v2{width:85vw!important;padding:12px 24px 8px!important}body.layout7-active #overSummary.os-v2 .os-head{height:33px!important;top:-18px!important;font-size:18px!important}body.layout7-active #overSummary.os-v2 .os-deliveries{min-height:37px!important;margin-bottom:4px!important}body.layout7-active #overSummary.os-v2 .os-ball{width:35px!important;height:35px!important;flex-basis:35px!important;font-size:19px!important}body.layout7-active #overSummary.os-v2 .os-metric{min-height:43px!important}body.layout7-active #overSummary.os-v2 .os-panel{min-height:75px!important}body.layout7-active #overSummary.os-v2 .os-panel h3{padding:3px 12px!important}body.layout7-active #overSummary.os-v2 .os-row{padding:2px 6px!important}body.layout7-active #overSummary.os-v2 .os-situation{min-height:38px!important;margin-top:5px!important}}
+</style>
 <div aria-live="polite" id="overSummary" class="os-v2">
   <div class="os-head"><span id="osTitle">END OF OVER SUMMARY</span><span id="osOvers"></span></div>
   <div class="os-score" id="osFirstRow"><span id="osTeam"></span><strong id="osScore">—</strong><span id="osRR"></span></div>
   <div class="os-score os-second-score" hidden id="osSecondRow"><span id="osSecondTeam"></span><strong id="osSecondScore">—</strong><span id="osSecondRR"></span></div>
   <div class="os-deliveries" id="osDeliveries" aria-label="Deliveries in completed over"></div>
   <div class="os-metrics" id="osMetrics"></div>
-  <div class="os-grid"><section class="os-panel"><h3>BATTERS</h3><div id="osBatters"></div></section><section class="os-panel"><h3>BOWLER</h3><div id="osBowlers"></div></section></div>
+  <div class="os-grid"><section class="os-panel"><h3>Batters</h3><div id="osBatters"></div></section><section class="os-panel"><h3>Bowler</h3><div id="osBowlers"></div></section></div>
   <div class="os-situation" id="osSituation"></div>
   <div class="os-foot"><span id="osExtras"></span><span id="osFooter"></span></div>
 </div>
@@ -4011,7 +4081,7 @@ function osPartnershipMarkup(data,t,second){
 function renderCompactSummary(card,t,second,overNo,breakMode,balls,liveData){
   const d=card||{};const list=summaryDeliveries(balls);
   $('osTitle').textContent=breakMode?'INNINGS SUMMARY':`END OF OVER ${overNo} SUMMARY`;$('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo}`;
-  $('osTeam').textContent=t.name;$('osScore').textContent=`${t.total}/${t.wickets}`;$('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;$('osSecondRow').hidden=true;
+  $('osTeam').textContent=`Over ${overNo} – ${t.name}`;$('osScore').textContent=`${t.total}/${t.wickets}`;$('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;$('osSecondRow').hidden=true;
   renderOverMetrics(list);
   const bat=Array.isArray(d.batting)?d.batting.filter(x=>x.r!==null&&x.r!==undefined).slice(-overSummaryConfig.maxBatters):[];
   const bowl=Array.isArray(d.bowling)?d.bowling.slice(-overSummaryConfig.maxBowlers):[];
