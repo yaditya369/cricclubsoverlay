@@ -1315,6 +1315,10 @@ body.layout7-active #overSummary.os-v2 .os-situation-primary{font-size:12px!impo
 body.layout7-active #overSummary.os-v2 .os-situation-meta{font-size:10px!important;margin-top:4px!important;color:#fff!important}
 body.layout7-active #overSummary.os-v2 .os-foot{position:absolute;bottom:3px;right:12px;font-size:8px!important;margin:0!important;padding:0!important;color:#f9b7b7!important}
 @media(max-height:440px){body.layout7-active #overSummary.os-v2{padding:15px 9px 6px!important}body.layout7-active #overSummary.os-v2 .os-situation{padding:3px!important}body.layout7-active #overSummary.os-v2 .os-deliveries{margin-bottom:3px!important}}
+/* Layout 7: keep target inside the chase panel, aligned with the chase metrics. */
+body.layout7-active #overSummary.os-v2 .os-situation-meta{display:flex!important;align-items:center!important;justify-content:space-around!important;gap:8px!important;flex-wrap:wrap!important}
+body.layout7-active #overSummary.os-v2 .os-target-inline{color:#ffdb83!important;font-weight:900!important;white-space:nowrap!important}
+body.layout7-active #overSummary.os-v2 .os-foot{display:none!important}
 </style>
 <style id="match-result-legibility-fix">
 /* Match result: balanced two-team rows, with overs alongside scores. */
@@ -3787,8 +3791,12 @@ function showSecondary(message) {
   if (overlayLayout === "7") {
     const l7Result = document.getElementById("ccL7_chase");
     if (l7Result) {
+      // Do not overwrite the live chase with the legacy bottom-message string.
+      // Only match-complete result messages belong in this field.
       const text = String(message ?? "");
-      l7Result.textContent = text.replace(/\s*[·•|]\s*POM\s*:\s*.*$/i, "").trim();
+      if (/\b(won by|match (?:complete|abandoned|tied)|no result)\b/i.test(text)) {
+        l7Result.textContent = text.replace(/\s*[·•|]\s*POM\s*:\s*.*$/i, "").trim();
+      }
     }
   }
   $("bottomText").textContent=message;
@@ -3973,22 +3981,30 @@ function renderBothTeamsSummary(card,first,second,overNo,balls,liveData){
   const need=firstRuns!==null&&secondRuns!==null?Math.max(0,firstRuns+1-secondRuns):null;
   const remaining=bowled!==null?Math.max(0,120-bowled):null;
   const rrr=need!==null&&remaining!==null&&remaining>0?(need*6/remaining).toFixed(2):'—';
-  $('osSituation').innerHTML=`<div class="os-situation-primary">${need===null?'CHASE DETAILS UNAVAILABLE':`NEED ${need} RUN${need===1?'':'S'} TO WIN IN ${remaining??'—'} BALLS`}</div><div class="os-situation-meta"><span>${osPartnershipMarkup(liveData||latestLayout7Data,second,true)}</span><span>RR ${escapeScore(second.rr??'—')}</span><span>RRR ${rrr}</span></div>`;
-  $('osFooter').textContent=firstRuns!==null?`TARGET ${firstRuns+1}`:'';
+  $('osSituation').innerHTML=`<div class="os-situation-primary">${need===null?'CHASE DETAILS UNAVAILABLE':`NEED ${need} RUN${need===1?'':'S'} TO WIN IN ${remaining??'—'} BALLS`}</div><div class="os-situation-meta"><span>${osPartnershipMarkup(liveData||latestLayout7Data,second,true)}</span><span>RR ${escapeScore(second.rr??'—')}</span><span>RRR ${rrr}</span>${firstRuns!==null?`<span class="os-target-inline">TARGET ${firstRuns+1}</span>`:''}</div>`;
+  $('osFooter').textContent='';
 }
 function observeCompletedOver(data,v,t1,t2,second,onBreak){
   if(!overSummaryEnabled)return;
   const t=second?t2:t1;
+  const oversText=String(t.overs??'').trim();
+  const overMatch=oversText.match(/^(\d+)(?:\.(\d+))?$/);
+  if(!overMatch)return;
+  // The integer component is the number of completed overs. The fractional
+  // component is NOT safe to treat as a monotonic ball count: a source can
+  // expose 14.7 (seven deliveries including extras) before reporting 15.0.
+  const completedCount=Number(overMatch[1]);
   const n=overBalls(t.overs);
-  if(n===null)return;
   const prev=previousOverState;
-  previousOverState={second,n};
-  if(awaitingNextBall && (awaitingNextBall.second!==second || n>awaitingNextBall.n))dismissOverSummary();
+  previousOverState={second,n,completedCount};
+  if(awaitingNextBall && (awaitingNextBall.second!==second || completedCount>awaitingNextBall.completedCount ||
+      (completedCount===awaitingNextBall.completedCount && Number(overMatch[2]||0)>0)))dismissOverSummary();
   // Trigger when polling crosses a completed-over boundary, even if the API
   // skips the exact 15.0 state and first reports 15.1. The over being summarized
   // is the last *completed* over, not the current over.
-  if(prev===null || prev.second!==second || prev.n===null || n<=prev.n || onBreak || completed(data,v))return;
-  const completedBefore=Math.floor(prev.n/6),completedNow=Math.floor(n/6);
+  if(prev===null || prev.second!==second || onBreak || completed(data,v))return;
+  const completedBefore=prev.completedCount;
+  const completedNow=completedCount;
   if(completedNow<=completedBefore || completedNow<1)return;
   const key=(second?'2':'1')+':'+completedNow;
   if(lastShownOverKey===key)return;
@@ -3998,7 +4014,7 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
   document.body.classList.add('show-over-summary');
   if(overSummaryTimer)clearTimeout(overSummaryTimer);
   overSummaryTimer=null;
-  if(summaryUntilNextBall)awaitingNextBall={second,n:completedNow*6};
+  if(summaryUntilNextBall)awaitingNextBall={second,completedCount:completedNow};
   else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
   if(scorecardUrl){fetchFullScorecard(true).then(()=>{
     if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key){
@@ -4651,7 +4667,7 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
 
 <style id="cc-l7-glossy-delivery-v1">
 /* Layout 7 only: batsmen panel moved left, with the existing 27% width. */
-#ccL7 .board>.batters{left:32.5%!important;width:27%!important}
+#ccL7 .board>.batters{left:32.5%!important;width:29.5%!important}
 /* Force circular delivery chips regardless of inherited styling. */
 #ccL7 .balls .ball{box-sizing:border-box!important;aspect-ratio:1 / 1!important;border-radius:50%!important;min-width:0!important;min-height:0!important;padding:0!important;flex-shrink:0!important}
 /* Layout 7 only: glossy, dimensional delivery chips. No additional animation workload. */
@@ -4706,7 +4722,7 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
   pointer-events:none!important;
 }
 </style>
-<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 of 30 balls</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">(0 runs)</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><style id="layout7-chase-fit-v1">
+<div id="ccL7"><div class="stage"><div class="message" id="ccL7_message"></div><div aria-label="CricClubs live cricket score" class="board"><div class="team"><div class="logo" id="ccL7_logoBat"></div><div class="abbr" id="ccL7_teamBat">IS</div></div><div class="scorebox"><div class="score" id="ccL7_score">92/3</div><div class="meta"><div class="overs" id="ccL7_overs">Overs 10.0</div><div class="chase" id="ccL7_chase">Need 64 of 30. RRR 12.80</div></div></div><div class="batters"><div class="batter striker"><span class="name" id="ccL7_batter1">ROY</span><span class="stats" id="ccL7_batter1Stats">36 (28)</span></div><div class="batter"><span class="name" id="ccL7_batter2">ANWAR</span><span class="stats" id="ccL7_batter2Stats">18 (12)</span></div></div><div class="bowling"><div class="bowlerline"><span class="bowlername" id="ccL7_bowler">MANESH</span><span class="bowlerstats" id="ccL7_bowlerStats">1/16 (2.0)</span></div><div class="over-ribbon"><div class="over-caption"><span>THIS OVER</span><span class="over-runs" id="ccL7_overRuns">(0 runs)</span></div><div class="balls" id="ccL7_balls"><span class="ball">0</span><span class="ball">1</span><span class="ball four">4</span><span class="ball">•</span><span class="ball">2</span><span class="ball">2</span></div></div></div><div class="brand">Powered by CricClubs</div><div class="team"><div class="logo" id="ccL7_logoBowl"></div><div class="abbr" id="ccL7_teamBowl">MH</div></div></div></div></div><style id="layout7-chase-fit-v1">
 /* Layout 7 only: keep full chase and RRR text within existing score capsule. */
 #ccL7 .board>.scorebox>.meta>.chase{max-width:100%!important;min-width:0!important;font-size:11px;letter-spacing:-.2px;white-space:nowrap!important;text-overflow:clip!important;overflow:visible!important;}
 #ccL7 .board>.scorebox>.meta{overflow:hidden!important;}
