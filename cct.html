@@ -2529,8 +2529,8 @@ html body.layout7-active .overlay,html body.layout7-active.show-final-result .ov
 <style id="cc-l7-delivery-zoom-isolated">
 /* Same zoom keyframes as Layout 4; transforms never affect flex geometry. */
 #ccL7 .balls > .ball {position:relative!important;transform-origin:center center!important;flex-shrink:0!important}
-#ccL7 .balls > .ball.delivery-zoom-in {animation:ccDeliveryZoomV64 1000ms ease-in-out 1!important;z-index:8!important}
-@media(prefers-reduced-motion:reduce){#ccL7 .balls > .ball.delivery-zoom-in{animation:none!important}}
+html body #ccL7 .bowling .balls > .ball.delivery-zoom-in {animation:ccDeliveryZoomV64 1000ms ease-in-out 1!important;z-index:8!important;will-change:transform}
+@media(prefers-reduced-motion:reduce){html body #ccL7 .bowling .balls > .ball.delivery-zoom-in{animation:none!important}}
 </style>
 </head>
 <body>
@@ -4629,15 +4629,22 @@ function setBalls(arr,overs){
   $('overRuns').textContent='('+(total==null?0:total)+' runs)';
   const signature=JSON.stringify(recent);
   if(signature===lastBallSignature)return;
-  // Animate only an appended delivery, never the initial render, corrections,
-  // over resets, or unchanged 5-second API refreshes.
+  // Detect a newly appended ball even when the API exposes a rolling window.
+  // Do not animate initial load, corrections, unchanged polls or over resets.
   let animateIndex=-1;
   if(lastBallSignature){
     try{
       const previous=JSON.parse(lastBallSignature);
-      if(Array.isArray(previous) && recent.length===previous.length+1 &&
-         previous.every((ball,i)=>JSON.stringify(ball)===JSON.stringify(recent[i])))
-        animateIndex=recent.length-1;
+      const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+      if(Array.isArray(previous) && previous.length && recent.length){
+        // Normal append, including multiple appended balls between polls.
+        const prefix=recent.length>previous.length &&
+          previous.every((ball,i)=>same(ball,recent[i]));
+        // Sliding window: old first delivery dropped and new one appended.
+        const slide=recent.length===previous.length && recent.length>1 &&
+          previous.slice(1).every((ball,i)=>same(ball,recent[i]));
+        if(prefix || slide)animateIndex=recent.length-1;
+      }
     }catch(e){}
   }
   lastBallSignature=signature;
