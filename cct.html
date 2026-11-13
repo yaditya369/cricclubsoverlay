@@ -3856,7 +3856,7 @@ function summaryDeliveries(balls){return Array.isArray(balls)?balls.slice(-overS
 function summaryBallClass(x){const s=String(x).toUpperCase();return /W/.test(s)&&!/^WD/.test(s)?'wicket':/6/.test(s)?'six':/4/.test(s)?'four':/^(WD|N|NB|B|LB)/.test(s)?'extra':'normal';}
 function summaryOverRuns(balls){if(!Array.isArray(balls)||!balls.length)return null;let runs=0;for(const x of balls){const v=String(x).toUpperCase().trim();if(/^(W|•|\.|0)$/.test(v))continue;const parts=v.match(/\d+/g);if(parts)runs+=parts.reduce((a,b)=>a+Number(b),0);else if(/^(WD|NB|N|WIDE|NO BALL)$/.test(v))runs+=1;else return null;}return runs;}
 function renderOverMetrics(balls){const list=summaryDeliveries(balls);const fours=list.filter(x=>/4/.test(x)).length,sixes=list.filter(x=>/6/.test(x)).length,wickets=list.filter(x=>summaryBallClass(x)==='wicket').length;const runs=summaryOverRuns(list);$('osDeliveries').innerHTML=list.map(x=>`<span class="os-ball os-${summaryBallClass(x)}">${escapeScore(x==='0'?'•':x)}</span>`).join('')||'<span class="os-unavailable">Delivery details unavailable</span>';$('osMetrics').innerHTML=[['RUNS',runs??'—'],['WICKETS',list.length?wickets:'—'],['EXTRAS','—'],['4s',list.length?fours:'—'],['6s',list.length?sixes:'—']].map(([k,v])=>`<div class="os-metric"><small>${k}</small><strong>${v}</strong></div>`).join('');}
-function renderCompactSummary(card,t,second,overNo,breakMode,balls){
+function renderCompactSummary(card,t,second,overNo,breakMode,balls,liveData){
   const d=card||{};const list=summaryDeliveries(balls);
   $('osTitle').textContent=breakMode?'INNINGS SUMMARY':'END OF OVER SUMMARY';$('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo}`;
   $('osTeam').textContent=t.name;$('osScore').textContent=`${t.total}/${t.wickets}`;$('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;$('osSecondRow').hidden=true;
@@ -3864,12 +3864,21 @@ function renderCompactSummary(card,t,second,overNo,breakMode,balls){
   const bat=Array.isArray(d.batting)?d.batting.filter(x=>x.r!==null&&x.r!==undefined).slice(-overSummaryConfig.maxBatters):[];
   const bowl=Array.isArray(d.bowling)?d.bowling.slice(-overSummaryConfig.maxBowlers):[];
   $('osBatters').innerHTML=bat.length?bat.map(p=>{const no=p.notOut===true||/^(not out|retired hurt)$/i.test(String(p.howOut||'').trim());return `<div class="os-row"><span>${escapeScore(p.name)}${no?'*':''}</span><span>${numberOrDash(p.r)} (${numberOrDash(p.b)}) <small>match</small></span></div>`;}).join(''):'<div class="os-unavailable">Batter contributions unavailable</div>';
-  $('osBowlers').innerHTML=bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${numberOrDash(p.wickets)}/${numberOrDash(p.runs)} (${numberOrDash(p.overs)}) <small>match</small></span></div>`).join(''):'<div class="os-unavailable">Bowler figures unavailable</div>';
+  const live=liveData||latestLayout7Data||{};
+  const lv=live.values||live;
+  const bowlerName=lv.bowlerName;
+  const bowlerAvailable=bowlerName && String(bowlerName).trim() && String(bowlerName)!=='—';
+  // The footer and summary MUST use identical CricClubs live fields.
+  $('osBowlers').innerHTML=bowlerAvailable
+    ? `<div class="os-row"><span>${escapeScore(bowlerName)}</span><span>${escapeScore(lv.bowlerWickets??'0')}/${escapeScore(lv.bowlerRuns??'0')} (${escapeScore(lv.bowlerOvers??'0.0')}) <small>match</small></span></div>`
+    : bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${numberOrDash(p.wickets)}/${numberOrDash(p.runs)} (${numberOrDash(p.overs)}) <small>match</small></span></div>`).join(''):'<div class="os-unavailable">Bowler figures unavailable</div>';
+  const liveBatters=[1,2].map(i=>({name:lv['batsman'+i+'Name'],runs:lv['batsman'+i+'Runs'],balls:lv['batsman'+i+'Balls']})).filter(p=>p.name&&String(p.name).trim()&&String(p.name)!=='—');
+  if(liveBatters.length) $('osBatters').innerHTML=liveBatters.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${escapeScore(p.runs??'0')} (${escapeScore(p.balls??'0')}) <small>match</small></span></div>`).join('');
   $('osSituation').innerHTML=`<div class="os-situation-primary">${breakMode?'INNINGS COMPLETE':'PROJECTED SCORE '+(summaryNumber(t.rr)!==null&&summaryNumber(t.overs)!==null?Math.round(Number(t.rr)*20):'—')}</div><div class="os-situation-meta"><span>PARTNERSHIP —</span><span>RR ${escapeScore(t.rr??'—')}</span></div>`;
   $('osExtras').textContent='';$('osFooter').textContent='';
 }
-function renderBothTeamsSummary(card,first,second,overNo,balls){
-  renderCompactSummary(card,second,true,overNo,false,balls);
+function renderBothTeamsSummary(card,first,second,overNo,balls,liveData){
+  renderCompactSummary(card,second,true,overNo,false,balls,liveData);
   $('osTeam').textContent=second.name;$('osScore').textContent=`${second.total}/${second.wickets}`;$('osRR').textContent=`${second.overs} OV · RR ${second.rr}`;
   const firstRuns=summaryNumber(first.total),secondRuns=summaryNumber(second.total),bowled=overBalls(second.overs);
   const need=firstRuns!==null&&secondRuns!==null?Math.max(0,firstRuns+1-secondRuns):null;
@@ -3895,8 +3904,8 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
   const key=(second?'2':'1')+':'+completedNow;
   if(lastShownOverKey===key)return;
   lastShownOverKey=key;
-  if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls);
-  else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls);
+  if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls,data);
+  else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls,data);
   document.body.classList.add('show-over-summary');
   if(overSummaryTimer)clearTimeout(overSummaryTimer);
   overSummaryTimer=null;
@@ -3904,8 +3913,8 @@ function observeCompletedOver(data,v,t1,t2,second,onBreak){
   else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
   if(scorecardUrl){fetchFullScorecard(true).then(()=>{
     if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key){
-      if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls);
-      else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls);
+      if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls,data);
+      else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls,data);
     }
   }).catch(err=>console.warn('End-of-over scorecard refresh failed',err));}
 }
@@ -4237,10 +4246,10 @@ function render(data){
   if(onBreak && !inningsBreakSummaryEnabled) document.body.classList.remove('show-over-summary');
   if(onBreak && inningsBreakSummaryEnabled){
     document.body.classList.remove('show-full-break');
-    renderCompactSummary(showDemoFull?demoFullCard:loadedFullCard,t1,false,0,true,data.balls);
+    renderCompactSummary(showDemoFull?demoFullCard:loadedFullCard,t1,false,0,true,data.balls,data);
     document.body.classList.add('show-over-summary');
     if(scorecardUrl)fetchFullScorecard(true).then(()=>{
-      if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls);
+      if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls,data);
     });
   } else if(!(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
   const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
@@ -4613,6 +4622,19 @@ if (urlParam("demo") === "toss" && overlayLayout === "7") {
 #ccL7 .board>.scorebox>.meta>.chase{max-width:100%!important;min-width:0!important;font-size:11px;letter-spacing:-.2px;white-space:nowrap!important;text-overflow:clip!important;overflow:visible!important;}
 #ccL7 .board>.scorebox>.meta{overflow:hidden!important;}
 </style>
+<style id="cc-l7-zoom-unclipped-v3">
+/* The animated copy lives under BODY, outside the clipped score ribbon. */
+html body #ccL7 .bowling .balls > .ball.delivery-zoom-in {animation:none!important;transform:none!important;}
+.cc-l7-zoom-float {clip-path:circle(50% at 50%)!important;contain:paint!important;position:fixed!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;border-radius:50%!important;overflow:hidden!important;aspect-ratio:1 / 1!important;white-space:nowrap!important;line-height:1!important;pointer-events:none!important;z-index:2147483640!important;transform-origin:center center!important;animation:ccL7FloatCircleZoom 1000ms ease-in-out both!important;isolation:isolate;}
+@keyframes ccL7FloatCircleZoom {
+  0%{transform:scale(1);filter:brightness(1)}
+  30%{transform:scale(1.5);filter:brightness(1.17)}
+  65%{transform:scale(.88);filter:brightness(1)}
+  82%{transform:scale(1.45);filter:brightness(1.12)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+@media(prefers-reduced-motion:reduce){.cc-l7-zoom-float{animation:none!important}}
+</style>
 <script id="layout7-direct-runtime-v2">(function(){
 function fitL7Chase(){
   const el=document.getElementById('ccL7_chase');if(!el)return;
@@ -4659,6 +4681,37 @@ function formatL7Delivery(raw){
   // Unknown tokens remain visible rather than being silently mis-scored.
   return {text:value||'•',kind:'run'};
 }
+/* Animate a body-level circular copy: the ribbon can remain clipped for layout
+   while the growing ball is never cropped into a rectangle. */
+function animateL7UnclippedBall(chip){
+  if(!chip || !document.body.classList.contains('layout7-active'))return;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const rect=chip.getBoundingClientRect();
+  if(!rect.width || !rect.height)return;
+  document.querySelectorAll('.cc-l7-zoom-float').forEach(el=>el.remove());
+  // Fresh element rather than a clone: avoids inheriting ribbon pseudo-elements,
+  // width rules and clipping/rectangular styles from the scoreboard.
+  const copy=document.createElement('span');
+  copy.className='cc-l7-zoom-float';
+  copy.textContent=chip.textContent;
+  const side=Math.min(rect.width,rect.height);
+  const computed=getComputedStyle(chip);
+  Object.assign(copy.style,{
+    left:(rect.left+(rect.width-side)/2)+'px',
+    top:(rect.top+(rect.height-side)/2)+'px',
+    width:side+'px',height:side+'px',
+    minWidth:side+'px',maxWidth:side+'px',minHeight:side+'px',maxHeight:side+'px',
+    padding:'0',margin:'0',flex:'none',
+    borderRadius:'50%',clipPath:'circle(50% at 50% 50%)',
+    background:computed.background,backgroundColor:computed.backgroundColor,
+    color:computed.color,fontFamily:computed.fontFamily,fontSize:computed.fontSize,
+    fontWeight:computed.fontWeight,border:computed.border,
+    boxShadow:computed.boxShadow,opacity:'1'
+  });
+  document.body.appendChild(copy);
+  copy.addEventListener('animationend',()=>copy.remove(),{once:true});
+  setTimeout(()=>copy.remove(),1250);
+}
 function setBalls(arr,overs){
   if(!Array.isArray(arr))return;
   const root=$('balls');
@@ -4697,6 +4750,7 @@ function setBalls(arr,overs){
     fragment.appendChild(chip);
   });
   root.replaceChildren(fragment);
+  if(animateIndex>=0) requestAnimationFrame(()=>animateL7UnclippedBall(root.children[animateIndex]));
 }
 
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
