@@ -4989,5 +4989,61 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
 #ccL7 .board>.batters .batter.striker .name:after{font-size:14px!important;margin-left:3px!important}
 #ccL7 .chase{letter-spacing:-.25px!important}
 </style>
+
+<!-- CricBay v82-inspired summary/footer choreography; scoped to end-of-over only. -->
+<style id="cc-cricbay-over-motion">
+/* Match CricBay's 300ms cubic-bezier(.2,.7,.2,1) footer slide. */
+body:not(.show-full-break):not(.show-final-result) .overlay {
+  transition:transform 300ms cubic-bezier(.2,.7,.2,1),opacity 300ms ease;
+}
+body.show-over-summary:not(.show-full-break):not(.show-final-result) .overlay {
+  display:block!important;visibility:visible!important;
+  transform:translateY(calc(100% + 12px))!important;
+  opacity:0!important;pointer-events:none!important;
+}
+/* Keep the summary mounted during its 300ms exit, rather than abruptly hiding. */
+body.show-over-summary #overSummary,
+body.cc-over-summary-exiting #overSummary {display:block!important;}
+body.show-over-summary #overSummary {
+  animation:cc-over-summary-enter 300ms cubic-bezier(.2,.7,.2,1) 300ms both!important;
+}
+body.cc-over-summary-exiting:not(.show-over-summary) #overSummary {
+  animation:cc-over-summary-exit 300ms cubic-bezier(.2,.7,.2,1) both!important;
+  pointer-events:none!important;
+}
+@keyframes cc-over-summary-enter {
+  from {opacity:0;translate:0 32px;}
+  to {opacity:1;translate:0 0;}
+}
+@keyframes cc-over-summary-exit {
+  from {opacity:1;translate:0 0;}
+  to {opacity:0;translate:0 32px;}
+}
+@media(prefers-reduced-motion:reduce){
+ body.show-over-summary #overSummary,body.cc-over-summary-exiting #overSummary{animation:none!important;}
+ body .overlay{transition:none!important;}
+}
+</style>
+<script id="cc-cricbay-over-motion-controller">
+(function(){
+  const body=document.body;
+  let exitTimer=null;
+  let wasShowing=body.classList.contains('show-over-summary');
+  function sync(){
+    const showing=body.classList.contains('show-over-summary');
+    if(showing){
+      if(exitTimer!==null){clearTimeout(exitTimer);exitTimer=null;}
+      body.classList.remove('cc-over-summary-exiting');
+    }else if(wasShowing){
+      body.classList.add('cc-over-summary-exiting');
+      if(exitTimer!==null)clearTimeout(exitTimer);
+      exitTimer=setTimeout(()=>{body.classList.remove('cc-over-summary-exiting');exitTimer=null;},300);
+    }
+    wasShowing=showing;
+  }
+  new MutationObserver(sync).observe(body,{attributes:true,attributeFilter:['class']});
+  sync();
+})();
+</script>
 </body>
 </html>
