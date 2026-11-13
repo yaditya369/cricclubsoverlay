@@ -3926,11 +3926,14 @@ function osPartnership(data,t,second){
     }
     if(runs!==null&&balls!==null)break;
   }
+  if(runs===0&&balls===0&&total>0&&delivered>0){runs=null;balls=null;}
   const state=osPartnershipState;
   const reset=state.inning!==innings||(wickets!==null&&state.wickets!==null&&wickets!==state.wickets);
-  if(reset){state.anchorRuns=total;state.anchorBalls=delivered;state.lastRuns=null;state.lastBalls=null;}
+  if(reset){state.anchorRuns=null;state.anchorBalls=null;state.lastRuns=null;state.lastBalls=null;}
+  // Anchor only at a witnessed wicket, not on page load mid-partnership.
+  if(state.inning===innings&&state.wickets!==null&&wickets!==null&&wickets>state.wickets){state.anchorRuns=total;state.anchorBalls=delivered;}
   // At a fresh innings start, zero is a reliable anchor.
-  if(state.inning===null&&total===0){state.anchorRuns=0;state.anchorBalls=0;}
+  if(state.inning===null&&total===0&&wickets===0){state.anchorRuns=0;state.anchorBalls=0;}
   state.inning=innings;state.wickets=wickets;
   if(runs===null&&state.anchorRuns!==null&&total!==null)runs=Math.max(0,total-state.anchorRuns);
   if(balls===null&&state.anchorBalls!==null&&delivered!==null)balls=Math.max(0,delivered-state.anchorBalls);
@@ -4477,10 +4480,10 @@ function render(data){
       if(needed<=0){
         message="Target achieved";
       }else{
-        message=`Need ${needed} runs`;
+        message=`Need ${needed}`;
         if(Number.isFinite(limit)&&limit>0&&ballsBowled!==null){
           const left=Math.max(0,limit*6-ballsBowled);
-          if(left>0) message+=overlayLayout==="7"?` of ${left} balls. RRR ${(needed*6/left).toFixed(2)}`:` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
+          if(left>0) message+=overlayLayout==="7"?` of ${left}. RRR ${(needed*6/left).toFixed(2)}`:` · ${left} balls left · Required RR ${(needed*6/left).toFixed(2)}`;
         }
       }
     }else{
@@ -4842,7 +4845,7 @@ function setBalls(arr,overs){
 function render(data){const v=data?.values||data||{};const second=String(data?.isSecondInningsStarted??v.isSecondInningsStarted??'').toLowerCase()==='true'||v.isSecondInningsStarted===1;const bat=second?'t2':'t1',bowl=second?'t1':'t2';const batting=get(v,bat+'Name','BATTING'),bowling=get(v,bowl+'Name','BOWLING');
 // Prefer the exact team shortcode supplied by CricClubs; derive initials only as fallback.
 const teamCode=(side,name)=>{const keys=[side+'Code',side+'code',side+'CODE',side+'shortcode',side+'ShortCode',side+'Shortcode',side+'shortCode',side+'ShortName',side+'shortName',side+'Abbreviation',side+'Abbr'];for(const obj of [v,data]){if(!obj||typeof obj!=='object')continue;for(const key of keys){const value=obj[key];if(value!=null&&String(value).trim())return String(value).trim();}}return abbr(name)};
-$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} balls`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} balls`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=completedMatch?'':info;fitL7Chase();$('batter1').textContent=limitL7Name(get(v,'batsman1Name','—'),16);$('batter2').textContent=limitL7Name(get(v,'batsman2Name','—'),16);$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+$('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining}. RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining}. RRR ${rrr}`:`RR ${currentRR}`}}const completedMatch=/complete|finished|result|ended/i.test(get(v,'matchStatus',get(data,'status',''))) || Boolean(get(v,'matchResult',get(data,'result','')));if(completedMatch)info='MATCH COMPLETE';$('chase').textContent=completedMatch?'':info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);message('')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
@@ -4906,5 +4909,13 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
   catch(e){match.textContent='Unable to load match';title.textContent='Live API unavailable';subtitle.textContent='Use team1, team2, winner, decision query parameters for an offline test';console.warn('Toss preview fetch failed',e);}
 })();
 </script>
+
+<style id="layout7-name-chase-regression-fix">
+#ccL7 .board>.batters .batter{min-width:0;gap:3px!important;padding-right:5px!important}
+#ccL7 .board>.batters .batter .name{flex:1 1 auto!important;width:auto!important;min-width:0!important;max-width:none!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;display:block!important}
+#ccL7 .board>.batters .batter .stats{flex:0 0 auto!important;margin-left:2px!important}
+#ccL7 .board>.batters .batter.striker .name:after{font-size:14px!important;margin-left:3px!important}
+#ccL7 .chase{letter-spacing:-.25px!important}
+</style>
 </body>
 </html>
