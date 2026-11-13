@@ -1273,6 +1273,48 @@ body.show-final-result .overlay.layout2 .top { display:grid!important; }
 #overSummary.os-v2 .os-situation{background:linear-gradient(100deg,#4e0c1b,#7b172a);border-radius:10px;text-align:center;padding:10px;margin-top:9px}#overSummary.os-v2 .os-situation-primary{font-size:clamp(14px,1.8vw,21px);font-weight:900;letter-spacing:.25px}#overSummary.os-v2 .os-situation-meta{display:flex;justify-content:space-evenly;gap:8px;margin-top:7px;font-size:11px;color:#f3d4da}
 #overSummary.os-v2 .os-foot{background:transparent!important;padding:3px 4px 0;margin-top:3px;color:#cdb9bd;font-size:10px}
 @media(max-height:500px){#overSummary.os-v2{padding:7px!important;top:calc((100dvh - 70px)/2)!important}#overSummary.os-v2 .os-head{padding:5px 10px}#overSummary.os-v2 .os-score{padding:4px}#overSummary.os-v2 .os-deliveries{margin:0 0 5px;min-height:29px}#overSummary.os-v2 .os-ball{width:27px;height:27px;flex-basis:27px;font-size:12px}#overSummary.os-v2 .os-metric{padding:4px 2px}#overSummary.os-v2 .os-metric strong{font-size:16px}#overSummary.os-v2 .os-metrics{margin-bottom:5px}#overSummary.os-v2 .os-panel{padding:6px}#overSummary.os-v2 .os-panel h3{margin-bottom:3px}#overSummary.os-v2 .os-situation{padding:6px;margin-top:5px}#overSummary.os-v2 .os-foot{display:none}}
+
+/* L7 approved broadcast reference: isolated visual skin, tune these variables only. */
+body.layout7-active #overSummary.os-v2{
+ --os-width:610px;--os-accent:#ed2338;--os-line:#ff394b;--os-text:#fff;
+ width:min(var(--os-width),92vw)!important;top:calc((100dvh - 78px)/2)!important;
+ padding:18px 12px 10px!important;border:2px solid #e52a38!important;border-radius:16px!important;
+ background:linear-gradient(122deg,rgba(24,4,9,.98) 0%,rgba(62,5,13,.97) 52%,rgba(11,5,9,.98) 100%)!important;
+ box-shadow:0 0 0 2px #180407,0 0 18px #df102855,0 12px 25px #000b!important;
+ overflow:visible!important;font:700 12px/1.1 Arial,sans-serif!important;
+}
+body.layout7-active #overSummary.os-v2:before{content:'';position:absolute;inset:6px;border:1px solid #8d1424;border-radius:10px;pointer-events:none}
+body.layout7-active #overSummary.os-v2 .os-head{
+ position:absolute;top:-15px;left:50%;transform:translateX(-50%);height:25px;min-width:200px;
+ display:flex;align-items:center;justify-content:center;white-space:nowrap;
+ padding:0 24px!important;border:1px solid #ff4c5b;border-radius:6px 6px 12px 12px!important;
+ background:linear-gradient(#f32739,#850817 75%,#3a040a)!important;box-shadow:0 2px 8px #000a,0 0 9px #fa283a80;
+ font-size:13px!important;font-weight:900;letter-spacing:.6px!important;z-index:1;
+}
+body.layout7-active #overSummary.os-v2 #osOvers{display:none}
+body.layout7-active #overSummary.os-v2 .os-score{display:flex;justify-content:center;gap:6px;align-items:baseline;min-height:0!important;padding:1px 0 4px!important;text-align:center}
+body.layout7-active #overSummary.os-v2 .os-score>span:first-child{font-size:16px!important;font-weight:900!important;max-width:65%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.layout7-active #overSummary.os-v2 .os-score>strong{font-size:15px!important;color:#fff!important}
+body.layout7-active #overSummary.os-v2 .os-score>span:last-child{display:none}
+body.layout7-active #overSummary.os-v2 .os-deliveries{min-height:30px!important;gap:8px!important;margin:0 0 6px!important;flex-wrap:nowrap}
+body.layout7-active #overSummary.os-v2 .os-ball{width:27px!important;height:27px!important;flex:0 0 27px!important;font-size:12px!important;border:1px solid #f6f2e7aa!important;box-shadow:inset 0 2px 3px #fff8,0 2px 4px #000b!important}
+body.layout7-active #overSummary.os-v2 .os-metrics{gap:4px!important;margin:0 0 5px!important}
+body.layout7-active #overSummary.os-v2 .os-metric{border:1px solid #a9182c!important;background:linear-gradient(110deg,#9a091b,#4e0712)!important;border-radius:5px!important;padding:3px 2px!important;gap:0!important}
+body.layout7-active #overSummary.os-v2 .os-metric small{color:#fff!important;font-size:9px!important;line-height:1.1!important;font-weight:700!important}
+body.layout7-active #overSummary.os-v2 .os-metric strong{font-size:15px!important;line-height:1.1!important}
+body.layout7-active #overSummary.os-v2 .os-grid{grid-template-columns:1.15fr 1fr!important;gap:5px!important}
+body.layout7-active #overSummary.os-v2 .os-panel{background:linear-gradient(105deg,#590913,#26050b)!important;border:1px solid #a51c2a!important;border-radius:6px!important;padding:5px 7px!important;min-width:0!important}
+body.layout7-active #overSummary.os-v2 .os-panel h3{color:#fff!important;font-size:10px!important;margin:0 0 3px!important;background:#9c1224;border-radius:4px;padding:2px 5px;display:inline-block}
+body.layout7-active #overSummary.os-v2 .os-row{font-size:10px!important;padding:2px 0!important;min-width:0;display:flex;justify-content:space-between;gap:8px}
+body.layout7-active #overSummary.os-v2 .os-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.layout7-active #overSummary.os-v2 .os-row span:last-child{flex-shrink:0}
+body.layout7-active #overSummary.os-v2 .os-row small{color:#ffb6b8!important}
+body.layout7-active #overSummary.os-v2 .os-unavailable{font-size:10px!important}
+body.layout7-active #overSummary.os-v2 .os-situation{margin-top:5px!important;padding:5px 7px!important;background:linear-gradient(90deg,#590613,#250409)!important;border:1px solid #a51b2c;border-radius:6px!important}
+body.layout7-active #overSummary.os-v2 .os-situation-primary{font-size:12px!important;letter-spacing:0!important}
+body.layout7-active #overSummary.os-v2 .os-situation-meta{font-size:10px!important;margin-top:4px!important;color:#fff!important}
+body.layout7-active #overSummary.os-v2 .os-foot{position:absolute;bottom:3px;right:12px;font-size:8px!important;margin:0!important;padding:0!important;color:#f9b7b7!important}
+@media(max-height:440px){body.layout7-active #overSummary.os-v2{padding:15px 9px 6px!important}body.layout7-active #overSummary.os-v2 .os-situation{padding:3px!important}body.layout7-active #overSummary.os-v2 .os-deliveries{margin-bottom:3px!important}}
 </style>
 <style id="match-result-legibility-fix">
 /* Match result: balanced two-team rows, with overs alongside scores. */
@@ -2566,7 +2608,14 @@ html body #ccL7 .bowling .balls > .ball.delivery-zoom-in {
   html body #ccL7 .bowling .balls > .ball.delivery-zoom-in {animation:none!important;}
 }
 </style>
-</head>
+<style id="os-layout7-palette-fix">
+/* Exact Layout 7 THIS OVER palette and gloss, scoped only to summary chips. */
+body.layout7-active #overSummary.os-v2 .os-ball{box-sizing:border-box!important;border-radius:50%!important;aspect-ratio:1!important;overflow:hidden!important;color:#fff!important;background:linear-gradient(155deg,#c22b43 0%,#870918 55%,#4b0610 100%)!important;border:1px solid #ffffff65!important;box-shadow:inset 0 2px 3px #ffffff65,0 2px 4px #000b!important}
+body.layout7-active #overSummary.os-v2 .os-wicket{background:linear-gradient(155deg,#dd344c 0%,#8e091b 55%,#43000c 100%)!important}
+body.layout7-active #overSummary.os-v2 .os-four{background:linear-gradient(155deg,#f8d76b 0%,#d4a017 49%,#8c5d05 100%)!important;color:#fff!important}
+body.layout7-active #overSummary.os-v2 .os-six{background:linear-gradient(155deg,#52d991 0%,#16834a 50%,#07522c 100%)!important}
+body.layout7-active #overSummary.os-v2 .os-extra{background:linear-gradient(155deg,#5bb3f3 0%,#1769aa 50%,#073967 100%)!important}
+</style></head>
 <body>
 <div class="overlay">
 <div class="prematch-template" hidden="" id="prematchTemplate">
@@ -3853,12 +3902,49 @@ function dismissOverSummary(){
 const overSummaryConfig = Object.freeze({ maxBalls: 12, maxBatters: 2, maxBowlers: 1 });
 function summaryNumber(value){const n=Number(value);return value!==null&&value!==undefined&&value!==''&&Number.isFinite(n)?n:null;}
 function summaryDeliveries(balls){return Array.isArray(balls)?balls.slice(-overSummaryConfig.maxBalls).map(x=>String(x)):[];}
-function summaryBallClass(x){const s=String(x).toUpperCase();return /W/.test(s)&&!/^WD/.test(s)?'wicket':/6/.test(s)?'six':/4/.test(s)?'four':/^(WD|N|NB|B|LB)/.test(s)?'extra':'normal';}
+function summaryBallClass(x){const s=String(x).toUpperCase();return /^(W|W\+|\d+W)/.test(s)?'wicket':/^(WD|Y|N|NB|B|LB|L)(?:\+|\d|$)/.test(s)?'extra':/6/.test(s)?'six':/4/.test(s)?'four':'normal';}
 function summaryOverRuns(balls){if(!Array.isArray(balls)||!balls.length)return null;let runs=0;for(const x of balls){const v=String(x).toUpperCase().trim();if(/^(W|•|\.|0)$/.test(v))continue;const parts=v.match(/\d+/g);if(parts)runs+=parts.reduce((a,b)=>a+Number(b),0);else if(/^(WD|NB|N|WIDE|NO BALL)$/.test(v))runs+=1;else return null;}return runs;}
 function renderOverMetrics(balls){const list=summaryDeliveries(balls);const fours=list.filter(x=>/4/.test(x)).length,sixes=list.filter(x=>/6/.test(x)).length,wickets=list.filter(x=>summaryBallClass(x)==='wicket').length;const runs=summaryOverRuns(list);$('osDeliveries').innerHTML=list.map(x=>`<span class="os-ball os-${summaryBallClass(x)}">${escapeScore(x==='0'?'•':x)}</span>`).join('')||'<span class="os-unavailable">Delivery details unavailable</span>';$('osMetrics').innerHTML=[['RUNS',runs??'—'],['WICKETS',list.length?wickets:'—'],['EXTRAS','—'],['4s',list.length?fours:'—'],['6s',list.length?sixes:'—']].map(([k,v])=>`<div class="os-metric"><small>${k}</small><strong>${v}</strong></div>`).join('');}
+// Layout 7 partnership state: prefer explicit API totals; otherwise track from a
+// witnessed wicket/innings start. Never mislabel an innings total as a partnership.
+const osPartnershipState={inning:null,wickets:null,anchorRuns:null,anchorBalls:null,lastRuns:null,lastBalls:null};
+function osPartnership(data,t,second){
+  const v=data?.values||data||{};
+  const innings=second?2:1;
+  const total=summaryNumber(t?.total),wickets=summaryNumber(t?.wickets);
+  const delivered=overBalls(t?.overs);
+  const sources=[v?.partnership,v?.currentPartnership,data?.partnership,data?.currentPartnership,data?.current?.partnership];
+  let runs=null,balls=null;
+  for(const src of [v,data,data?.current,...sources]){
+    if(!src||typeof src!=='object')continue;
+    const nested=sources.includes(src);
+    for(const k of ['partnershipRuns','currentPartnershipRuns','partnershipScore','partnershipTotal',...(nested?['runs','totalRuns']:[])]){
+      const val=summaryNumber(src[k]);if(val!==null){runs=val;break;}
+    }
+    for(const k of ['partnershipBalls','currentPartnershipBalls','ballsFaced',...(nested?['balls','deliveries']:[])]){
+      const val=summaryNumber(src[k]);if(val!==null){balls=val;break;}
+    }
+    if(runs!==null&&balls!==null)break;
+  }
+  const state=osPartnershipState;
+  const reset=state.inning!==innings||(wickets!==null&&state.wickets!==null&&wickets!==state.wickets);
+  if(reset){state.anchorRuns=total;state.anchorBalls=delivered;state.lastRuns=null;state.lastBalls=null;}
+  // At a fresh innings start, zero is a reliable anchor.
+  if(state.inning===null&&total===0){state.anchorRuns=0;state.anchorBalls=0;}
+  state.inning=innings;state.wickets=wickets;
+  if(runs===null&&state.anchorRuns!==null&&total!==null)runs=Math.max(0,total-state.anchorRuns);
+  if(balls===null&&state.anchorBalls!==null&&delivered!==null)balls=Math.max(0,delivered-state.anchorBalls);
+  if(runs!==null)state.lastRuns=runs;
+  if(balls!==null)state.lastBalls=balls;
+  return {runs:state.lastRuns,balls:state.lastBalls};
+}
+function osPartnershipMarkup(data,t,second){
+  const p=osPartnership(data,t,second);
+  return `PARTNERSHIP ${p.runs===null?'—':escapeScore(p.runs)}${p.balls===null?'':` (${escapeScore(p.balls)})`}`;
+}
 function renderCompactSummary(card,t,second,overNo,breakMode,balls,liveData){
   const d=card||{};const list=summaryDeliveries(balls);
-  $('osTitle').textContent=breakMode?'INNINGS SUMMARY':'END OF OVER SUMMARY';$('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo}`;
+  $('osTitle').textContent=breakMode?'INNINGS SUMMARY':`END OF OVER ${overNo} SUMMARY`;$('osOvers').textContent=breakMode?'INNINGS BREAK':`OVER ${overNo}`;
   $('osTeam').textContent=t.name;$('osScore').textContent=`${t.total}/${t.wickets}`;$('osRR').textContent=`${t.overs} OV · RR ${t.rr}`;$('osSecondRow').hidden=true;
   renderOverMetrics(list);
   const bat=Array.isArray(d.batting)?d.batting.filter(x=>x.r!==null&&x.r!==undefined).slice(-overSummaryConfig.maxBatters):[];
@@ -3874,7 +3960,7 @@ function renderCompactSummary(card,t,second,overNo,breakMode,balls,liveData){
     : bowl.length?bowl.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${numberOrDash(p.wickets)}/${numberOrDash(p.runs)} (${numberOrDash(p.overs)}) <small>match</small></span></div>`).join(''):'<div class="os-unavailable">Bowler figures unavailable</div>';
   const liveBatters=[1,2].map(i=>({name:lv['batsman'+i+'Name'],runs:lv['batsman'+i+'Runs'],balls:lv['batsman'+i+'Balls']})).filter(p=>p.name&&String(p.name).trim()&&String(p.name)!=='—');
   if(liveBatters.length) $('osBatters').innerHTML=liveBatters.map(p=>`<div class="os-row"><span>${escapeScore(p.name)}</span><span>${escapeScore(p.runs??'0')} (${escapeScore(p.balls??'0')}) <small>match</small></span></div>`).join('');
-  $('osSituation').innerHTML=`<div class="os-situation-primary">${breakMode?'INNINGS COMPLETE':'PROJECTED SCORE '+(summaryNumber(t.rr)!==null&&summaryNumber(t.overs)!==null?Math.round(Number(t.rr)*20):'—')}</div><div class="os-situation-meta"><span>PARTNERSHIP —</span><span>RR ${escapeScore(t.rr??'—')}</span></div>`;
+  $('osSituation').innerHTML=`<div class="os-situation-primary">${breakMode?'INNINGS COMPLETE':'PROJECTED SCORE '+(summaryNumber(t.rr)!==null&&summaryNumber(t.overs)!==null?Math.round(Number(t.rr)*20):'—')}</div><div class="os-situation-meta"><span>${osPartnershipMarkup(liveData||latestLayout7Data,t,false)}</span><span>RR ${escapeScore(t.rr??'—')}</span></div>`;
   $('osExtras').textContent='';$('osFooter').textContent='';
 }
 function renderBothTeamsSummary(card,first,second,overNo,balls,liveData){
@@ -3884,7 +3970,7 @@ function renderBothTeamsSummary(card,first,second,overNo,balls,liveData){
   const need=firstRuns!==null&&secondRuns!==null?Math.max(0,firstRuns+1-secondRuns):null;
   const remaining=bowled!==null?Math.max(0,120-bowled):null;
   const rrr=need!==null&&remaining!==null&&remaining>0?(need*6/remaining).toFixed(2):'—';
-  $('osSituation').innerHTML=`<div class="os-situation-primary">${need===null?'CHASE DETAILS UNAVAILABLE':`NEED ${need} RUN${need===1?'':'S'} TO WIN IN ${remaining??'—'} BALLS`}</div><div class="os-situation-meta"><span>PARTNERSHIP —</span><span>RR ${escapeScore(second.rr??'—')}</span><span>RRR ${rrr}</span></div>`;
+  $('osSituation').innerHTML=`<div class="os-situation-primary">${need===null?'CHASE DETAILS UNAVAILABLE':`NEED ${need} RUN${need===1?'':'S'} TO WIN IN ${remaining??'—'} BALLS`}</div><div class="os-situation-meta"><span>${osPartnershipMarkup(liveData||latestLayout7Data,second,true)}</span><span>RR ${escapeScore(second.rr??'—')}</span><span>RRR ${rrr}</span></div>`;
   $('osFooter').textContent=firstRuns!==null?`TARGET ${firstRuns+1}`:'';
 }
 function observeCompletedOver(data,v,t1,t2,second,onBreak){
