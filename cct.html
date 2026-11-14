@@ -3269,7 +3269,6 @@ const API = `https://cricclubs.com/liveScoreOverlayData.do?clubId=${encodeURICom
 
 let stopped = false;
 let timer;
-window.ccOverlayDiagnostics={polls:0,apiSuccess:0,renderCalls:0,layout7Success:0,layout7Errors:0,lastApiAt:null,lastLayout7At:null,lastLayout7Error:null};
 
 const $ = id => document.getElementById(id);
 const get = (o,k,d="") => o?.[k] == null || o[k] === "" ? d : String(o[k]);
@@ -3912,61 +3911,10 @@ function breakMessage(t1){
   return `INNINGS BREAK${Number.isFinite(runs)?` · Target ${runs+1}`:""}`;
 }
 
-// Full scorecard data contract: { batting:[{name,howOut,r,b,fours,sixes,sr}],
-// bowling:[{name,overs,maidens,runs,wickets,econ}], extras:{byes,legByes,wides,noBalls,penalty}, fallOfWickets:[...], battingTeam,bowlingTeam,total,wickets,overs }.
-// Provide via ?scorecardUrl=https://your-cors-enabled-service/... (same-origin or CORS required).
-const demoFullCard = {
- battingTeam:'RAGING BULLS',bowlingTeam:'CSK YORKERS',total:156,wickets:8,overs:'20.0',
- batting:[
-  {name:'Rahul Sharma',howOut:'c Patel b Kumar',r:36,b:36,fours:6,sixes:1},
-  {name:'Aditya Reddy',howOut:'b Singh',r:27,b:21,fours:3,sixes:1},
-  {name:'Vikram Rao',howOut:'lbw b Kumar',r:18,b:16,fours:2,sixes:0},
-  {name:'Sandeep Patel',howOut:'c Shah b Reddy',r:32,b:24,fours:4,sixes:2},
-  {name:'Kiran R',howOut:'run out (Singh)',r:12,b:10,fours:1,sixes:0},
-  {name:'Naresh Regunta',howOut:'c & b Patel',r:8,b:9,fours:1,sixes:0},
-  {name:'Vamsi K',howOut:'st Shah b Patel',r:6,b:7,fours:0,sixes:0},
-  {name:'Rohit Verma',howOut:'not out',r:4,b:3,fours:0,sixes:0},
-  {name:'Deepak M',howOut:'c Shah b Kumar',r:1,b:2,fours:0,sixes:0},
-  {name:'Karthik S',howOut:'did not bat',r:null,b:null},
-  {name:'Manoj T',howOut:'did not bat',r:null,b:null}
- ],
- bowling:[{name:'Kumar',overs:'4.0',maidens:0,runs:28,wickets:2},{name:'Singh',overs:'4.0',maidens:0,runs:26,wickets:1},{name:'Patel',overs:'4.0',maidens:0,runs:32,wickets:2},{name:'Reddy',overs:'4.0',maidens:0,runs:30,wickets:1},{name:'Shah',overs:'4.0',maidens:0,runs:35,wickets:1}],
- extras:{byes:2,legByes:3,wides:6,noBalls:1,penalty:0},
- fallOfWickets:[]
-};
-// Demo is intentionally a UI illustration, not a validated CricClubs match scorecard.
-let loadedFullCard=null;
-let fullCardLoading=false;
-let lastFullCardAttempt=0;
-const scorecardUrl=params.get('scorecardUrl');
+// Scoreboard and summaries use only the CricClubs live response.
 function escapeScore(s){return String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function numberOrDash(n){return n===null||n===undefined?'—':escapeScore(n);}
-function showFullScorecard(card,live){
- document.body.classList.add('show-full-break');
- const d=card||{};const a=Array.isArray(d.batting)?d.batting:[];const b=Array.isArray(d.bowling)?d.bowling:[];
- const battingTeam=d.battingTeam||live?.t1?.name||'';const bowlingTeam=d.bowlingTeam||live?.t2?.name||'';
- const total=d.total??live?.t1?.total??'—';const wickets=d.wickets??live?.t1?.wickets??'—';const overs=d.overs??live?.t1?.overs??'—';
- $('ibBatTeam').textContent=battingTeam;$('ibBowlTeam').textContent=bowlingTeam;
- $('ibScore').textContent=total+'/'+wickets;$('ibOvers').textContent=overs+' overs';
- $('ibTarget').textContent=Number.isFinite(Number(total))?'Target: '+(Number(total)+1):'';
- $('ibBatTitle').textContent=battingTeam+' BATTING';$('ibBowlTitle').textContent=bowlingTeam+' BOWLING';
- $('ibBatRows').innerHTML=a.length?a.map(p=>{const sr=p.sr??(Number(p.b)>0?(Number(p.r)*100/Number(p.b)).toFixed(1):'—');return `<tr><td class="ib-name">${escapeScore(p.name)}</td><td class="ib-how" title="${escapeScore(p.howOut||'')}">${escapeScore(p.howOut||'not out')}</td><td class="ib-runs">${numberOrDash(p.r)}</td><td>${numberOrDash(p.b)}</td><td>${numberOrDash(p.fours)}</td><td>${numberOrDash(p.sixes)}</td><td>${numberOrDash(sr)}</td></tr>`}).join(''):'<tr><td colspan="7" class="ib-status">Waiting for full batting scorecard feed</td></tr>';
- $('ibBowlRows').innerHTML=b.length?b.map(p=>{const o=String(p.overs??'0');const parts=o.split('.');const balls=Number(parts[0])*6+Number(parts[1]||0);const econ=p.econ??(balls>0?(Number(p.runs)*6/balls).toFixed(2):'—');return `<tr><td class="ib-name">${escapeScore(p.name)}</td><td>${numberOrDash(p.overs)}</td><td>${numberOrDash(p.maidens)}</td><td>${numberOrDash(p.runs)}</td><td>${numberOrDash(p.wickets)}</td><td>${numberOrDash(econ)}</td></tr>`}).join(''):'<tr><td colspan="6" class="ib-status">Waiting for full bowling scorecard feed</td></tr>';
- const ex=d.extras||{};const fields=[['Byes',ex.byes],['Leg byes',ex.legByes],['Wides',ex.wides],['No balls',ex.noBalls],['Penalty',ex.penalty]];const known=fields.every(x=>Number.isFinite(Number(x[1]))&&x[1]!==undefined&&x[1]!==null);const sum=known?fields.reduce((n,x)=>n+Number(x[1]),0):null;
- $('ibExtras').innerHTML=fields.map(([name,val])=>`<span>${name}</span><span>${numberOrDash(val)}</span>`).join('')+`<span class="ib-total">Total Extras</span><span class="ib-total">${numberOrDash(sum)}</span>`;
- $('ibFoW').innerHTML='<b>Fall of wickets: </b>'+escapeScore(Array.isArray(d.fallOfWickets)&&d.fallOfWickets.length?d.fallOfWickets.join(', '):'Not available');
- $('ibFoot').textContent=Number.isFinite(Number(total))?`${bowlingTeam} need ${Number(total)+1} runs to win · SECOND INNINGS STARTING SOON`:'SECOND INNINGS STARTING SOON';
-}
-async function fetchFullScorecard(force=false){
- if(!scorecardUrl||fullCardLoading||(!force&&Date.now()-lastFullCardAttempt<15000))return;
- lastFullCardAttempt=Date.now();fullCardLoading=true;
- try{const res=await fetch(scorecardUrl,{cache:'no-store'});if(!res.ok)throw Error('Scorecard HTTP '+res.status);const obj=await res.json();if(!Array.isArray(obj.batting)||!Array.isArray(obj.bowling))throw Error('Expected batting and bowling arrays');loadedFullCard=obj;}
- catch(e){console.warn('Full scorecard feed unavailable:',e);}
- finally{fullCardLoading=false;}
-}
-
-
-// Summary data uses the optional full scorecard JSON feed; missing stats are never fabricated.
+// Summaries use the live CricClubs response; missing stats are never fabricated.
 // Independent switches; both disabled by default.
 // summary=1 remains an alias for the end-of-over summary for older links.
 const summaryParams = new URLSearchParams(location.search);
@@ -3985,7 +3933,12 @@ const OVER_SUMMARY_MS = !summaryUntilNextBall && Number.isFinite(summarySeconds)
 let awaitingNextBall = null;
 let overSummaryTimer=null;
 let previousOverState=null;
-let lastShownOverKey=null;
+const shownOverKeysByTeam=new Set();
+// The scorecard's overs field is the single authority for completed overs.
+function completedOversFromScoreboard(overs){
+  const match=String(overs??'').trim().match(/^(\d+)(?:\.(\d+))?$/);
+  return match?Number(match[1]):null;
+}
 function dismissOverSummary(){
   if(overSummaryTimer){clearTimeout(overSummaryTimer);overSummaryTimer=null;}
   awaitingNextBall = null;
@@ -4111,43 +4064,45 @@ function renderBothTeamsSummary(card,first,second,overNo,balls,liveData){
   $('osFooter').textContent='';
 }
 function observeCompletedOver(data,v,t1,t2,second,onBreak){
-  if(!overSummaryEnabled)return;
-  const t=second?t2:t1;
-  const oversText=String(t.overs??'').trim();
-  const overMatch=oversText.match(/^(\d+)(?:\.(\d+))?$/);
-  if(!overMatch)return;
-  // The integer component is the number of completed overs. The fractional
-  // component is NOT safe to treat as a monotonic ball count: a source can
-  // expose 14.7 (seven deliveries including extras) before reporting 15.0.
-  const completedCount=Number(overMatch[1]);
-  const n=overBalls(t.overs);
-  const prev=previousOverState;
-  previousOverState={second,n,completedCount};
-  if(awaitingNextBall && (awaitingNextBall.second!==second || completedCount>awaitingNextBall.completedCount ||
-      (completedCount===awaitingNextBall.completedCount && Number(overMatch[2]||0)>0)))dismissOverSummary();
-  // Trigger when polling crosses a completed-over boundary, even if the API
-  // skips the exact 15.0 state and first reports 15.1. The over being summarized
-  // is the last *completed* over, not the current over.
-  if(prev===null || prev.second!==second || onBreak || matchCompletion(data,v,t1,t2,second).finished)return;
-  const completedBefore=prev.completedCount;
-  const completedNow=completedCount;
-  if(completedNow<=completedBefore || completedNow<1)return;
-  const key=(second?'2':'1')+':'+completedNow;
-  if(lastShownOverKey===key)return;
-  lastShownOverKey=key;
-  if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls,data);
-  else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls,data);
-  document.body.classList.add('show-over-summary');
-  if(overSummaryTimer)clearTimeout(overSummaryTimer);
-  overSummaryTimer=null;
-  if(summaryUntilNextBall)awaitingNextBall={second,completedCount:completedNow};
-  else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
-  if(scorecardUrl){fetchFullScorecard(true).then(()=>{
-    if(document.body.classList.contains('show-over-summary')&&lastShownOverKey===key){
-      if(second)renderBothTeamsSummary(loadedFullCard,t1,t2,completedNow,data.balls,data);
-      else renderCompactSummary(loadedFullCard,t,false,completedNow,false,data.balls,data);
-    }
-  }).catch(err=>console.warn('End-of-over scorecard refresh failed',err));}
+  const team=second?t2:t1;
+  const completed=completedOversFromScoreboard(team.overs);
+  if(completed===null)return;
+  const innings=second?2:1;
+  const deliveries=Array.isArray(data.balls)?data.balls.slice():[];
+  const previous=previousOverState;
+  // Save the last live feed for the same innings. No extra requests or observers.
+  previousOverState={innings,completed,deliveries};
+  if(awaitingNextBall && (awaitingNextBall.second!==second ||
+      completed>awaitingNextBall.completedCount ||
+      (completed===awaitingNextBall.completedCount && /^(?:\d+)\.[1-9]\d*$/.test(String(team.overs))))) {
+    dismissOverSummary();
+  }
+  if(!overSummaryEnabled || onBreak || matchCompletion(data,v,t1,t2,second).finished)return;
+  if(!previous || previous.innings!==innings || completed<=previous.completed)return;
+  // Only an explicit whole-over scoreboard value (8 or 8.0) can trigger.
+  // If polling skips the boundary (7.5 -> 8.1), the completed-over
+  // delivery data may no longer be available; do not show a summary.
+  if(!/^\d+(?:\.0+)?$/.test(String(team.overs??'').trim()))return;
+  // Track displayed summaries independently for each batting team and innings.
+  const teamId=String(team.name??'').trim().toLowerCase();
+  const key=JSON.stringify([innings,teamId,completed]);
+  if(shownOverKeysByTeam.has(key))return;
+  shownOverKeysByTeam.add(key);
+  // Use the same live delivery feed used by THIS OVER. Prefer the boundary
+  // response; retain the preceding feed if CricClubs has already cleared it.
+  const balls=deliveries.length?deliveries:previous.deliveries;
+  try{
+    if(second)renderBothTeamsSummary(null,t1,t2,completed,balls,data);
+    else renderCompactSummary(null,team,false,completed,false,balls,data);
+    document.body.classList.add('show-over-summary');
+    if(overSummaryTimer){clearTimeout(overSummaryTimer);overSummaryTimer=null;}
+    if(summaryUntilNextBall)awaitingNextBall={second,completedCount:completed};
+    else overSummaryTimer=setTimeout(dismissOverSummary,OVER_SUMMARY_MS);
+  }catch(error){
+    // A summary failure must never interrupt the live scoreboard refresh.
+    console.warn('End-of-over summary skipped:',error);
+    dismissOverSummary();
+  }
 }
 
 
@@ -4243,12 +4198,7 @@ function milestoneRead(data,v,second,t1,t2){
   }
   const bowler=validDisplayName(get(v,'bowlerName',''));
   const wickets=milestoneNumeric(get(v,'bowlerWickets',''));
-  // Prefer explicit current bowler maiden count; otherwise use the optional full scorecard.
-  let maidens=milestoneNumeric(get(v,'bowlerMaidens',''));
-  if(maidens===null && loadedFullCard && Array.isArray(loadedFullCard.bowling)){
-    const row=loadedFullCard.bowling.find(p=>p.name===bowler);
-    if(row)maidens=milestoneNumeric(row.maidens);
-  }
+  const maidens=milestoneNumeric(get(v,'bowlerMaidens',''));
   if(bowler)snap.bowl[bowler]={wickets,maidens};
   // Read the partnership total from common live-score payload locations.
   // A zero is valid; never substitute the innings total for partnership runs.
@@ -4476,15 +4426,12 @@ function render(data){
   else {$("finalMatchResult").hidden=true;document.body.classList.remove("show-final-result");}
   if(isFinished||onBreak) dismissOverSummary();
   observeCompletedOver(data,v,t1,t2,second,onBreak);
-  const showDemoFull=params.get('demo')==='inningsBreak';
   if(onBreak && !inningsBreakSummaryEnabled) document.body.classList.remove('show-over-summary');
   if(onBreak && inningsBreakSummaryEnabled){
     document.body.classList.remove('show-full-break');
-    renderCompactSummary(showDemoFull?demoFullCard:loadedFullCard,t1,false,0,true,data.balls,data);
+    renderCompactSummary(null,t1,false,0,true,data.balls,data);
     document.body.classList.add('show-over-summary');
-    if(scorecardUrl)fetchFullScorecard(true).then(()=>{
-      if(document.body.classList.contains('show-over-summary'))renderCompactSummary(loadedFullCard,t1,false,0,true,data.balls,data);
-    });
+
   } else if(!(overSummaryEnabled || inningsBreakSummaryEnabled)) document.body.classList.remove('show-over-summary');
   const preMatch=!onBreak && !isFinished && matchNotStarted(data,v,t1,t2,second);
   observeNativeMatchState(resultData,resultData.values,second,t1,t2,preMatch,onBreak,isFinished);
@@ -4540,7 +4487,8 @@ function render(data){
     if (isFinished) {
       showSecondary(postMatchMessage(data,v));
       // Preserve the bottom result/footer while showing the centered result.
-      // Continue polling after a reported result; later API frames may correct it.
+      stopped = true;
+      if (timer) clearTimeout(timer);
       return;
     }
 
@@ -4599,7 +4547,8 @@ function render(data){
   if(isFinished){
     showSecondary(postMatchMessage(data,v));
     if(powered) powered.style.display="inline";
-    // Keep polling so a premature or corrected result cannot freeze the overlay.
+    stopped=true;
+    if(timer)clearTimeout(timer);
     return;
   }
 
@@ -4640,7 +4589,6 @@ function render(data){
 }
 async function refresh(){
   if(stopped)return;
-  window.ccOverlayDiagnostics.polls++;
   try{
     // Bound both the HTTP request and body read so Android WebView cannot
     // permanently stall the single-flight refresh loop on a pending fetch.
@@ -4652,19 +4600,17 @@ async function refresh(){
       const response=await fetch(API,{cache:"no-store",signal:controller.signal});
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
       liveData=await response.json();
-      window.ccOverlayDiagnostics.apiSuccess++;window.ccOverlayDiagnostics.lastApiAt=new Date().toISOString();
     } finally {
       clearTimeout(requestTimeout);
     }
-    // The API view field is not a reliable live-score gate. Render any response
-    // containing score values; ignore only frames with no scoreboard payload.
-    if (liveData && typeof liveData === "object" && liveData.values && typeof liveData.values === "object") {
+    // Ignore non-scoreboard API frames without disturbing the last valid render,
+    // delivery tracker, over-summary state, or animation lifecycle.
+    if (String(liveData?.view) !== "1") {
+      console.debug("CricClubs: ignoring non-scoreboard view", liveData?.view);
+    } else {
       await fetchHatTrickFeed();
-      window.ccOverlayDiagnostics.renderCalls++;
       render(liveData);
       $("error").style.display="none";
-    } else {
-      console.debug("CricClubs: no scoreboard values in response; retaining last frame");
     }
   }catch(e){
     console.error("CricClubs refresh/render failed:", e);
@@ -4914,7 +4860,7 @@ function fitL7Chase(){
 window.addEventListener('resize',()=>{if(document.body.classList.contains('layout7-active'))fitL7Chase()});
 
 
-'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);const old=e.querySelector('img');if(!src){if(old)old.remove();return;}try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com'))){if(old)old.remove();return;}if(old&&old.src===u.href)return;if(old)old.remove();const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>{if(img.isConnected)img.remove()};e.append(img)}catch{if(old)old.remove()}}
+'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();e.append(img)}catch{}}
 let lastBallSignature='';
 function formatL7Delivery(raw){
   const source=raw&&typeof raw==='object'?(raw.ballResult??raw.result??raw.runs??raw.delivery??''):raw;
@@ -5020,7 +4966,7 @@ function render(data){const v=data?.values||data||{};const second=String(data?.i
 const teamCode=(side,name)=>{const keys=[side+'Code',side+'code',side+'CODE',side+'shortcode',side+'ShortCode',side+'Shortcode',side+'shortCode',side+'ShortName',side+'shortName',side+'Abbreviation',side+'Abbr'];for(const obj of [v,data]){if(!obj||typeof obj!=='object')continue;for(const key of keys){const value=obj[key];if(value!=null&&String(value).trim())return String(value).trim();}}return abbr(name)};
 $('teamBat').textContent=teamCode(bat,batting);$('teamBowl').textContent=teamCode(bowl,bowling);$('score').textContent=get(v,bat+'Total','0')+'/'+get(v,bat+'Wickets','0');const overs=get(v,bat+'Overs','0.0');const currentRR=get(v,bat+'RR','—');$('overs').textContent='Overs '+overs+' · RR '+currentRR;let info='RR '+currentRR;if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
-window.ccLayout7Render=function(data){try{render(data);window.ccOverlayDiagnostics.layout7Success++;window.ccOverlayDiagnostics.lastLayout7At=new Date().toISOString();message('');document.documentElement.classList.remove('cc-l7-awaiting-live')}catch(err){window.ccOverlayDiagnostics.layout7Errors++;window.ccOverlayDiagnostics.lastLayout7Error=String(err&&err.stack||err);console.warn('Layout7 render failed',err);message('Score data unavailable')}};
+window.ccLayout7Render=function(data){try{render(data);message('');document.documentElement.classList.remove('cc-l7-awaiting-live')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
 if(typeof latestLayout7Data!=="undefined" && latestLayout7Data && window.ccLayout7Render)window.ccLayout7Render(latestLayout7Data);</script><style id="layout7-toss-preview-style">
 /* The toss uses the existing rounded Layout 7 board, not a separate footer. */
