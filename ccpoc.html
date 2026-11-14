@@ -5045,6 +5045,35 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
 @media(max-width:680px){#freshEOO{width:96vw}#freshEOO .fe-card{padding-inline:9px}#freshEOO .fe-main{grid-template-columns:1fr .75fr 1fr}#freshEOO .fe-label{min-width:auto}#freshEOO .fe-balls{gap:4px}#freshEOO #feBalls{gap:3px!important}#freshEOO .fe-bottom{gap:5px}#freshEOO .fe-box{padding-inline:6px}#freshEOO .fe-stats>div{gap:3px}}
 </style>
 
+
+<style id="fresh-eoo-centered-broadcast-polish">
+/* Visual-only refinement: centered within the viewport, including landscape mobile. */
+#freshEOO{left:50%!important;top:50%!important;width:min(1190px,90vw)!important;max-height:calc(100dvh - 28px);transform:translate(-50%,-50%)!important;filter:drop-shadow(0 18px 26px #000a)!important}
+#freshEOO .fe-card{padding:27px 23px 17px;border:1.5px solid #e31b35;border-radius:13px;background:linear-gradient(125deg,#08090e 0%,#17080d 48%,#2b0811 80%,#09090d 100%);box-shadow:inset 0 0 0 1px #f4a53d35,0 14px 35px #000b}
+#freshEOO .fe-head{width:55%;min-height:47px;margin:-49px auto 13px;border:1.5px solid #eab348;border-radius:5px;background:linear-gradient(105deg,#69070e,#d10c20 48%,#65040c);font-style:italic;box-shadow:0 5px 13px #0009}
+#freshEOO .fe-main{min-height:74px;margin-bottom:10px;grid-template-columns:1.15fr .83fr 1.05fr}
+#freshEOO .fe-team{font-size:clamp(17px,2.25vw,30px);background:linear-gradient(110deg,#740611,#cf0c22 75%,#5b0711)}
+#freshEOO .fe-score{font-size:clamp(36px,5vw,68px)}
+#freshEOO .fe-info{font-size:clamp(13px,1.55vw,21px)}
+#freshEOO .fe-balls{min-height:54px;margin-bottom:8px;background:linear-gradient(90deg,#080a0f,#1d0a11)}
+#freshEOO .fe-stats{margin-bottom:1px}
+#freshEOO .fe-bottom{grid-template-columns:1.25fr 1.08fr .72fr;gap:12px;margin-top:11px}
+#freshEOO .fe-box{min-height:99px;border-color:#9c2735;background:linear-gradient(145deg,#291017,#090b0f 85%)}
+#freshEOO .fe-box b{background:linear-gradient(105deg,#9b0615,#d20d23 68%,#660610)}
+#freshEOO .fe-situation{margin-top:10px;border-color:#eab34a;color:#ffe06a}
+@media(max-height:560px){
+  #freshEOO{top:50%!important;width:min(1190px,89vw)!important}
+  #freshEOO .fe-card{padding:20px 18px 11px}
+  #freshEOO .fe-head{min-height:35px;margin:-38px auto 9px}
+  #freshEOO .fe-main{min-height:56px;margin-bottom:6px}
+  #freshEOO .fe-balls{min-height:42px;margin-bottom:5px}
+  #freshEOO .fe-bottom{gap:8px;margin-top:7px}
+  #freshEOO .fe-box{min-height:75px}
+  #freshEOO .fe-situation{margin-top:6px}
+}
+@media(max-width:680px){#freshEOO{width:95vw!important}#freshEOO .fe-bottom{gap:5px}}
+</style>
+
 <style id="cc-eoo-cricbay-left-motion">
 /* Motion only. All scoreboard layout/score calculations remain unchanged.
    CricBay reference: 300ms cubic-bezier(.2,.7,.2,1) slide. */
@@ -5086,6 +5115,47 @@ body.cc-eoo-leaving #freshEOO.visible{
 @media(prefers-reduced-motion:reduce){
   body:not(.layout7-active) .overlay,body.layout7-active #ccL7,body.layout7-active #layout7Frame{transition:none!important}
   body.cc-eoo-active #freshEOO.visible,body.cc-eoo-leaving #freshEOO.visible{animation:none!important}
+}
+</style>
+
+<style id="fresh-eoo-reference-match-v3">
+/* Money Heist reference alignment: visual-only, no scoring or polling changes. */
+#freshEOO{width:min(1440px,94vw)!important;top:50%!important;left:50%!important;max-height:94dvh;filter:drop-shadow(0 18px 30px #000b)!important}
+#freshEOO .fe-card{padding:34px 23px 17px!important;border-radius:14px!important;border:2px solid #e11b33!important;background:linear-gradient(115deg,#09090d 0%,#15080d 46%,#280711 78%,#09090d 100%)!important;box-shadow:inset 0 0 0 1px #ff6a3b25,0 18px 38px #000b!important}
+#freshEOO .fe-head{width:61%!important;max-width:850px!important;min-height:57px!important;margin:-64px auto 15px!important;font-size:clamp(23px,3vw,43px)!important;letter-spacing:1.2px!important;background:linear-gradient(100deg,#70040b,#d70a1b 50%,#78040a)!important;border:2px solid #efba53!important;box-shadow:0 7px 16px #0009!important}
+#freshEOO .fe-main{grid-template-columns:1.12fr .87fr 1.03fr!important;min-height:85px!important;margin-bottom:11px!important;border-radius:9px!important}
+#freshEOO .fe-team{font-size:clamp(17px,2.65vw,36px)!important;font-style:italic!important;background:linear-gradient(110deg,#78050e,#da1023 76%,#610610)!important}
+#freshEOO .fe-score{font-size:clamp(42px,5.8vw,83px)!important;background:linear-gradient(110deg,#0d0a10,#3e0712 60%,#13080d)!important}
+#freshEOO .fe-info{font-size:clamp(12px,1.85vw,25px)!important;background:linear-gradient(110deg,#27070e,#690b1b)!important}
+#freshEOO .fe-balls{min-height:67px!important;margin-bottom:9px!important;border-radius:9px!important;background:linear-gradient(95deg,#08090d,#210912)!important}
+#freshEOO .fe-label{min-width:155px!important;font-size:clamp(14px,1.85vw,25px)!important;background:linear-gradient(115deg,#78050d,#d20c20)!important}
+#freshEOO .fe-ball{width:clamp(31px,3.6vw,49px)!important;min-width:clamp(31px,3.6vw,49px)!important;height:clamp(31px,3.6vw,49px)!important;font-size:clamp(15px,1.85vw,25px)!important;box-shadow:inset 0 2px 4px #ffffff38,0 2px 5px #0009!important}
+#freshEOO .fe-stats{font-size:clamp(12px,1.75vw,23px)!important;padding:1px 4px 9px!important}
+#freshEOO .fe-stats>div{min-height:46px!important;gap:13px!important}
+#freshEOO .fe-stats span{font-size:1.65em!important;color:#ffcb3e!important}
+#freshEOO .fe-bottom{grid-template-columns:1.3fr 1.06fr .7fr!important;gap:15px!important;margin-top:13px!important}
+#freshEOO .fe-box{min-height:119px!important;padding:49px 15px 12px!important;border:1px solid #a62b3a!important;border-radius:14px!important;background:linear-gradient(145deg,#2b111a,#0b0c10 78%)!important;box-shadow:inset 0 1px 0 #ffffff20!important}
+#freshEOO .fe-box b{font-size:clamp(13px,1.8vw,24px)!important;padding:9px 20px 10px 14px!important;min-width:49%!important;background:linear-gradient(100deg,#9a0612,#d80c23 70%,#67060c)!important}
+#freshEOO .fe-row{font-size:clamp(13px,1.7vw,22px)!important;line-height:1.2!important}
+#freshEOO #fePartnership{font-size:clamp(22px,2.8vw,38px)!important}
+#freshEOO .fe-situation{margin-top:14px!important;min-height:43px!important;font-size:clamp(15px,2.15vw,29px)!important;padding:7px 25px!important;color:#ffda4d!important;background:linear-gradient(100deg,#640710,#b70c1d,#640710)!important}
+@media(max-height:560px){
+ #freshEOO{width:min(1260px,92vw)!important}
+ #freshEOO .fe-card{padding:20px 16px 9px!important}
+ #freshEOO .fe-head{min-height:36px!important;margin:-40px auto 8px!important;font-size:clamp(17px,2.7vw,30px)!important;padding:4px 10px!important}
+ #freshEOO .fe-main{min-height:57px!important;margin-bottom:6px!important}
+ #freshEOO .fe-score{font-size:clamp(33px,5vw,54px)!important}
+ #freshEOO .fe-balls{min-height:43px!important;margin-bottom:5px!important;padding:3px 8px!important}
+ #freshEOO .fe-label{min-width:110px!important;margin:-3px 5px -3px -8px!important;font-size:clamp(12px,1.5vw,17px)!important}
+ #freshEOO .fe-ball{width:clamp(25px,2.8vw,34px)!important;min-width:clamp(25px,2.8vw,34px)!important;height:clamp(25px,2.8vw,34px)!important;font-size:clamp(12px,1.5vw,17px)!important}
+ #freshEOO .fe-stats{padding:0 4px 4px!important;font-size:clamp(11px,1.4vw,16px)!important}
+ #freshEOO .fe-stats>div{min-height:29px!important;gap:8px!important}
+ #freshEOO .fe-bottom{gap:9px!important;margin-top:7px!important}
+ #freshEOO .fe-box{min-height:76px!important;padding:28px 10px 6px!important}
+ #freshEOO .fe-box b{padding:4px 12px!important;font-size:clamp(12px,1.45vw,17px)!important}
+ #freshEOO .fe-row{font-size:clamp(11px,1.4vw,16px)!important;margin:2px 0!important}
+ #freshEOO #fePartnership{font-size:clamp(18px,2.4vw,28px)!important;min-height:30px!important}
+ #freshEOO .fe-situation{min-height:28px!important;margin-top:6px!important;padding:3px 15px!important;font-size:clamp(12px,1.7vw,20px)!important}
 }
 </style>
 </body>
