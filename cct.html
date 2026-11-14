@@ -4539,8 +4539,7 @@ function render(data){
     if (isFinished) {
       showSecondary(postMatchMessage(data,v));
       // Preserve the bottom result/footer while showing the centered result.
-      stopped = true;
-      if (timer) clearTimeout(timer);
+      // Continue polling after a reported result; later API frames may correct it.
       return;
     }
 
@@ -4599,8 +4598,7 @@ function render(data){
   if(isFinished){
     showSecondary(postMatchMessage(data,v));
     if(powered) powered.style.display="inline";
-    stopped=true;
-    if(timer)clearTimeout(timer);
+    // Keep polling so a premature or corrected result cannot freeze the overlay.
     return;
   }
 
@@ -4655,14 +4653,14 @@ async function refresh(){
     } finally {
       clearTimeout(requestTimeout);
     }
-    // Ignore non-scoreboard API frames without disturbing the last valid render,
-    // delivery tracker, over-summary state, or animation lifecycle.
-    if (String(liveData?.view) !== "1") {
-      console.debug("CricClubs: ignoring non-scoreboard view", liveData?.view);
-    } else {
+    // The API view field is not a reliable live-score gate. Render any response
+    // containing score values; ignore only frames with no scoreboard payload.
+    if (liveData && typeof liveData === "object" && liveData.values && typeof liveData.values === "object") {
       await fetchHatTrickFeed();
       render(liveData);
       $("error").style.display="none";
+    } else {
+      console.debug("CricClubs: no scoreboard values in response; retaining last frame");
     }
   }catch(e){
     console.error("CricClubs refresh/render failed:", e);
