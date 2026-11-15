@@ -2493,7 +2493,7 @@ html body.layout7-active #overSummary,html body.layout7-active #fullInningsBreak
 #ccL7 .stats{white-space:nowrap;font-variant-numeric:tabular-nums;flex:none}
 #ccL7 .bowling{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:1px 8px 2px 12px;border-left:1px solid #ffffff60;overflow:hidden}
 #ccL7 .bowlerline{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:clamp(12px,1.25vw,18px);font-weight:900;min-width:0;white-space:nowrap}
-#ccL7 .bowlername{min-width:0;overflow:hidden;text-overflow:ellipsis}
+#ccL7 .bowlername{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #ccL7 .bowlerstats{flex:none;white-space:nowrap}
 #ccL7 .balls{display:flex;align-items:center;gap:4px;overflow:hidden;min-width:0}
 #ccL7 .ball{display:flex;flex:0 0 auto;align-items:center;justify-content:center;width:clamp(17px,1.85vw,26px);height:clamp(17px,1.85vw,26px);border-radius:50%;font-size:clamp(10px,1.1vw,15px);font-weight:900;background:#870918;line-height:1}
@@ -3188,7 +3188,7 @@ document.querySelectorAll('.l4-svg-panels linearGradient stop').forEach(stop => 
 
 // Layout and theme are independent query parameters.
 // layout=1 preserves the original design; layout=2 uses the reference broadcast layout.
-const requestedLayout = (params.get("layout") || "4").trim().toLowerCase();
+const requestedLayout = (params.get("layout") || "7").trim().toLowerCase();
 const overlayLayout = ["2", "3", "4", "5", "7"].includes(requestedLayout) ? requestedLayout : "1";
 document.body.classList.toggle("layout7-active",overlayLayout==="7");
 const requestedTheme = (params.get("theme") || "mh").trim().toLowerCase();
@@ -5271,19 +5271,19 @@ body.cc-eoo-active #scoreEvent,body.cc-eoo-leaving #scoreEvent,body.cc-eoo-activ
   box-shadow:inset 0 1px 0 rgba(255,214,178,.36),inset 0 0 0 1px rgba(255,115,80,.15),inset 0 -12px 28px rgba(0,0,0,.24),0 18px 38px rgba(0,0,0,.65)!important;
 }
 #freshEOO .fe-head{
-  background:linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.055) 42%,transparent 51%),linear-gradient(105deg,#720912,#d8152b 48%,#65040c)!important;
-  box-shadow:inset 0 1px 0 rgba(255,238,197,.55),inset 0 -4px 8px rgba(55,0,7,.35),0 5px 13px rgba(0,0,0,.55)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.075) 35%,transparent 52%),linear-gradient(105deg,#720912,#d8152b 48%,#65040c)!important;
+  box-shadow:inset 0 1px 0 rgba(255,238,197,.60),inset 0 -4px 8px rgba(55,0,7,.35),0 5px 13px rgba(0,0,0,.55)!important;
 }
 #freshEOO .fe-team,#freshEOO .fe-info,#freshEOO .fe-label,#freshEOO .fe-box b{
   background-image:linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,.025) 47%,rgba(0,0,0,.12) 51%),linear-gradient(110deg,#750710,#c80c23 75%,#560710)!important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -3px 8px rgba(0,0,0,.16);
 }
 #freshEOO .fe-score{
-  background:linear-gradient(180deg,rgba(255,255,255,.09),transparent 48%),linear-gradient(115deg,#19080d,#440813 65%,#19090d)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.13),transparent 46%),linear-gradient(115deg,#19080d,#4b0a17 62%,#19090d)!important;
 }
 #freshEOO .fe-box{
-  background:linear-gradient(165deg,rgba(255,255,255,.09),transparent 35%),linear-gradient(145deg,#291017,#090b0f 85%)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -8px 18px rgba(0,0,0,.15)!important;
+  background:linear-gradient(165deg,rgba(255,255,255,.12),transparent 32%),linear-gradient(145deg,#291017,#090b0f 85%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.27),inset 0 -8px 18px rgba(0,0,0,.15)!important;
 }
 #freshEOO .fe-situation{
   background:linear-gradient(180deg,rgba(255,255,255,.20),transparent 49%),linear-gradient(110deg,#610910,#b30c1a,#600910)!important;
