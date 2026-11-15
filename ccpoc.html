@@ -3838,11 +3838,6 @@ function showSecondary(message) {
 function matchNotStarted(data,v,t1,t2,second) {
   const status=textField(data,v,["matchStatus","status","statusText"]).toLowerCase();
   if(/live|in progress|innings break|completed|finished/.test(status))return false;
-  // Score/delivery evidence overrides stale pre-match status text.
-  if ((overBalls(t1.overs)||0)>0 || (overBalls(t2.overs)||0)>0 ||
-      Number(t1.total)>0 || Number(t2.total)>0 ||
-      Number(t1.wickets)>0 || Number(t2.wickets)>0 ||
-      (Array.isArray(data?.balls) && data.balls.length>0) || second) return false;
   if(/not started|upcoming|scheduled|toss/.test(status))return true;
   return !(Array.isArray(data.balls) && data.balls.length) && !second && Number(t1.total)===0 && Number(t2.total)===0 &&
     overBalls(t1.overs)===0 && overBalls(t2.overs)===0;
@@ -4060,7 +4055,7 @@ function milestonePlayNext(){
 // Optional visual QA: play every defined milestone, sequentially, 10 seconds
 // after page load. Does not change scores, live milestone tracking, or API data.
 function startMilestoneDemo(){
-  if(!milestoneDemo || (overlayLayout!=='4' && overlayLayout!=='7') || (params.get('view')||'').trim()==='8')return;
+  if(!milestoneDemo || overlayLayout!=='4' || (params.get('view')||'').trim()==='8')return;
   const samples=[
     ['team50','','TEAM TOTAL'],['team100','','TEAM TOTAL'],
     ['team150','','TEAM TOTAL'],['team200','','TEAM TOTAL'],
@@ -4212,12 +4207,12 @@ function hatProcess(payload,inning,allowCelebration=true){
   return detected;
 }
 function observeHatTrick(data,inning,preMatch,onBreak,isFinished){
-  if(milestoneDemo||!milestoneEnabled||(overlayLayout!=='4' && overlayLayout!=='7')||preMatch)return;
+  if(milestoneDemo||!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
   const payload=hatTrickFeed||data;
   hatProcess(payload,inning,!onBreak&&!isFinished);
 }
 async function fetchHatTrickFeed(){
-  if(!hatTrickFeedUrl || !milestoneEnabled || (overlayLayout!=='4' && overlayLayout!=='7'))return;
+  if(!hatTrickFeedUrl || !milestoneEnabled || overlayLayout!=='4')return;
   try{
     const response=await fetch(hatTrickFeedUrl,{cache:'no-store'});
     if(!response.ok)throw Error('Hat-trick feed HTTP '+response.status);
@@ -4226,7 +4221,7 @@ async function fetchHatTrickFeed(){
 }
 
 function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
-  if(milestoneDemo||!milestoneEnabled||(overlayLayout!=='4' && overlayLayout!=='7')||preMatch)return;
+  if(milestoneDemo||!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
   const now=milestoneRead(data,v,second,t1,t2);
   const prev=milestoneBaseline;
   const changedInning=!prev||prev.inning!==now.inning;
@@ -4336,10 +4331,10 @@ function render(data){
     $("name2").textContent=t2.name;
     $("preTeam1").textContent=t1.name;
     $("preTeam2").textContent=t2.name;
-    prematchLogo("preLogo1","preInitials1",t1.name,v.firstLogo);
-    prematchLogo("preLogo2","preInitials2",t2.name,v.secondLogo);
-    logo("logo1",v.firstLogo);
-    logo("logo2",v.secondLogo);
+    prematchLogo("preLogo1","preInitials1",t1.name,v.secondLogo);
+    prematchLogo("preLogo2","preInitials2",t2.name,v.firstLogo);
+    logo("logo1",v.secondLogo);
+    logo("logo2",v.firstLogo);
     $("details1").innerHTML=showBatters(v);
     $("details2").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
     if (isLayout2) $("score1").closest(".scorebox").style.display="flex";
@@ -4365,8 +4360,8 @@ function render(data){
     setPlayerDetails($("details2"), showBowler(v, data.balls, second?t2.overs:t1.overs));
 
     // Layout 2: first-innings logos corrected; preserve the working second-innings mapping.
-    logo("logo1", v.firstLogo);
-    logo("logo2", v.secondLogo);
+    logo("logo1", second ? v.firstLogo : v.secondLogo);
+    logo("logo2", second ? v.secondLogo : v.firstLogo);
 
     if (isFinished) {
       showSecondary(postMatchMessage(data,v));
@@ -4487,8 +4482,8 @@ function freshEOORender(data,team,over,second,balls){
   text('feInfo',`${over}.0 OVERS · RR ${team.rr}`);
   const tokens=balls.slice(-14);
   document.getElementById('feBalls').innerHTML=tokens.length?tokens.map(raw=>{
-    const formatted=formatL7Delivery(raw);
-    return `<span class="fe-ball ${formatted.kind}">${freshEOOHtml(formatted.text)}</span>`;
+    const formatted=window.ccFormatL7Delivery(raw);
+    return `<span class="fe-ball ${formatted.kind}">${freshEOOHtml(formatted.kind==='dot'?'•':formatted.text)}</span>`;
   }).join(''):'<span>Delivery details unavailable</span>';
   // Never fabricate per-over statistics from incomplete or ambiguous deliveries.
   const runs=tokens.length&&typeof thisOverRuns==='function'?thisOverRuns(tokens):null;
@@ -4538,19 +4533,29 @@ function freshEOOObserve(data){
   const scope=`${inning}|${identity}`;const raw=String(team.overs??'').trim();
   const prev=freshEOOState.previous.get(scope);freshEOOState.previous.set(scope,raw);
   const balls=freshEOOBalls(data);
-  const completed=freshEOOBoundary(raw);
+  // An API poll may skip the exact N.0 response and arrive at N.1 or later.
+  // Overs notation is legal balls, not decimal fractions; the integer part is
+  // the number of fully completed overs.
+  const valid=/^\d+(?:\.[0-5])?$/.test(raw);
+  const completed=valid?Math.floor(Number(raw)):null;
   if(completed===null){if(balls.length)freshEOOState.lastBalls.set(scope,balls);return;}
-  if(prev===undefined)return; // No popup when loading a match already at a boundary.
-  const previousNumber=Number(prev);
-  if(!Number.isFinite(previousNumber)||Math.floor(previousNumber)>=completed)return;
-  const key=`${scope}|${completed}`;if(freshEOOState.seen.has(key))return;
-  freshEOOState.seen.add(key);
-  // Only show when a completed-over frame was actually observed.
+  if(prev===undefined){if(balls.length)freshEOOState.lastBalls.set(scope,balls);return;}
+  const previousValid=/^\d+(?:\.[0-5])?$/.test(prev);
+  const previousNumber=previousValid?Number(prev):NaN;
+  if(!Number.isFinite(previousNumber)||Math.floor(previousNumber)>=completed){
+    if(balls.length)freshEOOState.lastBalls.set(scope,balls);
+    return;
+  }
+  const key=`${scope}|${completed}`;
+  if(freshEOOState.seen.has(key))return;
   const previousBalls=freshEOOState.lastBalls.get(scope)||[];
   const currentBalls=balls.length?balls:previousBalls;
+  // Only mark as shown after a successful render, so a rendering exception
+  // cannot permanently suppress this over.
   freshEOORender(data,team,completed,second,currentBalls);
+  freshEOOState.seen.add(key);
+  if(balls.length)freshEOOState.lastBalls.set(scope,balls);
 }
-
 async function refresh(){
   if(stopped)return;
   try{
@@ -4575,11 +4580,9 @@ async function refresh(){
       console.debug("CricClubs: ignoring non-scoreboard view", liveData?.view);
     } else {
       await fetchHatTrickFeed();
-      // Resolve toss/live state before rendering to prevent a stale toss mask
-      // from covering the first-innings scoreboard during the transition.
-      if(overlayLayout==="7" && typeof window.ccLiveTossUpdate==="function")window.ccLiveTossUpdate(liveData);
       render(liveData);
       try { freshEOOObserve(liveData); } catch(summaryError) { console.warn("End-of-over summary skipped:",summaryError); }
+      if(overlayLayout==="7" && typeof window.ccLiveTossUpdate==="function")window.ccLiveTossUpdate(liveData);
       $("error").style.display="none";
     }
   }catch(e){
@@ -4811,7 +4814,7 @@ function fitL7Chase(){
 window.addEventListener('resize',()=>{if(document.body.classList.contains('layout7-active'))fitL7Chase()});
 
 
-'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);e.querySelector('img')?.remove();if(!src)return;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))return;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();e.append(img)}catch{}}
+'use strict';const p=new URLSearchParams(location.search),demo=false;const opacity=Number(p.get('opacity')??'.8');document.getElementById('ccL7').style.setProperty('--opacity',String(Number.isFinite(opacity)?Math.max(0,Math.min(1,opacity)):.8));const $=id=>document.getElementById('ccL7_'+id);const str=(x,f='')=>x==null||x===''?f:String(x);const get=(o,k,f='')=>str(o?.[k],f);const num=x=>Number(x);const abbr=s=>str(s,'TEAM').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();function message(s){$('message').textContent=s;$('message').classList.toggle('visible',!!s)}function logo(id,initialId,src,name){const e=$(id);if(!e)return;const path=String(src??'').trim();let img=e.querySelector('img');if(!path){if(img)img.remove();return;}let href;try{href=path.startsWith('http')?path:new URL(path,'https://cricclubs.com').href;}catch{return;}if(!img){img=document.createElement('img');img.alt='';e.append(img);}if(img.getAttribute('src')!==href)img.src=href;img.onerror=()=>{img.style.display='none';};img.style.display='';}
 let lastBallSignature='';
 function formatL7Delivery(raw){
   const source=raw&&typeof raw==='object'?(raw.ballResult??raw.result??raw.runs??raw.delivery??''):raw;
@@ -4840,6 +4843,8 @@ function formatL7Delivery(raw){
   // Unknown tokens remain visible rather than being silently mis-scored.
   return {text:value||'•',kind:'run'};
 }
+// Shared with the end-of-over summary; keep one delivery formatter.
+window.ccFormatL7Delivery=formatL7Delivery;
 /* Animate a body-level circular copy: the ribbon can remain clipped for layout
    while the growing ball is never cropped into a rectangle. */
 function animateL7UnclippedBall(chip){
@@ -4924,10 +4929,10 @@ if(!second){
   const limit=Number(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);
   const runs=Number(get(v,bat+'Total','0'));
   info=(Number.isFinite(used)&&used>0&&Number.isFinite(limit)&&limit>0&&Number.isFinite(runs))
-    ? 'Projected '+Math.round(runs*limit*6/used)
-    : 'Projected —';
+    ? 'Projected Score '+Math.round(runs*limit*6/used)
+    : 'Projected Score —';
 }
-if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.firstLogo:v.secondLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.firstLogo:v.secondLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);if(!document.body.classList.contains('layout7-toss-demo')){const oldBottom=document.getElementById('bottom');if(oldBottom)oldBottom.classList.remove('visible','projection');const oldText=document.getElementById('bottomText');if(oldText)oldText.textContent='';}message('');document.documentElement.classList.remove('cc-l7-awaiting-live')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
@@ -4971,8 +4976,9 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
     if(left)left.textContent=pick(v,['t1Code','t1ShortName','t1Abbr'])||short(a);
     if(right)right.textContent=pick(v,['t2Code','t2ShortName','t2Abbr'])||short(b);
     // Toss displays t1 on the left and t2 on the right; use the pre-match team/logo mapping.
-    const logos=[['ccL7_logoBat',v.firstLogo],['ccL7_logoBowl',v.secondLogo]];
-    for(const [id,src] of logos){const el=document.getElementById(id);if(!el)continue;el.querySelector('img')?.remove();if(!src)continue;try{const u=new URL(src,'https://cricclubs.com/');if(u.protocol!=='https:'||!(u.hostname==='cricclubs.com'||u.hostname.endsWith('.cricclubs.com')))continue;const img=document.createElement('img');img.alt='';img.src=u.href;img.onerror=()=>img.remove();el.append(img);}catch{}}
+    // Use the same team-to-logo mapping and image loader as Layout 4.
+    const logos=[['ccL7_logoBat',v.secondLogo],['ccL7_logoBowl',v.firstLogo]];
+    for(const [id,src] of logos){const imgId=id==='ccL7_logoBat'?'logoBat':'logoBowl';const el=document.getElementById(id);if(!el)continue;const path=String(src??'').trim();let img=el.querySelector('img');if(!path){if(img)img.remove();continue;}let href;try{href=path.startsWith('http')?path:new URL(path,'https://cricclubs.com').href;}catch{continue;}if(!img){img=document.createElement('img');img.alt='';el.append(img);}if(img.getAttribute('src')!==href)img.src=href;img.onerror=()=>{img.style.display='none';};img.style.display='';}
     const toss=pick(v,['toss','tossDetails','tossResult'])||pick(data,['toss']);
     let winner=pick(v,['tossWinner','tossWonBy','tossWonByTeam','tossWinnerName','tossWon']);
     if(winner){const norm=winner.toLowerCase();const codesA=[a,pick(v,['t1Code','t1ShortName','t1Abbr'])].filter(Boolean).map(x=>x.toLowerCase());const codesB=[b,pick(v,['t2Code','t2ShortName','t2Abbr'])].filter(Boolean).map(x=>x.toLowerCase());if(codesA.includes(norm))winner=a;else if(codesB.includes(norm))winner=b;}
@@ -5205,22 +5211,6 @@ body.cc-eoo-leaving #freshEOO.visible{
   text-shadow:0 1px 2px #56000a!important;
 }
 body.cc-eoo-active #scoreEvent,body.cc-eoo-leaving #scoreEvent,body.cc-eoo-active .delivery-zoom-in,body.cc-eoo-leaving .delivery-zoom-in,body.cc-eoo-active [data-cc-eoo-zoom-clone],body.cc-eoo-leaving [data-cc-eoo-zoom-clone]{display:none!important;animation:none!important}
-</style>
-
-<style id="fresh-eoo-opacity-param-20261115">
-/* Only summary panel backgrounds use the existing global URL opacity.
-   Do not set opacity on #freshEOO itself: text, balls, and entrance/exit animations stay intact. */
-#freshEOO .fe-card{background:linear-gradient(115deg,rgba(9,9,13,var(--overlay-opacity,.80)) 0%,rgba(21,8,13,var(--overlay-opacity,.80)) 46%,rgba(40,7,17,var(--overlay-opacity,.80)) 78%,rgba(9,9,13,var(--overlay-opacity,.80)) 100%)!important}
-#freshEOO .fe-head{background:linear-gradient(100deg,rgba(112,4,11,var(--overlay-opacity,.80)),rgba(215,10,27,var(--overlay-opacity,.80)) 50%,rgba(120,4,10,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-main{background:linear-gradient(100deg,rgba(9,12,18,var(--overlay-opacity,.80)),rgba(48,7,15,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-team{background:linear-gradient(110deg,rgba(120,5,14,var(--overlay-opacity,.80)),rgba(218,16,35,var(--overlay-opacity,.80)) 76%,rgba(97,6,16,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-score{background:linear-gradient(110deg,rgba(13,10,16,var(--overlay-opacity,.80)),rgba(62,7,18,var(--overlay-opacity,.80)) 60%,rgba(19,8,13,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-info{background:linear-gradient(110deg,rgba(39,7,14,var(--overlay-opacity,.80)),rgba(105,11,27,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-balls{background:linear-gradient(95deg,rgba(8,9,13,var(--overlay-opacity,.80)),rgba(33,9,18,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-label{background:linear-gradient(115deg,rgba(120,5,13,var(--overlay-opacity,.80)),rgba(210,12,32,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-box{background:linear-gradient(145deg,rgba(43,17,26,var(--overlay-opacity,.80)),rgba(11,12,16,var(--overlay-opacity,.80)) 78%)!important}
-#freshEOO .fe-box b{background:linear-gradient(100deg,rgba(154,6,18,var(--overlay-opacity,.80)),rgba(216,12,35,var(--overlay-opacity,.80)) 70%,rgba(103,6,12,var(--overlay-opacity,.80)))!important}
-#freshEOO .fe-situation{background:linear-gradient(100deg,rgba(100,7,16,var(--overlay-opacity,.80)),rgba(183,12,29,var(--overlay-opacity,.80)),rgba(100,7,16,var(--overlay-opacity,.80)))!important}
 </style>
 </body>
 </html>
