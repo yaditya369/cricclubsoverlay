@@ -4973,6 +4973,9 @@ window.ccLayout7Render=function(data){try{render(data);if(!document.body.classLi
 })();
 if(typeof latestLayout7Data!=="undefined" && latestLayout7Data && window.ccLayout7Render)window.ccLayout7Render(latestLayout7Data);</script><style id="layout7-toss-preview-style">
 /* The toss uses the existing rounded Layout 7 board, not a separate footer. */
+/* Toss content must never appear over the live scoreboard. */
+#ccL7 .board>.toss-preview{display:none!important}
+body.layout7-toss-demo #ccL7 .board>.toss-preview{display:flex!important}
 body.layout7-toss-demo #ccL7 .board>.scorebox,
 body.layout7-toss-demo #ccL7 .board>.batters,
 body.layout7-toss-demo #ccL7 .board>.bowling,
