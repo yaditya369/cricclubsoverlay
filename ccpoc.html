@@ -3838,6 +3838,11 @@ function showSecondary(message) {
 function matchNotStarted(data,v,t1,t2,second) {
   const status=textField(data,v,["matchStatus","status","statusText"]).toLowerCase();
   if(/live|in progress|innings break|completed|finished/.test(status))return false;
+  // Score/delivery evidence overrides stale pre-match status text.
+  if ((overBalls(t1.overs)||0)>0 || (overBalls(t2.overs)||0)>0 ||
+      Number(t1.total)>0 || Number(t2.total)>0 ||
+      Number(t1.wickets)>0 || Number(t2.wickets)>0 ||
+      (Array.isArray(data?.balls) && data.balls.length>0) || second) return false;
   if(/not started|upcoming|scheduled|toss/.test(status))return true;
   return !(Array.isArray(data.balls) && data.balls.length) && !second && Number(t1.total)===0 && Number(t2.total)===0 &&
     overBalls(t1.overs)===0 && overBalls(t2.overs)===0;
@@ -4570,9 +4575,11 @@ async function refresh(){
       console.debug("CricClubs: ignoring non-scoreboard view", liveData?.view);
     } else {
       await fetchHatTrickFeed();
+      // Resolve toss/live state before rendering to prevent a stale toss mask
+      // from covering the first-innings scoreboard during the transition.
+      if(overlayLayout==="7" && typeof window.ccLiveTossUpdate==="function")window.ccLiveTossUpdate(liveData);
       render(liveData);
       try { freshEOOObserve(liveData); } catch(summaryError) { console.warn("End-of-over summary skipped:",summaryError); }
-      if(overlayLayout==="7" && typeof window.ccLiveTossUpdate==="function")window.ccLiveTossUpdate(liveData);
       $("error").style.display="none";
     }
   }catch(e){
