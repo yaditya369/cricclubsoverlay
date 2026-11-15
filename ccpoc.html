@@ -3558,7 +3558,6 @@ const urlParam = k => params.get(k) || "";
 let lastEventSignature = null;
 let eventReady = false;
 let animationTimer;
-let ccDeliveryCelebrationUntil=0;
 function showEvent(kind) {
   if(document.body.classList.contains('cc-eoo-active'))return;
   if(typeof milestoneBusy!=='undefined' && milestoneBusy){
@@ -3592,7 +3591,6 @@ function showEvent(kind) {
   }
   void el.offsetWidth;
   el.classList.add("active");
-  ccDeliveryCelebrationUntil=Date.now()+2500;
   if(typeof milestoneEventDeadline!=='undefined')milestoneEventDeadline=Date.now()+2600;
   animationTimer=setTimeout(()=>{el.classList.remove("active");if(typeof milestonePlayNext==='function')milestonePlayNext();},2500);
 }
@@ -4302,37 +4300,40 @@ function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
 // Single identity-based logo resolver for every layout and match stage.
 // CricClubs firstLogo belongs to the toss winner, not necessarily t1.
 const ccTossLogoCache = new Map();
-function ccLogoForTeam(data, teamName) {
+function ccLogoForTeam(data, teamIdentity) {
   const v = data?.values || {};
   const norm = x => String(x ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
-  const a = norm(v.t1Name), b = norm(v.t2Name), requested = norm(teamName);
-  if (!a || !b || !requested || a === b) return '';
-  const pair = [a,b].sort().join('|');
-  const read = (keys) => {
-    for (const obj of [v, data, data?.match, data?.matchDetails, data?.matchInfo, v.match, v.matchDetails, v.matchInfo]) {
+  const t1 = [v.t1Name, v.t1Code, v.t1ShortName, v.t1Abbr].map(norm).filter(Boolean);
+  const t2 = [v.t2Name, v.t2Code, v.t2ShortName, v.t2Abbr].map(norm).filter(Boolean);
+  const requested = norm(teamIdentity);
+  if (!requested || !t1.length || !t2.length) return '';
+  const side = t1.includes(requested) ? 1 : t2.includes(requested) ? 2 : 0;
+  if (!side) return '';
+  // t1/t2 are fixed first-/second-innings teams; neither implies toss winner.
+  // tossWon is the authoritative CricClubs team code, not the toss description.
+  const read = keys => {
+    for (const obj of [v, data, data?.match, data?.matchDetails, data?.matchInfo]) {
       if (!obj || typeof obj !== 'object') continue;
       for (const key of keys) {
-        const x = obj[key];
-        if (x != null && String(x).trim()) return typeof x === 'object' ? (x.name || x.teamName || '') : String(x);
+        const value = obj[key];
+        if (value != null && String(value).trim())
+          return typeof value === 'object' ? (value.code || value.name || value.teamName || '') : String(value);
       }
     }
     return '';
   };
-  let winner = norm(read(['tossWonBy','tossWinner','tossWonByTeam','tossWinnerName','tossWinningTeam','tossWonTeam','toss_winner','tossWon']));
-  if (!winner) {
-    const message = typeof tossMessage === 'function' ? tossMessage(data,v) : '';
-    const match = String(message).match(/(?:^|[.!?]\s*)(.*?)\s+won\s+the\s+toss/i);
-    if (match) winner = norm(match[1]);
+  const key = String(v.matchId ?? data?.matchId ?? '') + '|' + norm(v.t1Code || v.t1Name) + '|' + norm(v.t2Code || v.t2Name);
+  let tossWinner = norm(read(['tossWon','tossWonBy','tossWinner','tossWonByTeam','tossWinnerName','tossWinningTeam','tossWonTeam','toss_winner']));
+  if (!tossWinner) {
+    const tossText = String(read(['toss','tossDetails','tossResult']));
+    const found = tossText.match(/^\s*(.*?)\s+won\s+the\s+toss/i);
+    if (found) tossWinner = norm(found[1]);
   }
-  const t1Aliases = [a,norm(v.t1Code),norm(v.t1ShortName),norm(v.t1Abbr)].filter(Boolean);
-  const t2Aliases = [b,norm(v.t2Code),norm(v.t2ShortName),norm(v.t2Abbr)].filter(Boolean);
-  if (t1Aliases.includes(winner)) ccTossLogoCache.set(pair,a);
-  else if (t2Aliases.includes(winner)) ccTossLogoCache.set(pair,b);
-  const winnerName = ccTossLogoCache.get(pair);
-  if (!winnerName) return ''; // Never guess a logo before the toss winner is known.
-  if (requested === winnerName) return v.firstLogo || '';
-  if (requested === (winnerName === a ? b : a)) return v.secondLogo || '';
-  return '';
+  let winnerSide = t1.includes(tossWinner) ? 1 : t2.includes(tossWinner) ? 2 : 0;
+  if (winnerSide) ccTossLogoCache.set(key, winnerSide);
+  else winnerSide = ccTossLogoCache.get(key) || 0;
+  if (!winnerSide) return ''; // Unknown toss: do not assign a potentially incorrect logo.
+  return side === winnerSide ? (v.firstLogo || '') : (v.secondLogo || '');
 }
 let latestLayout7Data=null; function publishLayout7(data){latestLayout7Data=data;if(typeof window.ccLayout7Render==='function')window.ccLayout7Render(data);}
 
@@ -4511,7 +4512,7 @@ function render(data){
 }
 
 // Fresh end-of-over component. No observers, extra fetches or scoreboard mutations.
-const freshEOOState={seen:new Set(),previous:new Map(),lastBalls:new Map(),timer:null,pending:null,pendingTimer:null};
+const freshEOOState={seen:new Set(),previous:new Map(),lastBalls:new Map(),timer:null};
 // Seconds shown after the entrance completes; default 10 seconds.
 const freshEOODurationSeconds=(()=>{const raw=new URLSearchParams(location.search).get('endOfOverDuration');const n=raw===null?10:Number(raw);return Number.isFinite(n)&&n>=1?Math.min(n,120):10;})();
 const freshEOOMotionMs=520;
@@ -4575,14 +4576,6 @@ function freshEOOObserve(data){
   const identity=String(second?v.t2Name:v.t1Name||'').trim()||`innings-${inning}`;
   const scope=`${inning}|${identity}`;const raw=String(team.overs??'').trim();
   const prev=freshEOOState.previous.get(scope);freshEOOState.previous.set(scope,raw);
-  // A new delivery makes a queued summary obsolete; never obscure live play.
-  if(freshEOOState.pending && (freshEOOState.pending.scope!==scope ||
-      (freshEOOState.pending.over!==null && /^\d+(?:\.[0-5])?$/.test(raw) &&
-       Number(raw)>freshEOOState.pending.over))){
-    clearTimeout(freshEOOState.pendingTimer);
-    freshEOOState.pendingTimer=null;
-    freshEOOState.pending=null;
-  }
   const balls=freshEOOBalls(data);
   // An API poll may skip the exact N.0 response and arrive at N.1 or later.
   // Overs notation is legal balls, not decimal fractions; the integer part is
@@ -4603,23 +4596,7 @@ function freshEOOObserve(data){
   const currentBalls=balls.length?balls:previousBalls;
   // Only mark as shown after a successful render, so a rendering exception
   // cannot permanently suppress this over.
-  // The final delivery celebration owns the screen for its full 2.5 seconds.
-  // Keep polling normally, but only show the snapshot if no new ball arrives.
-  const wait=Math.max(0,ccDeliveryCelebrationUntil-Date.now());
-  if(wait>0 && overlayLayout==="7"){
-    clearTimeout(freshEOOState.pendingTimer);
-    const pending={scope,over:completed,key};
-    freshEOOState.pending=pending;
-    freshEOOState.pendingTimer=setTimeout(()=>{
-      if(freshEOOState.pending!==pending)return;
-      freshEOOState.pending=null;
-      freshEOOState.pendingTimer=null;
-      try{freshEOORender(data,team,completed,second,currentBalls);}
-      catch(error){console.warn('Deferred end-of-over summary skipped:',error);}
-    },wait+100);
-  }else{
-    freshEOORender(data,team,completed,second,currentBalls);
-  }
+  freshEOORender(data,team,completed,second,currentBalls);
   freshEOOState.seen.add(key);
   if(balls.length)freshEOOState.lastBalls.set(scope,balls);
 }
