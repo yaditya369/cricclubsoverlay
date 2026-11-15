@@ -4055,7 +4055,7 @@ function milestonePlayNext(){
 // Optional visual QA: play every defined milestone, sequentially, 10 seconds
 // after page load. Does not change scores, live milestone tracking, or API data.
 function startMilestoneDemo(){
-  if(!milestoneDemo || overlayLayout!=='4' || (params.get('view')||'').trim()==='8')return;
+  if(!milestoneDemo || (overlayLayout!=='4' && overlayLayout!=='7') || (params.get('view')||'').trim()==='8')return;
   const samples=[
     ['team50','','TEAM TOTAL'],['team100','','TEAM TOTAL'],
     ['team150','','TEAM TOTAL'],['team200','','TEAM TOTAL'],
@@ -4207,12 +4207,12 @@ function hatProcess(payload,inning,allowCelebration=true){
   return detected;
 }
 function observeHatTrick(data,inning,preMatch,onBreak,isFinished){
-  if(milestoneDemo||!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
+  if(milestoneDemo||!milestoneEnabled||(overlayLayout!=='4' && overlayLayout!=='7')||preMatch)return;
   const payload=hatTrickFeed||data;
   hatProcess(payload,inning,!onBreak&&!isFinished);
 }
 async function fetchHatTrickFeed(){
-  if(!hatTrickFeedUrl || !milestoneEnabled || overlayLayout!=='4')return;
+  if(!hatTrickFeedUrl || !milestoneEnabled || (overlayLayout!=='4' && overlayLayout!=='7'))return;
   try{
     const response=await fetch(hatTrickFeedUrl,{cache:'no-store'});
     if(!response.ok)throw Error('Hat-trick feed HTTP '+response.status);
@@ -4221,7 +4221,7 @@ async function fetchHatTrickFeed(){
 }
 
 function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
-  if(milestoneDemo||!milestoneEnabled||overlayLayout!=='4'||preMatch)return;
+  if(milestoneDemo||!milestoneEnabled||(overlayLayout!=='4' && overlayLayout!=='7')||preMatch)return;
   const now=milestoneRead(data,v,second,t1,t2);
   const prev=milestoneBaseline;
   const changedInning=!prev||prev.inning!==now.inning;
@@ -4917,8 +4917,8 @@ if(!second){
   const limit=Number(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);
   const runs=Number(get(v,bat+'Total','0'));
   info=(Number.isFinite(used)&&used>0&&Number.isFinite(limit)&&limit>0&&Number.isFinite(runs))
-    ? 'Projected Score '+Math.round(runs*limit*6/used)
-    : 'Projected Score —';
+    ? 'Projected '+Math.round(runs*limit*6/used)
+    : 'Projected —';
 }
 if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
@@ -5198,6 +5198,22 @@ body.cc-eoo-leaving #freshEOO.visible{
   text-shadow:0 1px 2px #56000a!important;
 }
 body.cc-eoo-active #scoreEvent,body.cc-eoo-leaving #scoreEvent,body.cc-eoo-active .delivery-zoom-in,body.cc-eoo-leaving .delivery-zoom-in,body.cc-eoo-active [data-cc-eoo-zoom-clone],body.cc-eoo-leaving [data-cc-eoo-zoom-clone]{display:none!important;animation:none!important}
+</style>
+
+<style id="fresh-eoo-opacity-param-20261115">
+/* Only summary panel backgrounds use the existing global URL opacity.
+   Do not set opacity on #freshEOO itself: text, balls, and entrance/exit animations stay intact. */
+#freshEOO .fe-card{background:linear-gradient(115deg,rgba(9,9,13,var(--overlay-opacity,.80)) 0%,rgba(21,8,13,var(--overlay-opacity,.80)) 46%,rgba(40,7,17,var(--overlay-opacity,.80)) 78%,rgba(9,9,13,var(--overlay-opacity,.80)) 100%)!important}
+#freshEOO .fe-head{background:linear-gradient(100deg,rgba(112,4,11,var(--overlay-opacity,.80)),rgba(215,10,27,var(--overlay-opacity,.80)) 50%,rgba(120,4,10,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-main{background:linear-gradient(100deg,rgba(9,12,18,var(--overlay-opacity,.80)),rgba(48,7,15,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-team{background:linear-gradient(110deg,rgba(120,5,14,var(--overlay-opacity,.80)),rgba(218,16,35,var(--overlay-opacity,.80)) 76%,rgba(97,6,16,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-score{background:linear-gradient(110deg,rgba(13,10,16,var(--overlay-opacity,.80)),rgba(62,7,18,var(--overlay-opacity,.80)) 60%,rgba(19,8,13,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-info{background:linear-gradient(110deg,rgba(39,7,14,var(--overlay-opacity,.80)),rgba(105,11,27,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-balls{background:linear-gradient(95deg,rgba(8,9,13,var(--overlay-opacity,.80)),rgba(33,9,18,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-label{background:linear-gradient(115deg,rgba(120,5,13,var(--overlay-opacity,.80)),rgba(210,12,32,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-box{background:linear-gradient(145deg,rgba(43,17,26,var(--overlay-opacity,.80)),rgba(11,12,16,var(--overlay-opacity,.80)) 78%)!important}
+#freshEOO .fe-box b{background:linear-gradient(100deg,rgba(154,6,18,var(--overlay-opacity,.80)),rgba(216,12,35,var(--overlay-opacity,.80)) 70%,rgba(103,6,12,var(--overlay-opacity,.80)))!important}
+#freshEOO .fe-situation{background:linear-gradient(100deg,rgba(100,7,16,var(--overlay-opacity,.80)),rgba(183,12,29,var(--overlay-opacity,.80)),rgba(100,7,16,var(--overlay-opacity,.80)))!important}
 </style>
 </body>
 </html>
