@@ -4297,43 +4297,21 @@ function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
 }
 
 
-// Single identity-based logo resolver for every layout and match stage.
-// CricClubs firstLogo belongs to the toss winner, not necessarily t1.
-const ccTossLogoCache = new Map();
+// CricClubs logos describe the current innings: firstLogo is the batting
+// team's logo, secondLogo is the bowling team's logo. t1/t2 identify the
+// first-/second-innings batting teams and do not change between innings.
 function ccLogoForTeam(data, teamIdentity) {
   const v = data?.values || {};
   const norm = x => String(x ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const requested = norm(teamIdentity);
   const t1 = [v.t1Name, v.t1Code, v.t1ShortName, v.t1Abbr].map(norm).filter(Boolean);
   const t2 = [v.t2Name, v.t2Code, v.t2ShortName, v.t2Abbr].map(norm).filter(Boolean);
-  const requested = norm(teamIdentity);
-  if (!requested || !t1.length || !t2.length) return '';
+  if (!requested) return '';
   const side = t1.includes(requested) ? 1 : t2.includes(requested) ? 2 : 0;
   if (!side) return '';
-  // t1/t2 are fixed first-/second-innings teams; neither implies toss winner.
-  // tossWon is the authoritative CricClubs team code, not the toss description.
-  const read = keys => {
-    for (const obj of [v, data, data?.match, data?.matchDetails, data?.matchInfo]) {
-      if (!obj || typeof obj !== 'object') continue;
-      for (const key of keys) {
-        const value = obj[key];
-        if (value != null && String(value).trim())
-          return typeof value === 'object' ? (value.code || value.name || value.teamName || '') : String(value);
-      }
-    }
-    return '';
-  };
-  const key = String(v.matchId ?? data?.matchId ?? '') + '|' + norm(v.t1Code || v.t1Name) + '|' + norm(v.t2Code || v.t2Name);
-  let tossWinner = norm(read(['tossWon','tossWonBy','tossWinner','tossWonByTeam','tossWinnerName','tossWinningTeam','tossWonTeam','toss_winner']));
-  if (!tossWinner) {
-    const tossText = String(read(['toss','tossDetails','tossResult']));
-    const found = tossText.match(/^\s*(.*?)\s+won\s+the\s+toss/i);
-    if (found) tossWinner = norm(found[1]);
-  }
-  let winnerSide = t1.includes(tossWinner) ? 1 : t2.includes(tossWinner) ? 2 : 0;
-  if (winnerSide) ccTossLogoCache.set(key, winnerSide);
-  else winnerSide = ccTossLogoCache.get(key) || 0;
-  if (!winnerSide) return ''; // Unknown toss: do not assign a potentially incorrect logo.
-  return side === winnerSide ? (v.firstLogo || '') : (v.secondLogo || '');
+  const second = truthy(data?.isSecondInningsStarted) || truthy(v.isSecondInningsStarted);
+  const battingSide = second ? 2 : 1;
+  return side === battingSide ? (v.firstLogo || '') : (v.secondLogo || '');
 }
 let latestLayout7Data=null; function publishLayout7(data){latestLayout7Data=data;if(typeof window.ccLayout7Render==='function')window.ccLayout7Render(data);}
 
