@@ -3558,6 +3558,7 @@ const urlParam = k => params.get(k) || "";
 let lastEventSignature = null;
 let eventReady = false;
 let animationTimer;
+let ccDeliveryCelebrationUntil=0;
 function showEvent(kind) {
   if(document.body.classList.contains('cc-eoo-active'))return;
   if(typeof milestoneBusy!=='undefined' && milestoneBusy){
@@ -3591,6 +3592,7 @@ function showEvent(kind) {
   }
   void el.offsetWidth;
   el.classList.add("active");
+  ccDeliveryCelebrationUntil=Date.now()+2500;
   if(typeof milestoneEventDeadline!=='undefined')milestoneEventDeadline=Date.now()+2600;
   animationTimer=setTimeout(()=>{el.classList.remove("active");if(typeof milestonePlayNext==='function')milestonePlayNext();},2500);
 }
@@ -4509,7 +4511,7 @@ function render(data){
 }
 
 // Fresh end-of-over component. No observers, extra fetches or scoreboard mutations.
-const freshEOOState={seen:new Set(),previous:new Map(),lastBalls:new Map(),timer:null};
+const freshEOOState={seen:new Set(),previous:new Map(),lastBalls:new Map(),timer:null,pending:null,pendingTimer:null};
 // Seconds shown after the entrance completes; default 10 seconds.
 const freshEOODurationSeconds=(()=>{const raw=new URLSearchParams(location.search).get('endOfOverDuration');const n=raw===null?10:Number(raw);return Number.isFinite(n)&&n>=1?Math.min(n,120):10;})();
 const freshEOOMotionMs=520;
@@ -4573,6 +4575,14 @@ function freshEOOObserve(data){
   const identity=String(second?v.t2Name:v.t1Name||'').trim()||`innings-${inning}`;
   const scope=`${inning}|${identity}`;const raw=String(team.overs??'').trim();
   const prev=freshEOOState.previous.get(scope);freshEOOState.previous.set(scope,raw);
+  // A new delivery makes a queued summary obsolete; never obscure live play.
+  if(freshEOOState.pending && (freshEOOState.pending.scope!==scope ||
+      (freshEOOState.pending.over!==null && /^\d+(?:\.[0-5])?$/.test(raw) &&
+       Number(raw)>freshEOOState.pending.over))){
+    clearTimeout(freshEOOState.pendingTimer);
+    freshEOOState.pendingTimer=null;
+    freshEOOState.pending=null;
+  }
   const balls=freshEOOBalls(data);
   // An API poll may skip the exact N.0 response and arrive at N.1 or later.
   // Overs notation is legal balls, not decimal fractions; the integer part is
@@ -4593,7 +4603,23 @@ function freshEOOObserve(data){
   const currentBalls=balls.length?balls:previousBalls;
   // Only mark as shown after a successful render, so a rendering exception
   // cannot permanently suppress this over.
-  freshEOORender(data,team,completed,second,currentBalls);
+  // The final delivery celebration owns the screen for its full 2.5 seconds.
+  // Keep polling normally, but only show the snapshot if no new ball arrives.
+  const wait=Math.max(0,ccDeliveryCelebrationUntil-Date.now());
+  if(wait>0 && overlayLayout==="7"){
+    clearTimeout(freshEOOState.pendingTimer);
+    const pending={scope,over:completed,key};
+    freshEOOState.pending=pending;
+    freshEOOState.pendingTimer=setTimeout(()=>{
+      if(freshEOOState.pending!==pending)return;
+      freshEOOState.pending=null;
+      freshEOOState.pendingTimer=null;
+      try{freshEOORender(data,team,completed,second,currentBalls);}
+      catch(error){console.warn('Deferred end-of-over summary skipped:',error);}
+    },wait+100);
+  }else{
+    freshEOORender(data,team,completed,second,currentBalls);
+  }
   freshEOOState.seen.add(key);
   if(balls.length)freshEOOState.lastBalls.set(scope,balls);
 }
@@ -4973,7 +4999,7 @@ if(!second){
     ? 'Projected Score '+Math.round(runs*limit*6/used)
     : 'Projected Score —';
 }
-if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',ccLogoForTeam(data,batting),batting);logo('logoBowl','initialBowl',ccLogoForTeam(data,bowling),bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=get(v,'bowlerName','—');$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',ccLogoForTeam(data,batting),batting);logo('logoBowl','initialBowl',ccLogoForTeam(data,bowling),bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);if(!document.body.classList.contains('layout7-toss-demo')){const oldBottom=document.getElementById('bottom');if(oldBottom)oldBottom.classList.remove('visible','projection');const oldText=document.getElementById('bottomText');if(oldText)oldText.textContent='';}message('');document.documentElement.classList.remove('cc-l7-awaiting-live')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
