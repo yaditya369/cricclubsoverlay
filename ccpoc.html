@@ -3792,8 +3792,8 @@ function showFinalMatchResult(data,v,t1,t2){
     setText("mrScore"+n,`${t.total}/${t.wickets}`);
     setText("mrOvers"+n,`(${formatOvers(t.overs)} ov)`);
     const img=$("mrLogo"+n);
-    // Match the existing CricClubs logo mapping used by layout 1.
-    const path=i===0?v.secondLogo:v.firstLogo;
+    // Resolve logo from toss-winning team identity.
+    const path=ccLogoForTeam(data,t.name);
     if(path){img.src=/^(https?:|data:|\/\/)/i.test(String(path))?path:new URL(path,"https://cricclubs.com").href;img.hidden=false;img.onerror=()=>{img.hidden=true};}
     else {img.hidden=true;img.removeAttribute("src")}
   });
@@ -4291,6 +4291,41 @@ function observeMilestones(data,v,second,t1,t2,preMatch,onBreak,isFinished){
 }
 
 
+// Single identity-based logo resolver for every layout and match stage.
+// CricClubs firstLogo belongs to the toss winner, not necessarily t1.
+const ccTossLogoCache = new Map();
+function ccLogoForTeam(data, teamName) {
+  const v = data?.values || {};
+  const norm = x => String(x ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const a = norm(v.t1Name), b = norm(v.t2Name), requested = norm(teamName);
+  if (!a || !b || !requested || a === b) return '';
+  const pair = [a,b].sort().join('|');
+  const read = (keys) => {
+    for (const obj of [v, data, data?.match, data?.matchDetails, data?.matchInfo, v.match, v.matchDetails, v.matchInfo]) {
+      if (!obj || typeof obj !== 'object') continue;
+      for (const key of keys) {
+        const x = obj[key];
+        if (x != null && String(x).trim()) return typeof x === 'object' ? (x.name || x.teamName || '') : String(x);
+      }
+    }
+    return '';
+  };
+  let winner = norm(read(['tossWonBy','tossWinner','tossWonByTeam','tossWinnerName','tossWinningTeam','tossWonTeam','toss_winner','tossWon']));
+  if (!winner) {
+    const message = typeof tossMessage === 'function' ? tossMessage(data,v) : '';
+    const match = String(message).match(/(?:^|[.!?]\s*)(.*?)\s+won\s+the\s+toss/i);
+    if (match) winner = norm(match[1]);
+  }
+  const t1Aliases = [a,norm(v.t1Code),norm(v.t1ShortName),norm(v.t1Abbr)].filter(Boolean);
+  const t2Aliases = [b,norm(v.t2Code),norm(v.t2ShortName),norm(v.t2Abbr)].filter(Boolean);
+  if (t1Aliases.includes(winner)) ccTossLogoCache.set(pair,a);
+  else if (t2Aliases.includes(winner)) ccTossLogoCache.set(pair,b);
+  const winnerName = ccTossLogoCache.get(pair);
+  if (!winnerName) return ''; // Never guess a logo before the toss winner is known.
+  if (requested === winnerName) return v.firstLogo || '';
+  if (requested === (winnerName === a ? b : a)) return v.secondLogo || '';
+  return '';
+}
 let latestLayout7Data=null; function publishLayout7(data){latestLayout7Data=data;if(typeof window.ccLayout7Render==='function')window.ccLayout7Render(data);}
 
 function render(data){
@@ -4331,10 +4366,10 @@ function render(data){
     $("name2").textContent=t2.name;
     $("preTeam1").textContent=t1.name;
     $("preTeam2").textContent=t2.name;
-    prematchLogo("preLogo1","preInitials1",t1.name,v.secondLogo);
-    prematchLogo("preLogo2","preInitials2",t2.name,v.firstLogo);
-    logo("logo1",v.secondLogo);
-    logo("logo2",v.firstLogo);
+    prematchLogo("preLogo1","preInitials1",t1.name,ccLogoForTeam(data,t1.name));
+    prematchLogo("preLogo2","preInitials2",t2.name,ccLogoForTeam(data,t2.name));
+    logo("logo1",ccLogoForTeam(data,t1.name));
+    logo("logo2",ccLogoForTeam(data,t2.name));
     $("details1").innerHTML=showBatters(v);
     $("details2").innerHTML=showBowler(v,data.balls,second?t2.overs:t1.overs);
     if (isLayout2) $("score1").closest(".scorebox").style.display="flex";
@@ -4359,9 +4394,9 @@ function render(data){
     setPlayerDetails($("details1"), showBatters(v));
     setPlayerDetails($("details2"), showBowler(v, data.balls, second?t2.overs:t1.overs));
 
-    // Layout 2: first-innings logos corrected; preserve the working second-innings mapping.
-    logo("logo1", second ? v.firstLogo : v.secondLogo);
-    logo("logo2", second ? v.secondLogo : v.firstLogo);
+    // Layout 2: resolve both logos by the displayed team names.
+    logo("logo1",ccLogoForTeam(data,battingTeam.name));
+    logo("logo2",ccLogoForTeam(data,bowlingTeam.name));
 
     if (isFinished) {
       showSecondary(postMatchMessage(data,v));
@@ -4412,8 +4447,8 @@ function render(data){
   $("score2").closest(".scorebox").style.display = "";
   $("score1").closest(".scorebox").style.visibility = "visible";
   $("score2").closest(".scorebox").style.visibility = "visible";
-  logo("logo1", v.secondLogo);
-  logo("logo2", v.firstLogo);
+  logo("logo1",ccLogoForTeam(data,t1.name));
+  logo("logo2",ccLogoForTeam(data,t2.name));
 
   if(!second){
     $("details1").innerHTML=showBatters(v);
@@ -4932,7 +4967,7 @@ if(!second){
     ? 'Projected Score '+Math.round(runs*limit*6/used)
     : 'Projected Score —';
 }
-if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',ccLogoForTeam(data,batting),batting);logo('logoBowl','initialBowl',ccLogoForTeam(data,bowling),bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);if(!document.body.classList.contains('layout7-toss-demo')){const oldBottom=document.getElementById('bottom');if(oldBottom)oldBottom.classList.remove('visible','projection');const oldText=document.getElementById('bottomText');if(oldText)oldText.textContent='';}message('');document.documentElement.classList.remove('cc-l7-awaiting-live')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
@@ -4975,9 +5010,8 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
     const left=document.getElementById('ccL7_teamBat'),right=document.getElementById('ccL7_teamBowl');
     if(left)left.textContent=pick(v,['t1Code','t1ShortName','t1Abbr'])||short(a);
     if(right)right.textContent=pick(v,['t2Code','t2ShortName','t2Abbr'])||short(b);
-    // Toss displays t1 on the left and t2 on the right; use the pre-match team/logo mapping.
-    // Use the same team-to-logo mapping and image loader as Layout 4.
-    const logos=[['ccL7_logoBat',v.secondLogo],['ccL7_logoBowl',v.firstLogo]];
+    // Toss displays t1 on the left and t2 on the right; logos follow team identity.
+    const logos=[['ccL7_logoBat',ccLogoForTeam(data,a)],['ccL7_logoBowl',ccLogoForTeam(data,b)]];
     for(const [id,src] of logos){const imgId=id==='ccL7_logoBat'?'logoBat':'logoBowl';const el=document.getElementById(id);if(!el)continue;const path=String(src??'').trim();let img=el.querySelector('img');if(!path){if(img)img.remove();continue;}let href;try{href=path.startsWith('http')?path:new URL(path,'https://cricclubs.com').href;}catch{continue;}if(!img){img=document.createElement('img');img.alt='';el.append(img);}if(img.getAttribute('src')!==href)img.src=href;img.onerror=()=>{img.style.display='none';};img.style.display='';}
     const toss=pick(v,['toss','tossDetails','tossResult'])||pick(data,['toss']);
     let winner=pick(v,['tossWinner','tossWonBy','tossWonByTeam','tossWinnerName','tossWon']);
