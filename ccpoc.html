@@ -5171,12 +5171,32 @@ body.cc-eoo-leaving #freshEOO.visible{
 </style>
 
 <style id="cc-eoo-delivery-parity-and-suppression">
-/* Match Layout 7 footer delivery categories and palette exactly. */
-#freshEOO .fe-ball.run,#freshEOO .fe-ball.dot{background:linear-gradient(155deg,#c22b43 0%,#870918 55%,#4b0610 100%)!important;color:#fff!important;border-color:#c95a6c!important}
-#freshEOO .fe-ball.four{background:linear-gradient(155deg,#f8d76b 0%,#d4a017 49%,#8c5d05 100%)!important;color:#fff!important;border-color:#e7c35b!important}
-#freshEOO .fe-ball.six{background:linear-gradient(155deg,#52d991 0%,#16834a 50%,#07522c 100%)!important;color:#fff!important;border-color:#79dfab!important}
-#freshEOO .fe-ball.extra{background:linear-gradient(155deg,#5bb3f3 0%,#1769aa 50%,#073967 100%)!important;color:#fff!important;border-color:#7fc9f9!important}
-#freshEOO .fe-ball.wicket{background:linear-gradient(145deg,#ff6b70 0%,#ed182b 32%,#b5001b 70%,#720012 100%)!important;color:#fff!important;border-color:#fff1f1!important}
+/* Summary chips share the exact Layout 7 footer glossy finish and category colors.
+   Scoped to #freshEOO; scoreboard CSS and JavaScript remain unchanged. */
+#freshEOO .fe-ball{
+  box-sizing:border-box!important;aspect-ratio:1/1!important;border-radius:50%!important;
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  padding:0!important;flex-shrink:0!important;
+  border:1px solid rgba(255,255,255,.48)!important;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.46),inset 0 -3px 5px rgba(0,0,0,.28),0 1px 3px rgba(0,0,0,.38)!important;
+  text-shadow:0 1px 1px rgba(0,0,0,.55)!important;
+}
+#freshEOO .fe-ball::before{
+  content:"";position:absolute;left:12%;top:7%;width:76%;height:39%;
+  border-radius:50% 50% 43% 43%;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.63),rgba(255,255,255,.16) 68%,transparent);
+  opacity:.8;z-index:-1;
+}
+#freshEOO .fe-ball.run,#freshEOO .fe-ball.dot{background:linear-gradient(155deg,#c22b43 0%,#870918 55%,#4b0610 100%)!important;color:#fff!important}
+#freshEOO .fe-ball.four{background:linear-gradient(155deg,#f8d76b 0%,#d4a017 49%,#8c5d05 100%)!important;color:#fff!important}
+#freshEOO .fe-ball.six{background:linear-gradient(155deg,#52d991 0%,#16834a 50%,#07522c 100%)!important;color:#fff!important}
+#freshEOO .fe-ball.extra{background:linear-gradient(155deg,#5bb3f3 0%,#1769aa 50%,#073967 100%)!important;color:#fff!important}
+#freshEOO .fe-ball.wicket{
+  background:linear-gradient(145deg,#ff6b70 0%,#ed182b 32%,#b5001b 70%,#720012 100%)!important;
+  color:#fff!important;border:2px solid #fff1f1!important;outline:1px solid #ff4657!important;
+  box-shadow:0 0 0 2px rgba(255,48,73,.55),0 0 9px rgba(255,38,65,.9),inset 0 2px 2px rgba(255,255,255,.7),inset 0 -3px 4px rgba(74,0,0,.5)!important;
+  text-shadow:0 1px 2px #56000a!important;
+}
 body.cc-eoo-active #scoreEvent,body.cc-eoo-leaving #scoreEvent,body.cc-eoo-active .delivery-zoom-in,body.cc-eoo-leaving .delivery-zoom-in,body.cc-eoo-active [data-cc-eoo-zoom-clone],body.cc-eoo-leaving [data-cc-eoo-zoom-clone]{display:none!important;animation:none!important}
 </style>
 </body>
