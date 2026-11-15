@@ -2611,7 +2611,13 @@ html body #ccL7 .bowling .balls > .ball.delivery-zoom-in {
 
 
 
-</style></head>
+</style>
+<style id="fresh-eoo-opacity-animation-correction">
+/* Keep the entrance/exit animation on #freshEOO, but apply URL opacity to
+   the inner card so animation keyframes cannot override it. */
+#freshEOO .fe-card { opacity: var(--overlay-opacity, .80) !important; }
+</style>
+</head>
 <body>
 <div class="overlay">
 <div class="prematch-template" hidden="" id="prematchTemplate">
@@ -5251,6 +5257,40 @@ body.cc-eoo-leaving #freshEOO.visible{
   text-shadow:0 1px 2px #56000a!important;
 }
 body.cc-eoo-active #scoreEvent,body.cc-eoo-leaving #scoreEvent,body.cc-eoo-active .delivery-zoom-in,body.cc-eoo-leaving .delivery-zoom-in,body.cc-eoo-active [data-cc-eoo-zoom-clone],body.cc-eoo-leaving [data-cc-eoo-zoom-clone]{display:none!important;animation:none!important}
+</style>
+
+<style id="fresh-eoo-clean-corners">
+/* Remove decorative corner stripes; retain the single rounded frame and banner. */
+#freshEOO .fe-card::before,
+#freshEOO .fe-card::after { content:none !important; display:none !important; }
+</style>
+
+<style id="fresh-eoo-subtle-gloss">
+/* Scoped visual polish only. No pseudo-elements on .fe-card: corners stay clean.
+   The parent #freshEOO continues to control opacity. */
+#freshEOO .fe-card{
+  background:linear-gradient(172deg,rgba(255,255,255,.105) 0%,rgba(255,255,255,.035) 15%,transparent 33%),linear-gradient(115deg,#09090d 0%,#190b12 46%,#300a17 78%,#09090d 100%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,214,178,.36),inset 0 0 0 1px rgba(255,115,80,.15),inset 0 -12px 28px rgba(0,0,0,.24),0 18px 38px rgba(0,0,0,.65)!important;
+}
+#freshEOO .fe-head{
+  background:linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.055) 42%,transparent 51%),linear-gradient(105deg,#720912,#d8152b 48%,#65040c)!important;
+  box-shadow:inset 0 1px 0 rgba(255,238,197,.55),inset 0 -4px 8px rgba(55,0,7,.35),0 5px 13px rgba(0,0,0,.55)!important;
+}
+#freshEOO .fe-team,#freshEOO .fe-info,#freshEOO .fe-label,#freshEOO .fe-box b{
+  background-image:linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,.025) 47%,rgba(0,0,0,.12) 51%),linear-gradient(110deg,#750710,#c80c23 75%,#560710)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -3px 8px rgba(0,0,0,.16);
+}
+#freshEOO .fe-score{
+  background:linear-gradient(180deg,rgba(255,255,255,.09),transparent 48%),linear-gradient(115deg,#19080d,#440813 65%,#19090d)!important;
+}
+#freshEOO .fe-box{
+  background:linear-gradient(165deg,rgba(255,255,255,.09),transparent 35%),linear-gradient(145deg,#291017,#090b0f 85%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -8px 18px rgba(0,0,0,.15)!important;
+}
+#freshEOO .fe-situation{
+  background:linear-gradient(180deg,rgba(255,255,255,.20),transparent 49%),linear-gradient(110deg,#610910,#b30c1a,#600910)!important;
+  box-shadow:inset 0 1px 0 rgba(255,230,163,.35),inset 0 -3px 7px rgba(0,0,0,.25)!important;
+}
 </style>
 </body>
 </html>
