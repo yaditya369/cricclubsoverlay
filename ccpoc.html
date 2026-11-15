@@ -3553,6 +3553,7 @@ let lastEventSignature = null;
 let eventReady = false;
 let animationTimer;
 function showEvent(kind) {
+  if(document.body.classList.contains('cc-eoo-active'))return;
   if(typeof milestoneBusy!=='undefined' && milestoneBusy){
     setTimeout(()=>showEvent(kind),350);
     return;
@@ -4468,6 +4469,9 @@ function render(data){
 
 // Fresh end-of-over component. No observers, extra fetches or scoreboard mutations.
 const freshEOOState={seen:new Set(),previous:new Map(),lastBalls:new Map(),timer:null};
+// Seconds shown after the entrance completes; default 10 seconds.
+const freshEOODurationSeconds=(()=>{const raw=new URLSearchParams(location.search).get('endOfOverDuration');const n=raw===null?10:Number(raw);return Number.isFinite(n)&&n>=1?Math.min(n,120):10;})();
+const freshEOOMotionMs=520;
 function freshEOOBoundary(value){const s=String(value??'').trim();return /^(?:[1-9]\d*)(?:\.0)?$/.test(s)?Number(s):null;}
 function freshEOOBalls(data){return Array.isArray(data?.balls)?data.balls.map(String):[];}
 function freshEOOHtml(x){return String(x??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -4478,8 +4482,8 @@ function freshEOORender(data,team,over,second,balls){
   text('feInfo',`${over}.0 OVERS · RR ${team.rr}`);
   const tokens=balls.slice(-14);
   document.getElementById('feBalls').innerHTML=tokens.length?tokens.map(raw=>{
-    const val=String(raw).trim();const kind=/^W(?:$|\+)|\dW$/i.test(val)?'wicket':/(?:WD|NB|WIDE|LB|BYE)/i.test(val)?'extra':val==='4'?'four':val==='6'?'six':'';
-    return `<span class="fe-ball ${kind}">${freshEOOHtml(val)}</span>`;
+    const formatted=formatL7Delivery(raw);
+    return `<span class="fe-ball ${formatted.kind}">${freshEOOHtml(formatted.text)}</span>`;
   }).join(''):'<span>Delivery details unavailable</span>';
   // Never fabricate per-over statistics from incomplete or ambiguous deliveries.
   const runs=tokens.length&&typeof thisOverRuns==='function'?thisOverRuns(tokens):null;
@@ -4504,6 +4508,11 @@ function freshEOORender(data,team,over,second,balls){
   // Directly controlled transitions; no observer and no extra fetch.
   const body=document.body;
   body.classList.remove('cc-eoo-leaving');
+  // Stop transient delivery celebrations and detached zoom clones while summary is visible.
+  const event=document.getElementById('scoreEvent');
+  if(event){event.classList.remove('active');event.style.display='none';}
+  document.querySelectorAll('.delivery-zoom-in').forEach(node=>node.classList.remove('delivery-zoom-in'));
+  document.querySelectorAll('[data-cc-eoo-zoom-clone]').forEach(node=>node.remove());
   body.classList.add('cc-eoo-active');
   el.classList.add('visible');
   freshEOOState.timer=setTimeout(()=>{
@@ -4514,8 +4523,8 @@ function freshEOORender(data,team,over,second,balls){
       body.classList.remove('cc-eoo-leaving');
       el.classList.remove('visible');
       freshEOOState.exitTimer=null;
-    },360);
-  },6500);
+    },freshEOOMotionMs+80);
+  },Math.round(freshEOODurationSeconds*1000+freshEOOMotionMs));
 }
 function freshEOOObserve(data){
   const v=data?.values||{},second=truthy(data.isSecondInningsStarted)||truthy(v.isSecondInningsStarted);
@@ -4851,6 +4860,8 @@ function animateL7UnclippedBall(chip){
     fontWeight:computed.fontWeight,border:computed.border,
     boxShadow:computed.boxShadow,opacity:'1'
   });
+  copy.dataset.ccEooZoomClone='1';
+  if(document.body.classList.contains('cc-eoo-active'))return;
   document.body.appendChild(copy);
   copy.addEventListener('animationend',()=>copy.remove(),{once:true});
   setTimeout(()=>copy.remove(),1250);
@@ -4888,7 +4899,7 @@ function setBalls(arr,overs){
   recent.forEach((raw,i)=>{
     const formatted=formatL7Delivery(raw);
     const chip=document.createElement('span');
-    chip.className='ball '+formatted.kind+(i===animateIndex?' delivery-zoom-in':'');
+    chip.className='ball '+formatted.kind+(i===animateIndex&&!document.body.classList.contains('cc-eoo-active')?' delivery-zoom-in':'');
     chip.textContent=formatted.text;
     fragment.appendChild(chip);
   });
@@ -4909,7 +4920,7 @@ if(!second){
     ? 'Projected Score '+Math.round(runs*limit*6/used)
     : 'Projected Score —';
 }
-if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.firstLogo:v.secondLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.firstLogo:v.secondLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
+if(second){const first=num(v.t1Total),current=num(v.t2Total),target=first+1;const maxOvers=num(v.maxOvers??v.maximumOvers??v.totalOvers??p.get('overs')??15);const parts=String(overs).split('.');const used=(num(parts[0])||0)*6+(num(parts[1])||0);const remaining=Math.max(0,Math.round(maxOvers*6)-used);if(Number.isFinite(first)&&Number.isFinite(current)&&Number.isFinite(maxOvers)&&maxOvers>0){const need=Math.max(0,target-current);const rrr=remaining>0?(need*6/remaining).toFixed(2):'—';info=need===0?'TARGET REACHED':`Need ${need} of ${remaining} · RRR ${rrr}`;}else{const need=get(v,'runsRequired',get(v,'runsNeeded',''));const rrr=get(v,'requiredRunRate',get(v,'rrr','—'));info=need?`Need ${need} of ${remaining} · RRR ${rrr}`:`RR ${currentRR}`}}const outcome=matchCompletion(data,v,teamScore(v,'t1'),teamScore(v,'t2'),second);if(outcome.finished)info=outcome.result;$('chase').textContent=info;fitL7Chase();$('batter1').textContent=get(v,'batsman1Name','—');$('batter2').textContent=get(v,'batsman2Name','—');$('batter1Stats').textContent=get(v,'batsman1Runs','0')+' ('+get(v,'batsman1Balls','0')+')';$('batter2Stats').textContent=get(v,'batsman2Runs','0')+' ('+get(v,'batsman2Balls','0')+')';$('bowler').textContent=limitL7Name(get(v,'bowlerName','—'),18);$('bowlerStats').textContent=get(v,'bowlerWickets','0')+'/'+get(v,'bowlerRuns','0')+' ('+get(v,'bowlerOvers','0.0')+')';logo('logoBat','initialBat',bat==='t1'?v.secondLogo:v.firstLogo,batting);logo('logoBowl','initialBowl',bowl==='t1'?v.secondLogo:v.firstLogo,bowling);setBalls(data?.balls??v.balls,overs);const result=get(v,'matchResult',get(data,'result',''));const done=/complete|finished/i.test(get(v,'matchStatus',get(data,'status','')));message('')}
 function limitL7Name(value,max){const name=String(value??'—').trim();const chars=Array.from(name);return chars.length>max?chars.slice(0,max).join('').trimEnd()+'...':name;}
 window.ccLayout7Render=function(data){try{render(data);if(!document.body.classList.contains('layout7-toss-demo')){const oldBottom=document.getElementById('bottom');if(oldBottom)oldBottom.classList.remove('visible','projection');const oldText=document.getElementById('bottomText');if(oldText)oldText.textContent='';}message('');document.documentElement.classList.remove('cc-l7-awaiting-live')}catch(err){console.warn('Layout7 render failed',err);message('Score data unavailable')}};
 })();
@@ -5077,7 +5088,7 @@ body.layout7-toss-demo #ccL7 .board>.team .logo{background:linear-gradient(#ad14
 <style id="cc-eoo-cricbay-left-motion">
 /* Motion only. All scoreboard layout/score calculations remain unchanged.
    CricBay reference: 300ms cubic-bezier(.2,.7,.2,1) slide. */
-:root{--cc-eoo-motion:300ms;--cc-eoo-ease:cubic-bezier(.2,.7,.2,1)}
+:root{--cc-eoo-motion:520ms;--cc-eoo-ease:cubic-bezier(.2,.7,.2,1)}
 /* Normal layouts use the existing .overlay; layout 7 renders separately in #ccL7. */
 body:not(.layout7-active) .overlay{
   transition:transform var(--cc-eoo-motion) var(--cc-eoo-ease),opacity var(--cc-eoo-motion) ease!important;
@@ -5099,10 +5110,10 @@ body.layout7-active.cc-eoo-active #layout7Frame{
 /* The summary remains mounted during its leftward exit. */
 #freshEOO.visible{display:block!important}
 body.cc-eoo-active #freshEOO.visible{
-  animation:cc-eoo-enter-left var(--cc-eoo-motion) var(--cc-eoo-ease) 300ms both!important;
+  animation:cc-eoo-enter-left var(--cc-eoo-motion) var(--cc-eoo-ease) 520ms both!important;
 }
 body.cc-eoo-leaving #freshEOO.visible{
-  animation:cc-eoo-exit-left 350ms var(--cc-eoo-ease) both!important;
+  animation:cc-eoo-exit-left 520ms var(--cc-eoo-ease) both!important;
 }
 @keyframes cc-eoo-enter-left{
   from{opacity:0;translate:calc(-100vw - 50%) 0}
@@ -5157,6 +5168,16 @@ body.cc-eoo-leaving #freshEOO.visible{
  #freshEOO #fePartnership{font-size:clamp(18px,2.4vw,28px)!important;min-height:30px!important}
  #freshEOO .fe-situation{min-height:28px!important;margin-top:6px!important;padding:3px 15px!important;font-size:clamp(12px,1.7vw,20px)!important}
 }
+</style>
+
+<style id="cc-eoo-delivery-parity-and-suppression">
+/* Match Layout 7 footer delivery categories and palette exactly. */
+#freshEOO .fe-ball.run,#freshEOO .fe-ball.dot{background:linear-gradient(155deg,#c22b43 0%,#870918 55%,#4b0610 100%)!important;color:#fff!important;border-color:#c95a6c!important}
+#freshEOO .fe-ball.four{background:linear-gradient(155deg,#f8d76b 0%,#d4a017 49%,#8c5d05 100%)!important;color:#fff!important;border-color:#e7c35b!important}
+#freshEOO .fe-ball.six{background:linear-gradient(155deg,#52d991 0%,#16834a 50%,#07522c 100%)!important;color:#fff!important;border-color:#79dfab!important}
+#freshEOO .fe-ball.extra{background:linear-gradient(155deg,#5bb3f3 0%,#1769aa 50%,#073967 100%)!important;color:#fff!important;border-color:#7fc9f9!important}
+#freshEOO .fe-ball.wicket{background:linear-gradient(145deg,#ff6b70 0%,#ed182b 32%,#b5001b 70%,#720012 100%)!important;color:#fff!important;border-color:#fff1f1!important}
+body.cc-eoo-active #scoreEvent,body.cc-eoo-leaving #scoreEvent,body.cc-eoo-active .delivery-zoom-in,body.cc-eoo-leaving .delivery-zoom-in,body.cc-eoo-active [data-cc-eoo-zoom-clone],body.cc-eoo-leaving [data-cc-eoo-zoom-clone]{display:none!important;animation:none!important}
 </style>
 </body>
 </html>
